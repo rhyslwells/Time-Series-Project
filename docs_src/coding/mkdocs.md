@@ -199,6 +199,23 @@ Install with:
 uv sync --all-extras
 ```
 
+### Important: MkDocs 2.0 Breaking Changes
+
+MkDocs 2.0 (currently in development) will introduce backward-incompatible changes:
+
+- Plugin system will be removed
+- Theme overrides will break
+- No migration path for existing projects
+- Material for MkDocs will not be compatible
+
+**Action needed**: Before MkDocs 2.0 is released, we need to either:
+1. Lock to MkDocs 1.x
+2. Migrate to a different documentation tool
+3. Wait for Material for MkDocs to release a 2.0-compatible version
+
+Currently using MkDocs 1.5.x, so there's time to plan. Monitor:
+- https://squidfunk.github.io/mkdocs-material/blog/2026/02/18/mkdocs-2.0/
+
 ## GitHub Pages Settings
 
 Verify in repo Settings → Pages:
