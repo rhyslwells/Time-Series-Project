@@ -2,7 +2,7 @@
 
 A time series forecasting and analysis system focused on energy systems, flexibility forecasting, and optimization.
 
-See: https://rhyslwells.github.io/time-series-project
+See: https://rhyslwells.github.io/Time-Series-Project/
 
 
 ## Project Structure
