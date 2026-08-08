@@ -17,9 +17,9 @@ jobs:
 
       - run: pip install mkdocs mkdocs-material
 
-      - run: mkdocs build
+      - run: mkdocs build --site-dir docs
 
-      - uses: peaceiris/actions-gh-pages@v3
+      - uses: actions/upload-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./site
+          name: docs
+          path: docs/
