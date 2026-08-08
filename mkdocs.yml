@@ -38,6 +38,8 @@ nav:
       - data/index.md
       - Data Dictionary: data/dictionary.md
   - Exploration Notebooks: notebooks.md
+  - Coding:
+      - MkDocs Setup: coding/mkdocs.md
 
 plugins:
   - search
