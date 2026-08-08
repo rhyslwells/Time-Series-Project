@@ -37,8 +37,13 @@ dev = [
     "ruff>=0.1.0",
 ]
 
-[tool.uv]
-python-version = "3.10"
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
 
 [build-system]
 requires = ["hatchling"]

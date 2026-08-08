@@ -1,0 +1,49 @@
+site_name: Time Series Forecasting
+site_description: Energy forecasting and flexibility analysis
+site_author: Rhys Wells
+repo_url: https://github.com/yourusername/time-series-project
+repo_name: time-series-project
+
+theme:
+  name: material
+  palette:
+    - scheme: light
+      primary: blue
+      accent: blue
+    - scheme: dark
+      primary: blue
+      accent: blue
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - Architecture: architecture.md
+  - Findings:
+      - findings/index.md
+      - Asset Profiling: findings/asset_profiling.md
+      - Anomaly Detection: findings/anomaly_detection.md
+      - Forecast Uncertainty: findings/forecast_uncertainty.md
+  - Methodology:
+      - methodology/index.md
+      - Feature Engineering: methodology/feature_engineering.md
+      - Model Selection: methodology/model_selection.md
+  - Data:
+      - data/index.md
+      - Data Dictionary: data/dictionary.md
+  - Exploration Notebooks: notebooks.md
+
+plugins:
+  - search
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tasklist
+  - pymdownx.emoji
+  - tables
+  - admonition
