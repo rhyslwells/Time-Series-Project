@@ -1,0 +1,48 @@
+# Documentation & Solid Notes
+
+This directory contains tracked, stable documentation and findings. All files here are committed to git and serve as your project's knowledge base.
+
+## Subdirectories
+
+### `findings/`
+Validated analysis and discoveries. Findings that are worth keeping and referring back to.
+
+Examples:
+- Asset behavior patterns discovered through exploration
+- Model performance comparisons
+- Data quality issues and how they were resolved
+- Methodology validations
+
+### `methodology/`
+Documented approaches and processes. How you decided to do something and why.
+
+Examples:
+- Feature engineering decisions
+- Model selection rationale
+- Data preprocessing pipelines
+- Validation strategies
+
+### `data/`
+Data dictionaries, schema definitions, and data-related documentation.
+
+Examples:
+- Data dictionary: what each column means
+- Source definitions: where data comes from
+- Data quality notes
+- Known issues with specific datasets
+
+---
+
+## How Files Get Here
+
+1. **Explore** in IPython (notes go to `working_notes/`, local only)
+2. **Validate** your findings
+3. **Write up** in a marimo notebook for clarity
+4. **Move** the solid findings/methodology to this directory
+5. **Commit** to git
+
+Files in `docs/` should be:
+- Clear and self-contained
+- Written for future reference (not just for you right now)
+- Organized by topic
+- Easy to find when you need them later

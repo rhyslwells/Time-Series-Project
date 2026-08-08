@@ -44,26 +44,6 @@ For notebook-based analysis and consolidation:
 uv run marimo edit
 ```
 
-## Key Concepts
-
-See **notes.md** for a comprehensive overview of the forecasting architecture, including:
-
-- Basic forecast generation with uncertainty
-- Derived features and signals
-- Asset profiling and baseline estimation
-- Anomaly detection
-- Model health monitoring
-- Portfolio-level aggregation
-- Flexibility forecasting
-- Trading volume estimation
-
-## Development Workflow
-
-1. **Exploration**: Start with IPython for rapid testing
-2. **Consolidation**: Move validated work into marimo notebooks
-3. **Implementation**: Clean up into reusable modules
-4. **Reference**: Archive experimental or reference work to `/archive`
-
 ## Dependencies
 
 Core dependencies are kept minimal and focused:

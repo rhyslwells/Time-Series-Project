@@ -41,6 +41,9 @@ env/
 .ipynb_checkpoints/
 *.ipynb
 
+# Rough working notes (local only)
+working_notes/
+
 # Testing
 .pytest_cache/
 .coverage
