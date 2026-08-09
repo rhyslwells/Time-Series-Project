@@ -35,14 +35,11 @@ env/
 *.swp
 *.swo
 *~
-.DS_Store
 
 # Jupyter
 .ipynb_checkpoints/
 *.ipynb
 
-# Rough working notes (local only)
-working_notes/
 
 # Testing
 .pytest_cache/

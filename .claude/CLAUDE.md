@@ -64,12 +64,12 @@ Do not create supplementary scaffolding or examples unless explicitly requested.
 ## Exploration -> Consolidation -> Implementation
 
 1. **Exploration** (IPython): Test hypotheses, validate approaches, quick iterations in `working_notes/`
-2. **Consolidation** (Marimo): Document validated work, create reproducible notebooks
+2. **Consolidation** (Marimo): Document validated work, create reproducible notebooks in (source of truth) `docs_src/` and `working_notes`
 3. **Implementation** (src/): Clean, reusable modules for production use
 
 ## Forecasting System Layers
 
-Refer to `notes.md` for the canonical architecture. The system should progress:
+Refer to `working_notes` for the canonical architecture. The system should progress:
 
 ```
 Raw metering -> Forecasts -> Derived features -> Flexibility/uncertainty -> Optimization
@@ -103,7 +103,7 @@ Documentation should:
 - Remain concise
 - Avoid redundancy
 - Be updated only when relevant to the requested change
-- Be stored in `docs/` for solid, tracked findings
+- Be stored in `docs_src/` for solid, tracked findings
 - Be written for future reference, not just immediate use
 
 Do not generate documentation solely for the sake of documentation.
