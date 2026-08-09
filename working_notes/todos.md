@@ -16,9 +16,11 @@
 ## In Progress
 
 - [ ] Will mkdocs allow for ipynb still html output to be shown? or marimo?
-- [ ] We will need example data for multple assets metering data. We can have synetics data, it will have noise, no missing data for 1 week of ts intervalas being 30mins, with valutes in metering_kwh. 
-- [ ] We will need to update Claude.md to reflect the structure I am using. and the bluepint.md
-- [ ] We will need an index in claude.md for the project, and a table of contents in the blueprints.md. So we know the the structure of the project and where to find things and the decisions of choices made.
+- [x] We will need example data for multple assets metering data. We can have synetics data, it will have noise, no missing data for 1 week of ts intervalas being 30mins, with valutes in metering_kwh. 
+- [x] We will need to update Claude.md to reflect the structure I am using. and the bluepint.md
+- [x] We will need an index in claude.md for the project, and a table of contents in the blueprints.md. So we know the the structure of the project and where to find things and the decisions of choices made.
+
+
 
 
 ## Backlog: Architecture Implementation
@@ -62,18 +64,11 @@ Implementation follows main_idea.md layering. Tackle these in any order.
 ## Backlog: Supporting Infrastructure
 
 - [ ] Create data pipeline for loading metering data
-- [ ] Set up data quality checks and validation
-- [ ] Create data dictionary in docs_src/data/
 - [ ] Build model training framework
-- [ ] Create evaluation and benchmarking utilities
-- [ ] Set up experiment tracking
 
 ## Backlog: Testing & Quality
 
 - [ ] Write unit tests for core forecasting functions
-- [ ] Create integration tests for end-to-end pipeline
-- [ ] Set up CI/CD pipeline
-- [ ] Performance profiling and optimization
 
 ## Backlog: Documentation
 
