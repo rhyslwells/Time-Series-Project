@@ -17,7 +17,7 @@
 
 - [ ] Will mkdocs allow for ipynb still html output to be shown? or marimo?
 - [ ] We will need example data for multple assets metering data. We can have synetics data, it will have noise, no missing data for 1 week of ts intervalas being 30mins, with valutes in metering_kwh. 
-- [ ] We will need to update Claude.md to reflect the srtuructre I am using. and the bluepint.md
+- [ ] We will need to update Claude.md to reflect the structure I am using. and the bluepint.md
 - [ ] We will need an index in claude.md for the project, and a table of contents in the blueprints.md. So we know the the structure of the project and where to find things and the decisions of choices made.
 
 

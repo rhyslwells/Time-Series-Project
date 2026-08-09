@@ -209,6 +209,29 @@ def print_clustering_readiness(fingerprints):
         print(f"  Peak-to-avg ratio:       {mean_peak:.3f} +/- {std_peak:.3f}")
         print(f"  Intermittency ratio:     {mean_inter:.4f} +/- {std_inter:.4f}")
 
+def save_parquet_files(df, daily, ramp_stats, fingerprints):
+    data_dir = Path(__file__).parent.parent.parent / 'src' / 'data'
+    data_dir.mkdir(parents=True, exist_ok=True)
+
+    metering_path = data_dir / 'metering_data.parquet'
+    daily_path = data_dir / 'daily_metrics.parquet'
+    ramp_path = data_dir / 'ramp_rates.parquet'
+    fingerprint_path = data_dir / 'behavioral_fingerprints.parquet'
+
+    df.write_parquet(metering_path)
+    daily.write_parquet(daily_path)
+    ramp_stats.write_parquet(ramp_path)
+    fingerprints.write_parquet(fingerprint_path)
+
+    print("\n" + "=" * 70)
+    print("FILES SAVED")
+    print("=" * 70)
+    print(f"Metering data: {metering_path}")
+    print(f"Daily metrics: {daily_path}")
+    print(f"Ramp rates: {ramp_path}")
+    print(f"Fingerprints: {fingerprint_path}")
+    print()
+
 def main():
     print("\nLoading data...")
     df = load_data('metering_data_raw.csv')
@@ -234,6 +257,8 @@ def main():
     print(f"Negative values: {negative}")
     print(f"Date continuity: OK (no gaps)")
     print()
+
+    save_parquet_files(df, daily, ramp_stats, fingerprints)
 
 if __name__ == "__main__":
     main()
