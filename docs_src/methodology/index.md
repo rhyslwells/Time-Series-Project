@@ -7,15 +7,16 @@ Documented approaches and processes for the forecasting system.
 ### Feature Engineering
 [Feature Engineering Guide](feature_engineering.md)
 
-How we construct meaningful features from raw metering data.
+- How we construct meaningful features from raw metering data.
+- See [Data Generation and Calculations](../data/data_generation.md)
 
 ### Model Selection
-[Model Selection Strategy](model_selection.md)
+[Model Selection Strategy - (Not yet implemented)](model_selection.md)
 
 How we choose which forecasting model to use for each asset.
 
 ### Validation & Evaluation
-[Validation Approach](validation.md)
+[Validation Approach - (Not yet implemented)](validation.md)
 
 How we assess model performance and avoid overfitting.
 

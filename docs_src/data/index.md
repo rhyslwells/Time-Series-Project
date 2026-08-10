@@ -13,19 +13,14 @@ Characteristics, patterns, and behavioral profiles of the synthetic dataset used
 How synthetic metering data is generated and the calculations performed to produce daily metrics, behavioral features, and ramp rate analysis.
 
 ## Data Dictionary
-[Complete Dictionary](dictionary.md)
+[Complete Dictionary - (Not yet implemented)](dictionary.md)
 
 Column definitions, units, and value ranges.
 
 ## Data Quality
-[Data Quality Assessment](quality.md)
+[Data Quality Assessment - (Not yet implemented)](quality.md)
 
 Known issues, missing data patterns, and outliers.
-
-## Sources
-[Data Sources](sources.md)
-
-Where data comes from and how it's updated.
 
 ---
 

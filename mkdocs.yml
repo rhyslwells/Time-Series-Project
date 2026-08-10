@@ -9,12 +9,18 @@ site_dir: docs
 theme:
   name: material
   palette:
-    - scheme: light
-      primary: blue
-      accent: blue
     - scheme: dark
       primary: blue
       accent: blue
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to light mode
+    - scheme: light
+      primary: blue
+      accent: blue
+      toggle:
+        icon: material/lightbulb
+        name: Switch to dark mode
   features:
     - navigation.instant
     - navigation.tracking

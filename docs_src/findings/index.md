@@ -12,14 +12,14 @@ Exploration notebook: [asset_profiling_exploration.md](../../asset_profiling_exp
 Discovered behavioral fingerprints distinguish asset types. See the marimo notebook for interactive examples.
 
 ### Anomaly Detection
-[Anomaly Detection via Residuals](anomaly_detection.md)
+[Anomaly Detection via Residuals - (Not yet implemented)](anomaly_detection.md)
 
 Exploration notebook: [anomaly_detection_exploration.md](../../anomaly_detection_exploration.md)
 
 Using forecast residuals to identify operational anomalies.
 
 ### Forecast Uncertainty
-[Uncertainty Quantification](forecast_uncertainty.md)
+[Uncertainty Quantification - (Not yet implemented)](forecast_uncertainty.md)
 
 Exploration notebook: [forecast_uncertainty_exploration.md](../../forecast_uncertainty_exploration.md)
 
