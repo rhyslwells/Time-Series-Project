@@ -22,7 +22,6 @@
 
 
 
-
 ## Backlog: Architecture Implementation
 
 Implementation follows main_idea.md layering. Tackle these in any order.
