@@ -966,34 +966,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#mkdocsyml" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        mkdocs.yml
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#github-actions-workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GitHub Actions Workflow
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -1263,34 +1235,6 @@
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Configuration">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#mkdocsyml" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        mkdocs.yml
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#github-actions-workflow" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        GitHub Actions Workflow
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
 </li>
       
         <li class="md-nav__item">
@@ -1472,7 +1416,7 @@ vim<span class="w"> </span>docs_src/findings/my_finding.md
 </code></pre></div>
 <h3 id="2-commit-and-push">2. Commit and Push</h3>
 <div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>docs_src/
-git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Document new finding&quot;</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Document new finding"</span>
 git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
 </code></pre></div>
 <h3 id="3-github-actions-builds-automatically">3. GitHub Actions Builds Automatically</h3>
@@ -1500,30 +1444,6 @@ uv<span class="w"> </span>run<span class="w"> </span>mkdocs<span class="w"> </sp
 </code></pre></div>
 <p>Then visit <code>http://localhost:8000</code></p>
 <h2 id="configuration">Configuration</h2>
-<h3 id="mkdocsyml">mkdocs.yml</h3>
-<p>Key settings:</p>
-<div class="highlight"><pre><span></span><code><span class="nt">site_name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Time Series Forecasting</span>
-<span class="nt">docs_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docs_src</span><span class="w">           </span><span class="c1"># Read markdown from here</span>
-<span class="nt">site_dir</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">docs</span><span class="w">               </span><span class="c1"># Build to here</span>
-<span class="nt">theme</span><span class="p">:</span>
-<span class="w">  </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">material</span><span class="w">             </span><span class="c1"># Material design theme</span>
-
-<span class="nt">nav</span><span class="p">:</span><span class="w">                          </span><span class="c1"># Navigation structure</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Home</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">index.md</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Findings</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">findings/index.md</span>
-<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">etc...</span>
-</code></pre></div>
-<h3 id="github-actions-workflow">GitHub Actions Workflow</h3>
-<p>File: <code>.github/workflows/deploy.yml</code></p>
-<p>Triggers on:
-- Push to <code>main</code> branch
-- Changes to <code>docs_src/**</code> or <code>mkdocs.yml</code></p>
-<p>Does:
-1. Checkout code
-2. Install Python 3.10
-3. Install mkdocs and mkdocs-material
-4. Run <code>mkdocs build</code> (reads <code>docs_src/</code>, writes <code>docs/</code>)
-5. Commit and push <code>docs/</code> folder</p>
 <h2 id="do-not-manually-edit-docs">Do NOT Manually Edit docs/</h2>
 <p>The <code>docs/</code> folder is auto-generated. Any manual changes will be overwritten on the next build.</p>
 <p>Edit <code>docs_src/</code> instead.</p>
@@ -1546,7 +1466,7 @@ touch<span class="w"> </span>docs_src/findings/new_discovery.md
 <li>
 <p>Write content, commit, push:
    <div class="highlight"><pre><span></span><code>git<span class="w"> </span>add<span class="w"> </span>docs_src/
-git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;Add new discovery page&quot;</span>
+git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Add new discovery page"</span>
 git<span class="w"> </span>push
 </code></pre></div></p>
 </li>

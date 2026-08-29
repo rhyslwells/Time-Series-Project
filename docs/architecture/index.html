@@ -1070,13 +1070,13 @@ Optimization &amp; Trading
 <h2 id="standard-forecast-contract">Standard Forecast Contract</h2>
 <p>All forecasts use a consistent schema:</p>
 <div class="highlight"><pre><span></span><code><span class="p">{</span>
-    <span class="s2">&quot;asset_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>           <span class="c1"># Unique asset identifier</span>
-    <span class="s2">&quot;timestamp&quot;</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>     <span class="c1"># Forecast target time</span>
-    <span class="s2">&quot;yhat&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>            <span class="c1"># Point forecast</span>
-    <span class="s2">&quot;lower&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>           <span class="c1"># Lower prediction interval</span>
-    <span class="s2">&quot;upper&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>           <span class="c1"># Upper prediction interval</span>
-    <span class="s2">&quot;model_version&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>     <span class="c1"># Which model produced this</span>
-    <span class="s2">&quot;forecast_ts&quot;</span><span class="p">:</span> <span class="n">datetime</span>   <span class="c1"># When forecast was made</span>
+    <span class="s2">"asset_id"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>           <span class="c1"># Unique asset identifier</span>
+    <span class="s2">"timestamp"</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>     <span class="c1"># Forecast target time</span>
+    <span class="s2">"yhat"</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>            <span class="c1"># Point forecast</span>
+    <span class="s2">"lower"</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>           <span class="c1"># Lower prediction interval</span>
+    <span class="s2">"upper"</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>           <span class="c1"># Upper prediction interval</span>
+    <span class="s2">"model_version"</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>     <span class="c1"># Which model produced this</span>
+    <span class="s2">"forecast_ts"</span><span class="p">:</span> <span class="n">datetime</span>   <span class="c1"># When forecast was made</span>
 <span class="p">}</span>
 </code></pre></div>
 <h2 id="directory-layout">Directory Layout</h2>

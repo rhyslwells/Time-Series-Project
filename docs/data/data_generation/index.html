@@ -1011,52 +1011,8 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#why-drop-autocorrelation" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why drop autocorrelation?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#reproducibility" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reproducibility
-      
-    </span>
-  </a>
-  
-</li>
-        
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#integration-points" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Integration Points
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Next Steps
-      
-    </span>
-  </a>
   
 </li>
       
@@ -1166,7 +1122,7 @@ Interpretation:
 <div class="highlight"><pre><span></span><code>asset_id: string                    # ASSET_001 to ASSET_015
 timestamp: datetime                 # UTC, 30-minute intervals
 metering_kwh: float                 # Consumption (+) or generation (-)
-asset_type: string                  # &#39;ev_charging&#39; or &#39;solar_battery&#39;
+asset_type: string                  # 'ev_charging' or 'solar_battery'
 </code></pre></div></p>
 <p><strong>Size:</strong> 10,080 rows (15 assets × 14 days × 48 periods)</p>
 <p><strong>Usage:</strong>
@@ -1208,56 +1164,6 @@ peak_to_avg_ratio: float            # Peak load vs average load
 <li><strong>Adaptive forecasting:</strong> Yesterday's coefficient_of_variation informs today's uncertainty bands</li>
 <li><strong>Single fact table:</strong> Simplifies data contracts and downstream logic</li>
 <li><strong>Drift detection:</strong> Time-series of behavioral metrics reveals asset state changes</li>
-</ol>
-<h3 id="why-drop-autocorrelation">Why drop autocorrelation?</h3>
-<p>Autocorrelation is inherently meaningful at sub-daily granularity (intra-day seasonal patterns). At daily granularity, it becomes less interpretable. If needed, it can be recomputed from metering_data on demand.</p>
-<h3 id="reproducibility">Reproducibility</h3>
-<ul>
-<li>All calculations are deterministic</li>
-<li>Seed=42 ensures identical data across runs</li>
-<li>Parquet format preserves numeric precision (float64)</li>
-<li>Schema is versioned and documented</li>
-</ul>
-<hr />
-<h2 id="integration-points">Integration Points</h2>
-<table>
-<thead>
-<tr>
-<th>Consumer</th>
-<th>File(s)</th>
-<th>Purpose</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Forecasting models</td>
-<td>metering_data.parquet</td>
-<td>Training and validation</td>
-</tr>
-<tr>
-<td>Model selection</td>
-<td>daily_metrics.parquet</td>
-<td>Asset profiling, clustering</td>
-</tr>
-<tr>
-<td>Operational analysis</td>
-<td>daily_metrics.parquet</td>
-<td>Ramp constraints, flexibility</td>
-</tr>
-<tr>
-<td>Monitoring/QA</td>
-<td>daily_metrics.parquet</td>
-<td>Trend tracking, anomaly detection</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="next-steps">Next Steps</h2>
-<ol>
-<li>Use metering_data.parquet to train baseline forecasts</li>
-<li>Use daily_metrics behavioral metrics for adaptive model selection</li>
-<li>Validate forecasts against daily energy targets</li>
-<li>Use ramp rate metrics to inform operational constraints</li>
 </ol>
 
 
