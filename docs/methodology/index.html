@@ -603,17 +603,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#feature-engineering" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Feature Engineering
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#model-selection" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -637,67 +626,6 @@
         
       </ul>
     </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#decision-log" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Decision Log
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Decision Log">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#why-standard-forecast-contract" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why Standard Forecast Contract?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#why-asset-profiling-first" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why Asset Profiling First?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#why-prediction-intervals-over-point-forecasts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why Prediction Intervals Over Point Forecasts?
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related-resources" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related Resources
-      
-    </span>
-  </a>
   
 </li>
       
@@ -1031,17 +959,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#feature-engineering" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Feature Engineering
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#model-selection" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1068,67 +985,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#decision-log" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Decision Log
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Decision Log">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#why-standard-forecast-contract" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why Standard Forecast Contract?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#why-asset-profiling-first" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why Asset Profiling First?
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#why-prediction-intervals-over-point-forecasts" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Why Prediction Intervals Over Point Forecasts?
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related-resources" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related Resources
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1152,46 +1008,12 @@
 <h1 id="methodology">Methodology</h1>
 <p>Documented approaches and processes for the forecasting system.</p>
 <h2 id="core-methodologies">Core Methodologies</h2>
-<h3 id="feature-engineering">Feature Engineering</h3>
-<p><a href="feature_engineering.md">Feature Engineering Guide</a></p>
-<ul>
-<li>How we construct meaningful features from raw metering data.</li>
-<li>See <a href="../data/data_generation/">Data Generation and Calculations</a></li>
-</ul>
 <h3 id="model-selection">Model Selection</h3>
 <p><a href="model_selection.md">Model Selection Strategy - (Not yet implemented)</a></p>
 <p>How we choose which forecasting model to use for each asset.</p>
 <h3 id="validation-evaluation">Validation &amp; Evaluation</h3>
 <p><a href="validation.md">Validation Approach - (Not yet implemented)</a></p>
 <p>How we assess model performance and avoid overfitting.</p>
-<hr />
-<h2 id="decision-log">Decision Log</h2>
-<p>This section documents why we chose certain approaches.</p>
-<h3 id="why-standard-forecast-contract">Why Standard Forecast Contract?</h3>
-<ul>
-<li><strong>Problem</strong>: Different models output different schemas</li>
-<li><strong>Solution</strong>: Standardize on <code>(asset_id, timestamp, yhat, lower, upper, model_version)</code></li>
-<li><strong>Benefit</strong>: Models become swappable without downstream changes</li>
-</ul>
-<h3 id="why-asset-profiling-first">Why Asset Profiling First?</h3>
-<ul>
-<li><strong>Problem</strong>: Single model doesn't work for all assets</li>
-<li><strong>Solution</strong>: Classify assets, use targeted models per class</li>
-<li><strong>Benefit</strong>: Better accuracy, clearer model assignment logic</li>
-</ul>
-<h3 id="why-prediction-intervals-over-point-forecasts">Why Prediction Intervals Over Point Forecasts?</h3>
-<ul>
-<li><strong>Problem</strong>: Users need to know forecast reliability</li>
-<li><strong>Solution</strong>: Always provide lower and upper bounds</li>
-<li><strong>Benefit</strong>: Enables risk-aware decision making in optimization</li>
-</ul>
-<hr />
-<h2 id="related-resources">Related Resources</h2>
-<ul>
-<li><a href="../architecture/">Architecture Overview</a> - System design</li>
-<li><a href="../notebooks/">Exploration Notebooks</a> - How we validated these approaches</li>
-<li><a href="../findings/">Findings</a> - What we discovered</li>
-</ul>
 
 
 
