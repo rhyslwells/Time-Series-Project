@@ -169,33 +169,3 @@ Previously, behavioral metrics and ramp rates were stored separately (15 rows ea
 3. **Single fact table:** Simplifies data contracts and downstream logic
 4. **Drift detection:** Time-series of behavioral metrics reveals asset state changes
 
-### Why drop autocorrelation?
-
-Autocorrelation is inherently meaningful at sub-daily granularity (intra-day seasonal patterns). At daily granularity, it becomes less interpretable. If needed, it can be recomputed from metering_data on demand.
-
-### Reproducibility
-
-- All calculations are deterministic
-- Seed=42 ensures identical data across runs
-- Parquet format preserves numeric precision (float64)
-- Schema is versioned and documented
-
----
-
-## Integration Points
-
-| Consumer | File(s) | Purpose |
-|----------|---------|---------|
-| Forecasting models | metering_data.parquet | Training and validation |
-| Model selection | daily_metrics.parquet | Asset profiling, clustering |
-| Operational analysis | daily_metrics.parquet | Ramp constraints, flexibility |
-| Monitoring/QA | daily_metrics.parquet | Trend tracking, anomaly detection |
-
----
-
-## Next Steps
-
-1. Use metering_data.parquet to train baseline forecasts
-2. Use daily_metrics behavioral metrics for adaptive model selection
-3. Validate forecasts against daily energy targets
-4. Use ramp rate metrics to inform operational constraints

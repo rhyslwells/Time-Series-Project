@@ -1,6 +1,6 @@
 # Synthetic Metering Data Description
 
-This document describes the characteristics, patterns, and behavior of the synthetic metering dataset used for model development and testing.
+This document describes the characteristics, patterns, and behavior of the synthetic metering dataset (src\data\metering_data.parquet) used for model development and testing.
 
 ## Dataset Overview
 
@@ -96,15 +96,6 @@ This document describes the characteristics, patterns, and behavior of the synth
 
 ## Data Quality and Characteristics
 
-### Completeness
-
-| Metric | Value |
-|--------|-------|
-| Missing values | 0 |
-| Data gaps | None (continuous 30-min intervals) |
-| Complete asset records | 15/15 (1,344 rows each) |
-| Completeness | 100% |
-
 ### Value Distribution
 
 **Range:**
@@ -170,17 +161,17 @@ The data includes realistic noise to make patterns non-trivial for forecasting:
 
 ### Limitations
 
-✗ **Not suitable for production forecasts**
+**Not suitable for production forecasts**
 - Too short (2 weeks << seasonal patterns)
 - Unrealistic (no missing data, no weather data, no real-world noise)
 - Synthetic patterns won't match production assets
 
-✗ **Not suitable for long-term trend analysis**
+**Not suitable for long-term trend analysis**
 - Only 14 days (no seasonal variation, no drift)
 - No year-over-year comparison
 - No holiday effects or special events
 
-✗ **Not suitable for uncertainty calibration**
+**Not suitable for uncertainty calibration**
 - Noise levels don't reflect real forecasting error
 - Weather variability not represented (solar assets)
 - Operational changes not captured
@@ -193,16 +184,6 @@ The data includes realistic noise to make patterns non-trivial for forecasting:
 |----------|------|---|---|---|---|
 | ASSET_001-008 | EV Charging | ~1.8 | ~0.79 | ~2.2 | Predictable peaks |
 | ASSET_009-015 | Solar+Battery | ~0.03 | ~45 | ~90 | Net exporter |
-
----
-
-## Next Steps
-
-1. **Baseline Forecasts:** Use metering_data.parquet to train models
-2. **Asset Profiling:** Use daily_metrics.parquet to study behavioral differences
-3. **Model Selection:** Demonstrate adaptive model choice based on asset type
-4. **Forecasting:** Evaluate models on held-out days
-5. **Transition:** Document path to real metering data integration
 
 ---
 

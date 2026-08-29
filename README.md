@@ -5,18 +5,6 @@ A time series forecasting and analysis system focused on energy systems, flexibi
 See: https://rhyslwells.github.io/Time-Series-Project/
 
 
-## Project Structure
-
-```
-.
-├── README.md              # This file
-├── CLAUDE.md              # AI assistant collaboration guidelines
-├── pyproject.toml         # Project dependencies and config
-├── notes.md               # Forecasting architecture and strategy
-├── archive/               # Reference scripts and experimental work
-└── src/                   # Main source code (to be created)
-```
-
 ## Setup
 
 ### Prerequisites

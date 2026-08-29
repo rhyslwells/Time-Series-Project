@@ -89,38 +89,6 @@ Then visit `http://localhost:8000`
 
 ## Configuration
 
-### mkdocs.yml
-
-Key settings:
-
-```yaml
-site_name: Time Series Forecasting
-docs_dir: docs_src           # Read markdown from here
-site_dir: docs               # Build to here
-theme:
-  name: material             # Material design theme
-
-nav:                          # Navigation structure
-  - Home: index.md
-  - Findings: findings/index.md
-  - etc...
-```
-
-### GitHub Actions Workflow
-
-File: `.github/workflows/deploy.yml`
-
-Triggers on:
-- Push to `main` branch
-- Changes to `docs_src/**` or `mkdocs.yml`
-
-Does:
-1. Checkout code
-2. Install Python 3.10
-3. Install mkdocs and mkdocs-material
-4. Run `mkdocs build` (reads `docs_src/`, writes `docs/`)
-5. Commit and push `docs/` folder
-
 ## Do NOT Manually Edit docs/
 
 The `docs/` folder is auto-generated. Any manual changes will be overwritten on the next build.
