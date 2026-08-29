@@ -16,37 +16,30 @@ uv run marimo edit <notebook>.md
 
 ## Available Notebooks
 
-### Foundational
-
-- **[forecast_basics_exploration.md](../forecast_basics_exploration.md)**: Basic point forecasting with uncertainty intervals
-- **[asset_classification_exploration.md](../asset_classification_exploration.md)**: Behavioral profiling and clustering
-
-### Deep Dives
-
-- **[asset_profiling_exploration.md](../asset_profiling_exploration.md)**: Detailed asset fingerprinting
-  - Status: Validated
-  - Finding: [Asset Profiling Analysis](findings/asset_profiling.md)
-
-- **[anomaly_detection_exploration.md](../anomaly_detection_exploration.md)**: Detecting operational anomalies via residuals
-  - Status: In progress
-  - Related: [Anomaly Detection](findings/anomaly_detection.md)
-
-- **[forecast_uncertainty_exploration.md](../forecast_uncertainty_exploration.md)**: Quantifying prediction interval quality
-  - Status: Planning
-  - Related: [Forecast Uncertainty](findings/forecast_uncertainty.md)
-
-- **[flexibility_forecasting_exploration.md](../flexibility_forecasting_exploration.md)**: Capacity envelope estimation
-  - Status: Planning
-
-- **[portfolio_aggregation_exploration.md](../portfolio_aggregation_exploration.md)**: Multi-asset correlation and aggregation
-  - Status: Planning
-
-## Status Legend
+### Status Legend
 
 - **Planning**: Not started, outline ready
 - **In progress**: Active exploration
 - **Validated**: Results documented in Findings
 - **Production**: Implemented in src/
+
+### Foundational
+
+- **forecast_basics_exploration.md**: Basic point forecasting with uncertainty intervals
+  - Status: Planning
+  - Finding: [Forecast Basics Exploration](findings/forecast_basics_exploration.md)
+
+- **asset_classification_exploration.md**: Behavioral profiling and clustering
+  - Status: Planning
+  - Finding: [Asset Classification Exploration](findings/asset_classification_exploration.md)
+
+- **asset_profiling_exploration.md**: Detailed asset fingerprinting
+  - Status: Planning
+  - Finding: [Asset Profiling Exploration](findings/asset_profiling_exploration.md)
+
+- **forecast_uncertainty_exploration.md**: Quantifying prediction interval quality
+  - Status: Planning
+  - Finding: [Forecast Uncertainty Exploration](findings/forecast_uncertainty_exploration.md)
 
 ## Creating a New Notebook
 
