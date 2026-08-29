@@ -25,9 +25,9 @@
 - [ ] What can we infer from the daily_metrics behavioral metrics?, asset profiling/clustering, also see docs_src\data\data_generation.md ### Why consolidate into daily_metrics? for more details.
 - [ ] Use src\data\metering_data.parquet autocorrolation. 
 
-1. **Baseline Forecasts:** Use metering_data.parquet to train models
-2. **Asset Profiling:** Use daily_metrics.parquet to study behavioral differences
-3. **Forecasting:** Evaluate models on held-out days
+- [ ] **Baseline Forecasts:** Use metering_data.parquet to train models
+- [ ] **Asset Profiling:** Use daily_metrics.parquet to study behavioral differences
+- [ ] **Forecasting:** Evaluate models on held-out days
 
 
 ## Backlog: Architecture Implementation
