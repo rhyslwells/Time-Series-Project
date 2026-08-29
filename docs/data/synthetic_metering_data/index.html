@@ -917,17 +917,6 @@
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#completeness" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Completeness
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
   <a href="#value-distribution" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1016,17 +1005,6 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Next Steps
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
   <a href="#reproducibility" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1058,7 +1036,7 @@
 
 
 <h1 id="synthetic-metering-data-description">Synthetic Metering Data Description</h1>
-<p>This document describes the characteristics, patterns, and behavior of the synthetic metering dataset used for model development and testing.</p>
+<p>This document describes the characteristics, patterns, and behavior of the synthetic metering dataset (src\data\metering_data.parquet) used for model development and testing.</p>
 <h2 id="dataset-overview">Dataset Overview</h2>
 <p><strong>Purpose:</strong> Provide realistic, reproducible metering data for developing and validating energy forecasting systems.</p>
 <p><strong>Temporal Coverage:</strong>
@@ -1130,33 +1108,6 @@
 - Requires probabilistic forecasts to capture tail risk</p>
 <hr />
 <h2 id="data-quality-and-characteristics">Data Quality and Characteristics</h2>
-<h3 id="completeness">Completeness</h3>
-<table>
-<thead>
-<tr>
-<th>Metric</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Missing values</td>
-<td>0</td>
-</tr>
-<tr>
-<td>Data gaps</td>
-<td>None (continuous 30-min intervals)</td>
-</tr>
-<tr>
-<td>Complete asset records</td>
-<td>15/15 (1,344 rows each)</td>
-</tr>
-<tr>
-<td>Completeness</td>
-<td>100%</td>
-</tr>
-</tbody>
-</table>
 <h3 id="value-distribution">Value Distribution</h3>
 <p><strong>Range:</strong>
 - Minimum: -1.8 kW (solar export)
@@ -1204,15 +1155,15 @@
 - Reproducible (seed=42)
 - All assumptions documented</p>
 <h3 id="limitations">Limitations</h3>
-<p>✗ <strong>Not suitable for production forecasts</strong>
+<p><strong>Not suitable for production forecasts</strong>
 - Too short (2 weeks &lt;&lt; seasonal patterns)
 - Unrealistic (no missing data, no weather data, no real-world noise)
 - Synthetic patterns won't match production assets</p>
-<p>✗ <strong>Not suitable for long-term trend analysis</strong>
+<p><strong>Not suitable for long-term trend analysis</strong>
 - Only 14 days (no seasonal variation, no drift)
 - No year-over-year comparison
 - No holiday effects or special events</p>
-<p>✗ <strong>Not suitable for uncertainty calibration</strong>
+<p><strong>Not suitable for uncertainty calibration</strong>
 - Noise levels don't reflect real forecasting error
 - Weather variability not represented (solar assets)
 - Operational changes not captured</p>
@@ -1248,15 +1199,6 @@
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="next-steps">Next Steps</h2>
-<ol>
-<li><strong>Baseline Forecasts:</strong> Use metering_data.parquet to train models</li>
-<li><strong>Asset Profiling:</strong> Use daily_metrics.parquet to study behavioral differences</li>
-<li><strong>Model Selection:</strong> Demonstrate adaptive model choice based on asset type</li>
-<li><strong>Forecasting:</strong> Evaluate models on held-out days</li>
-<li><strong>Transition:</strong> Document path to real metering data integration</li>
-</ol>
 <hr />
 <h2 id="reproducibility">Reproducibility</h2>
 <p>To regenerate this data:
