@@ -23,13 +23,7 @@ Examples:
 - Validation strategies
 
 ### `data/`
-Data dictionaries, schema definitions, and data-related documentation.
-
-Examples:
-- Data dictionary: what each column means
-- Source definitions: where data comes from
-- Data quality notes
-- Known issues with specific datasets
+Data-related documentation.
 
 ---
 
