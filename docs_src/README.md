@@ -35,13 +35,7 @@ Examples:
 
 ## How Files Get Here
 
-1. **Explore** in IPython (notes go to `working_notes/`, local only)
-2. **Validate** your findings
-3. **Write up** in a marimo notebook for clarity
-4. **Move** the solid findings/methodology to this directory
-5. **Commit** to git
-
-Files in `docs/` should be:
+Files in `docs_src/` should be:
 - Clear and self-contained
 - Written for future reference (not just for you right now)
 - Organized by topic
