@@ -85,11 +85,3 @@ See [Data Generation and Calculations](../../docs_src/data/data_generation.md#ou
 - **Behavioral:** Daily CV, intermittency, peak-to-avg ratio enable adaptive models
 - **Operationally useful:** Ramp rates inform flexibility constraints
 
----
-
-## Next Steps
-
-1. Use metering_data.parquet to train forecasting models
-2. Use daily_metrics for asset profiling and model selection
-3. Validate forecasts against daily energy targets
-4. Test ramp constraints in optimization

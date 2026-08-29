@@ -1,32 +1,5 @@
 # System Architecture
 
-See [notes.md](../notes.md) for the complete strategic design.
-
-## Layered Progression
-
-```
-Metering Data
-    |
-    v
-Point Forecasts + Uncertainty
-    |
-    +---> Daily Energy
-    +---> Peak/Ramp Rates
-    +---> Asset Profiles
-    |
-    v
-Anomaly Detection
-    |
-    v
-Flexibility Envelope
-    |
-    v
-Portfolio Aggregation
-    |
-    v
-Optimization & Trading
-```
-
 ## Key Principles
 
 1. **Forecast as intermediate layer**: Not a final output, but input to downstream analysis
@@ -50,30 +23,3 @@ All forecasts use a consistent schema:
     "forecast_ts": datetime   # When forecast was made
 }
 ```
-
-## Directory Layout
-
-```
-src/
-├── forecasting/          # Core forecasting models
-├── features/             # Feature engineering
-├── anomaly/              # Anomaly detection
-└── utils/                # Shared utilities
-
-docs/
-├── findings/             # Validated discoveries
-├── methodology/          # How we do things
-└── data/                 # Data documentation
-
-archive/
-└── [experimental work]
-
-working_notes/            # Untracked scratch space
-```
-
-## Development Workflow
-
-1. **Explore** in IPython, save to `working_notes/`
-2. **Validate** with marimo notebooks
-3. **Consolidate** findings into `docs/`
-4. **Implement** clean code in `src/`
