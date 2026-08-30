@@ -48,7 +48,6 @@ nav:
 plugins:
   - search
   - marimo
-  - plotly
 
 markdown_extensions:
   - pymdownx.highlight
@@ -61,3 +60,4 @@ markdown_extensions:
   - pymdownx.blocks.details
   - pymdownx.blocks.html
   - pymdownx.blocks.tab
+  - pymdownx.blocks

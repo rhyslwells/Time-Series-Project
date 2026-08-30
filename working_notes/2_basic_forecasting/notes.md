@@ -5,6 +5,8 @@
 
 https://github.com/marimo-team/marimo/tree/main/examples
 
+Look into this: https://marimo-team.github.io/mkdocs-marimo/getting-started/blocks/
+
 Use working_notes\2_basic_forecasting\main.py
 
 Build a marimo script for only the SARIMA model.

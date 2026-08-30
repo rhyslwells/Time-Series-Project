@@ -19,8 +19,10 @@ This notebook demonstrates a principled forecasting pipeline:
 
 Explore the SARIMA forecasting workflow interactively:
 
-/// marimo
-notebook: ../../working_notes/2_basic_forecasting/sarima_marimo.py
+/// marimo-embed-file
+filepath: working_notes/2_basic_forecasting/sarima_marimo.py
+height: 1000px
+show_source: false
 ///
 
 ## Key Findings
