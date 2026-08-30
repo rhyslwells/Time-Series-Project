@@ -3,6 +3,8 @@
 
 # Marimo Building
 
+https://github.com/marimo-team/marimo/tree/main/examples
+
 Use working_notes\2_basic_forecasting\main.py
 
 Build a marimo script for only the SARIMA model.
