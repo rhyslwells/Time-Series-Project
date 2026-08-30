@@ -1,6 +1,18 @@
 
 
 
+# Marimo Building
+
+Use working_notes\2_basic_forecasting\main.py
+
+Build a marimo script
+
+Use C:\Users\RhysL\Desktop\Time Series Project\working_notes\main_idea.md
+
+for context for where it is needed.
+
+# Prompt for main.py
+
 Focus Basic Forecasting
 
 Lets start with a ipython file here
@@ -17,3 +29,5 @@ load an asset from metering_data.parquet and train a baseline forecast model. Ev
 
 - [ ] Implement point forecast with uncertainty intervals
 - [ ] Set up standard forecast output contract (asset_id, timestamp, yhat, lower, upper, model_version)
+
+

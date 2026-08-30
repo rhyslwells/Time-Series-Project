@@ -1,8 +1,9 @@
 import polars as pl
 import numpy as np
 from datetime import datetime, timedelta
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 from statsmodels.tsa.statespace.sarimax import SARIMAX
+from statsmodels.tsa.holtwinters import ExponentialSmoothing
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 import warnings
 
@@ -68,62 +69,116 @@ print("\nTrain/Test Split:")
 print(split_info)
 
 # ============================================================================
-# SECTION 3: BASELINE FORECAST MODEL (SARIMA)
+# SECTION 3: SELECT AND FIT FORECAST MODEL
 # ============================================================================
 
-# Fit SARIMA model
-# Order: (p, d, q) = (1, 1, 1) - basic differencing
-# Seasonal: (P, D, Q, s) = (1, 1, 1, 48) - 48 half-hourly periods per day
+# Choose model: "SARIMA" or "ExponentialSmoothing"
+# MODEL_TYPE = "SARIMA"
+MODEL_TYPE = "ExponentialSmoothing"  # Uncomment to use Exponential Smoothing
 
-# There wont be any seasonality here as the data is only for 14 days
-print("\nFitting SARIMA model...")
+# ============================================================================
+# SECTION 3.1: SARIMA MODEL
+# ============================================================================
 
-model_config = pl.DataFrame(
-    {
-        "Parameter": ["Order (p,d,q)", "Seasonal Order (P,D,Q,s)"],
-        "Value": ["(1, 1, 1)", "(1, 1, 1, 48)"],
-    }
-)
-print(model_config)
-
-try:
-    model = SARIMAX(
-        y_train,
-        order=(1, 1, 1),
-        seasonal_order=(1, 1, 1, 48),
-        enforce_stationarity=False,
-        enforce_invertibility=False,
+if MODEL_TYPE == "SARIMA":
+    print("\nFitting SARIMA model...")
+    model_config = pl.DataFrame(
+        {
+            "Parameter": ["Order (p,d,q)", "Seasonal Order (P,D,Q,s)"],
+            "Value": ["(1, 1, 1)", "(1, 1, 1, 48)"],
+        }
     )
-    results = model.fit(disp=False, maxiter=1000)
-    model_status = "Success"
-    aic_value = f"{results.aic:.2f}"
-except Exception as e:
-    print(f"Error fitting model: {e}")
-    print("Falling back to simpler model...")
-    model = SARIMAX(y_train, order=(1, 0, 1), seasonal_order=(0, 0, 0, 48))
-    results = model.fit(disp=False)
-    model_status = "Simplified"
-    aic_value = f"{results.aic:.2f}"
+    print(model_config)
 
-model_result = pl.DataFrame(
-    {"Metric": ["Status", "AIC"], "Value": [model_status, aic_value]}
-)
-print(model_result)
+    try:
+        model = SARIMAX(
+            y_train,
+            order=(1, 1, 1),
+            seasonal_order=(1, 1, 1, 48),
+            enforce_stationarity=False,
+            enforce_invertibility=False,
+        )
+        results = model.fit(disp=False, maxiter=1000)
+        model_status = "Success"
+        aic_value = f"{results.aic:.2f}"
+    except Exception as e:
+        print(f"Error fitting model: {e}")
+        print("Falling back to simpler model...")
+        model = SARIMAX(y_train, order=(1, 0, 1), seasonal_order=(0, 0, 0, 48))
+        results = model.fit(disp=False)
+        model_status = "Simplified"
+        aic_value = f"{results.aic:.2f}"
+
+    model_result = pl.DataFrame(
+        {"Metric": ["Status", "AIC"], "Value": [model_status, aic_value]}
+    )
+    print(model_result)
+
+# ============================================================================
+# SECTION 3.2: EXPONENTIAL SMOOTHING MODEL (HOLT-WINTERS)
+# ============================================================================
+
+elif MODEL_TYPE == "ExponentialSmoothing":
+    print("\nFitting Exponential Smoothing (Holt-Winters) model...")
+
+    model_config = pl.DataFrame(
+        {
+            "Parameter": ["Trend", "Seasonal", "Seasonal Period"],
+            "Value": ["Additive", "Additive", "48 (daily)"],
+        }
+    )
+    print(model_config)
+
+    try:
+        model = ExponentialSmoothing(
+            y_train,
+            trend="add",
+            seasonal="add",
+            seasonal_periods=48,
+        )
+        results = model.fit(optimized=True)
+        model_status = "Success"
+        aic_value = f"{results.aic:.2f}"
+    except Exception as e:
+        print(f"Error fitting Exponential Smoothing: {e}")
+        print("Falling back to simpler ES model...")
+        model = ExponentialSmoothing(
+            y_train,
+            trend="add",
+            seasonal=None,
+        )
+        results = model.fit(optimized=True)
+        model_status = "Simplified"
+        aic_value = f"{results.aic:.2f}"
+
+    model_result = pl.DataFrame(
+        {"Metric": ["Status", "AIC"], "Value": [model_status, aic_value]}
+    )
+    print(model_result)
 
 # ============================================================================
 # SECTION 4: GENERATE FORECASTS WITH UNCERTAINTY INTERVALS
 # ============================================================================
 
-# Forecast on test set
 forecast_steps = len(y_test)
-forecast = results.get_forecast(steps=forecast_steps)
-
-# Extract point forecast and prediction intervals
-yhat = np.asarray(forecast.predicted_mean)
 confidence_level = 0.80  # 80% prediction interval (P10 and P90)
-forecast_ci = np.asarray(forecast.conf_int(alpha=1 - confidence_level))
-lower = forecast_ci[:, 0]
-upper = forecast_ci[:, 1]
+
+if MODEL_TYPE == "SARIMA":
+    forecast = results.get_forecast(steps=forecast_steps)
+    yhat = np.asarray(forecast.predicted_mean)
+    forecast_ci = np.asarray(forecast.conf_int(alpha=1 - confidence_level))
+    lower = forecast_ci[:, 0]
+    upper = forecast_ci[:, 1]
+
+elif MODEL_TYPE == "ExponentialSmoothing":
+    yhat = results.forecast(steps=forecast_steps)
+
+    # Estimate uncertainty from training residuals
+    residuals = y_train - results.fittedvalues
+    residual_std = np.std(residuals)
+    z_score = 1.282  # 80% confidence interval
+    lower = yhat - z_score * residual_std
+    upper = yhat + z_score * residual_std
 
 forecast_config = pl.DataFrame(
     {
@@ -161,42 +216,54 @@ print(
 )
 
 # Quick visualization: Forecast vs Actual
-fig, ax = plt.subplots(figsize=(14, 6))
-test_range = range(len(forecast_df))
-ax.plot(
-    test_range,
-    forecast_df["actual"],
-    "o-",
-    label="Actual",
-    linewidth=2,
-    markersize=4,
-    color="#1f77b4",
+fig = go.Figure()
+test_range = list(range(len(forecast_df)))
+
+fig.add_trace(
+    go.Scatter(
+        x=test_range,
+        y=forecast_df["actual"],
+        mode="lines+markers",
+        name="Actual",
+        line=dict(color="#1f77b4", width=2),
+        marker=dict(size=4),
+    )
 )
-ax.plot(
-    test_range,
-    forecast_df["prediction"],
-    "s-",
-    label="Forecast",
-    linewidth=2,
-    markersize=4,
-    alpha=0.7,
-    color="#ff7f0e",
+
+fig.add_trace(
+    go.Scatter(
+        x=test_range,
+        y=forecast_df["prediction"],
+        mode="lines+markers",
+        name="Forecast",
+        line=dict(color="#ff7f0e", width=2),
+        marker=dict(size=4),
+        opacity=0.7,
+    )
 )
-ax.fill_between(
-    test_range,
-    forecast_df["lower"],
-    forecast_df["upper"],
-    alpha=0.2,
-    label=f"{confidence_level * 100:.0f}% PI",
-    color="#ff7f0e",
+
+fig.add_trace(
+    go.Scatter(
+        x=test_range + test_range[::-1],
+        y=forecast_df["upper"].to_list() + forecast_df["lower"].to_list()[::-1],
+        fill="toself",
+        fillcolor="rgba(255, 127, 14, 0.2)",
+        line=dict(color="rgba(255,255,255,0)"),
+        name=f"{confidence_level * 100:.0f}% PI",
+        hoverinfo="skip",
+    )
 )
-ax.set_xlabel("Test Period (half-hourly intervals)", fontsize=11)
-ax.set_ylabel("Metering (kWh)", fontsize=11)
-ax.set_title(f"SARIMA Forecast vs Actual - {asset_id}", fontsize=13, fontweight="bold")
-ax.legend(fontsize=10)
-ax.grid(True, alpha=0.3)
-plt.tight_layout()
-plt.show()
+
+fig.update_layout(
+    title=f"SARIMA Forecast vs Actual - {asset_id}",
+    xaxis_title="Test Period (half-hourly intervals)",
+    yaxis_title="Metering (kWh)",
+    hovermode="x unified",
+    template="plotly_white",
+    height=600,
+    width=1400,
+)
+fig.show()
 
 
 # ============================================================================
@@ -300,68 +367,163 @@ print(probability_events)
 # SECTION 9: FULL VISUALIZATION
 # ============================================================================
 
-fig, axes = plt.subplots(3, 1, figsize=(14, 10))
-
 # Plot 1: Full time series with train/test split
-ax = axes[0]
-ax.plot(
-    range(len(y_train)), y_train, "o-", label="Training data", linewidth=1, markersize=2
+fig1 = go.Figure()
+train_range = list(range(len(y_train)))
+full_range = list(range(len(y_train), len(y)))
+
+fig1.add_trace(
+    go.Scatter(
+        x=train_range,
+        y=y_train,
+        mode="lines+markers",
+        name="Training data",
+        line=dict(width=1),
+        marker=dict(size=2),
+    )
 )
-ax.plot(
-    range(len(y_train), len(y)),
-    y_test,
-    "o-",
-    label="Test data",
-    linewidth=1,
-    markersize=2,
+
+fig1.add_trace(
+    go.Scatter(
+        x=full_range,
+        y=y_test,
+        mode="lines+markers",
+        name="Test data",
+        line=dict(width=1),
+        marker=dict(size=2),
+    )
 )
-ax.axvline(
-    x=len(y_train), color="red", linestyle="--", alpha=0.5, label="Train/Test split"
+
+fig1.add_vline(
+    x=len(y_train),
+    line_dash="dash",
+    line_color="red",
+    opacity=0.5,
+    annotation_text="Train/Test split",
+    annotation_position="top",
 )
-ax.set_ylabel("Metering (kWh)")
-ax.set_title(f"Asset {asset_id}: Time Series with Train/Test Split")
-ax.legend()
-ax.grid(True, alpha=0.3)
+
+fig1.update_layout(
+    title=f"Asset {asset_id}: Time Series with Train/Test Split",
+    xaxis_title="Time Period (half-hourly intervals)",
+    yaxis_title="Metering (kWh)",
+    hovermode="x unified",
+    template="plotly_white",
+    height=600,
+    width=1400,
+)
+fig1.show()
 
 # Plot 2: Forecast vs Actual (test period)
-ax = axes[1]
-test_range = range(len(y_test))
-ax.plot(test_range, y_test, "o-", label="Actual", linewidth=1.5, markersize=3)
-ax.plot(
-    test_range, yhat, "s-", label="Forecast", linewidth=1.5, markersize=3, alpha=0.7
+
+# For a plot between 1 and 2 you could have plot 1 but with the 80% PI on the forecast section
+# like 2 without the Actual.
+
+# Looking at 2 some questions which will arise are to evaluate the actual versus the 80% PI interval,
+# Like how many actual points fall outside the 80% PI interval.
+
+fig2 = go.Figure()
+test_range = list(range(len(y_test)))
+
+fig2.add_trace(
+    go.Scatter(
+        x=test_range,
+        y=y_test,
+        mode="lines+markers",
+        name="Actual",
+        line=dict(width=1.5),
+        marker=dict(size=3),
+    )
 )
-ax.fill_between(
-    test_range, lower, upper, alpha=0.3, label=f"{confidence_level * 100:.0f}% PI"
+
+fig2.add_trace(
+    go.Scatter(
+        x=test_range,
+        y=yhat,
+        mode="lines+markers",
+        name="Forecast",
+        line=dict(width=1.5),
+        marker=dict(size=3),
+        opacity=0.7,
+    )
 )
-ax.set_ylabel("Metering (kWh)")
-ax.set_xlabel("Test Period (half-hourly intervals)")
-ax.set_title(f"Forecast vs Actual (Test Period) - MAE: {mae:.4f}, RMSE: {rmse:.4f}")
-ax.legend()
-ax.grid(True, alpha=0.3)
+
+fig2.add_trace(
+    go.Scatter(
+        x=test_range + test_range[::-1],
+        y=upper.tolist() + lower.tolist()[::-1],
+        fill="toself",
+        fillcolor="rgba(99, 110, 250, 0.2)",
+        line=dict(color="rgba(255,255,255,0)"),
+        name=f"{confidence_level * 100:.0f}% PI",
+        hoverinfo="skip",
+    )
+)
+
+fig2.update_layout(
+    title=f"Forecast vs Actual (Test Period) - MAE: {mae:.4f}, RMSE: {rmse:.4f}",
+    xaxis_title="Test Period (half-hourly intervals)",
+    yaxis_title="Metering (kWh)",
+    hovermode="x unified",
+    template="plotly_white",
+    height=600,
+    width=1400,
+)
+fig2.show()
 
 # Plot 3: Residuals and uncertainty
-ax = axes[2]
-residuals = y_test - yhat
-ax.bar(test_range, residuals, alpha=0.6, label="Residuals", width=0.8)
-ax.plot(
-    test_range,
-    forecast_df["uncertainty_width"],
-    "r-",
-    linewidth=1.5,
-    label="Uncertainty width",
-)
-ax.axhline(y=0, color="k", linestyle="-", linewidth=0.5)
-ax.set_ylabel("Residual (kWh) / Uncertainty (kWh)")
-ax.set_xlabel("Test Period (half-hourly intervals)")
-ax.set_title("Residuals vs Forecast Uncertainty")
-ax.legend()
-ax.grid(True, alpha=0.3)
 
-plt.tight_layout()
-print(
-    "\nVisualization saved to: working_notes/2_basic_forecasting/forecast_analysis.png"
+# An explanation will be necessary here of what residuals and uncertainty width
+# are and how they relate to the forecast. The residuals are the difference between the actual values and the forecasted values, while the uncertainty width represents the range of possible values predicted by the model. This plot helps visualize how well the model is performing and where it may be uncertain.
+
+# Are the following correct:
+# What weould be expected to see is that the residuals should be randomly distributed around zero, indicating that the model is unbiased. The uncertainty width should ideally capture most of the residuals, meaning that the prediction intervals are accurate. If many residuals fall outside the uncertainty width, it suggests that the model's predictions are not reliable.
+# What if the uncertaintity width is close to a straight line? This would indicate that the model is consistently uncertain about its predictions, which could be due to a lack of variability in the data or an inadequate model. It may also suggest that the model is not capturing important patterns in the data, leading to a lack of confidence in its forecasts.
+
+
+fig3 = go.Figure()
+residuals = y_test - yhat
+
+fig3.add_trace(
+    go.Bar(
+        x=test_range,
+        y=residuals,
+        name="Residuals",
+        opacity=0.6,
+        marker_color="rgba(31, 119, 180, 0.6)",
+    )
 )
-plt.show()
+
+fig3.add_trace(
+    go.Scatter(
+        x=test_range,
+        y=forecast_df["uncertainty_width"],
+        mode="lines",
+        name="Uncertainty width",
+        line=dict(color="red", width=1.5),
+        yaxis="y2",
+    )
+)
+
+fig3.add_hline(y=0, line_dash="solid", line_color="black", line_width=0.5)
+
+fig3.update_layout(
+    title="Residuals vs Forecast Uncertainty",
+    xaxis_title="Test Period (half-hourly intervals)",
+    yaxis_title="Residual (kWh)",
+    yaxis2=dict(
+        title="Uncertainty Width (kWh)",
+        overlaying="y",
+        side="right",
+    ),
+    hovermode="x unified",
+    template="plotly_white",
+    height=600,
+    width=1400,
+    legend=dict(x=0.01, y=0.99),
+)
+fig3.show()
+
 
 # ============================================================================
 # SUMMARY

@@ -13,22 +13,19 @@ dependencies = [
     # Forecasting core
     "statsmodels>=0.14.0",
     "scikit-learn>=1.4.0",
-
     # Time series specific
-
     # Data handling
     "polars>=0.20.0",
     "numpy>=1.26.0",
-
     # Exploration and visualization
     "marimo>=0.1.0",
     "matplotlib>=3.7.0",
     "plotly>=5.0.0",
     "seaborn>=0.13.0",
-
     # IPython
     "ipython>=8.0.0",
     "ipykernel>=6.0.0",
+    "nbformat>=5.11.1",
 ]
 
 [dependency-groups]
