@@ -5,7 +5,7 @@
 
 Use working_notes\2_basic_forecasting\main.py
 
-Build a marimo script
+Build a marimo script for only the SARIMA model.
 
 Use C:\Users\RhysL\Desktop\Time Series Project\working_notes\main_idea.md
 
