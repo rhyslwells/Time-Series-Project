@@ -13,13 +13,13 @@ theme:
       primary: blue
       accent: blue
       toggle:
-        icon: material/lightbulb-outline
+        icon: material/weather-sunny
         name: Switch to light mode
     - scheme: light
       primary: blue
       accent: blue
       toggle:
-        icon: material/lightbulb
+        icon: material/weather-night
         name: Switch to dark mode
   features:
     - navigation.instant
@@ -34,15 +34,12 @@ nav:
   - Findings:
       - findings/index.md
       - Asset Profiling: findings/asset_profiling.md
-      - Anomaly Detection: findings/anomaly_detection.md
-      - Forecast Uncertainty: findings/forecast_uncertainty.md
   - Methodology:
       - methodology/index.md
-      - Feature Engineering: methodology/feature_engineering.md
-      - Model Selection: methodology/model_selection.md
   - Data:
       - data/index.md
-      - Data Dictionary: data/dictionary.md
+      - Data Generation: data/data_generation.md
+      - Synthetic Metering Data: data/synthetic_metering_data.md
   - Exploration Notebooks: notebooks.md
   - Coding:
       - MkDocs Setup: coding/mkdocs.md

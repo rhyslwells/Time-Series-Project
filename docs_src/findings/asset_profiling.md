@@ -38,6 +38,6 @@ Assets can be classified into behavioral clusters based on time series character
 
 ## Related
 
-- Exploration notebook: [asset_profiling_exploration.md](../../asset_profiling_exploration.md)
-- Methodology: [Feature Engineering](../methodology/feature_engineering.md)
-- See [Model Selection](../methodology/model_selection.md) for cluster-based strategies
+- Exploration notebook: asset_profiling_exploration.md
+- Methodology: Feature Engineering
+- See Model Selection for cluster-based strategies

@@ -27,19 +27,19 @@ uv run marimo edit <notebook>.md
 
 - **forecast_basics_exploration.md**: Basic point forecasting with uncertainty intervals
   - Status: Planning
-  - Finding: [Forecast Basics Exploration](findings/forecast_basics_exploration.md)
+  - Finding: Forecast Basics Exploration
 
 - **asset_classification_exploration.md**: Behavioral profiling and clustering
   - Status: Planning
-  - Finding: [Asset Classification Exploration](findings/asset_classification_exploration.md)
+  - Finding: Asset Classification Exploration
 
 - **asset_profiling_exploration.md**: Detailed asset fingerprinting
   - Status: Planning
-  - Finding: [Asset Profiling Exploration](findings/asset_profiling_exploration.md)
+  - Finding: Asset Profiling Exploration
 
 - **forecast_uncertainty_exploration.md**: Quantifying prediction interval quality
   - Status: Planning
-  - Finding: [Forecast Uncertainty Exploration](findings/forecast_uncertainty_exploration.md)
+  - Finding: Forecast Uncertainty Exploration
 
 ## Creating a New Notebook
 
