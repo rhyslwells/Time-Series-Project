@@ -4,6 +4,13 @@ Validated discoveries and analysis results from exploration.
 
 ## Recent Investigations
 
+### SARIMA Forecasting
+[SARIMA Time Series Forecasting](sarima_forecasting.md)
+
+Exploration notebook: `working_notes/2_basic_forecasting/sarima_marimo.py`
+
+Complete pipeline for energy metering forecasts with uncertainty quantification. Demonstrates SARIMA(1,1,1)×(1,1,1,48) modeling, prediction intervals, and forecast evaluation.
+
 ### Asset Profiling
 [Asset Profiling Analysis](asset_profiling.md)
 

@@ -33,6 +33,7 @@ nav:
   - Architecture: architecture.md
   - Findings:
       - findings/index.md
+      - SARIMA Forecasting: findings/sarima_forecasting.md
       - Asset Profiling: findings/asset_profiling.md
   - Methodology:
       - methodology/index.md
@@ -46,6 +47,8 @@ nav:
 
 plugins:
   - search
+  - marimo
+  - plotly
 
 markdown_extensions:
   - pymdownx.highlight
@@ -54,3 +57,7 @@ markdown_extensions:
   - pymdownx.emoji
   - tables
   - admonition
+  - pymdownx.blocks.admonition
+  - pymdownx.blocks.details
+  - pymdownx.blocks.html
+  - pymdownx.blocks.tab
