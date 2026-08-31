@@ -385,7 +385,7 @@ def _(y_train, y_test, yhat, lower, upper, asset_id, mae, rmse, go):
         height=500,
         width=1200,
     )
-    fig1.show()
+    fig1
 
     return fig1
 
@@ -429,7 +429,7 @@ def _(y_test, yhat, lower, upper, mae, rmse, go):
         height=500,
         width=1200,
     )
-    fig2.show()
+    fig2
 
     return fig2
 
@@ -470,7 +470,7 @@ def _(y_test, yhat, forecast_df, go):
         height=500,
         width=1200,
     )
-    fig3.show()
+    fig3
 
     return fig3
 
