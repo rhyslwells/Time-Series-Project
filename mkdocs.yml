@@ -5,28 +5,53 @@ repo_url: https://github.com/rhyslwells/time-series-project
 repo_name: time-series-project
 docs_dir: docs_src
 site_dir: docs
+edit_uri: edit/main/docs_src/
+copyright: '© 2026 Rhys Wells'
 
-theme:
-  name: material
-  palette:
-    - scheme: dark
-      primary: blue
-      accent: blue
-      toggle:
-        icon: material/weather-sunny
-        name: Switch to light mode
-    - scheme: light
-      primary: blue
-      accent: blue
-      toggle:
-        icon: material/weather-night
-        name: Switch to dark mode
-  features:
-    - navigation.instant
-    - navigation.tracking
-    - search.suggest
-    - search.highlight
-    - content.code.copy
+watch:
+  - docs_src/
+
+extra:
+  generator: false
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/rhyslwells/time-series-project
+
+extra_css:
+  - stylesheets/extra.css
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.superfences:
+      custom_fences:
+        - class: mermaid
+          name: mermaid
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.emoji
+  - pymdownx.blocks.admonition
+  - pymdownx.blocks.details
+  - pymdownx.blocks.tab
+  - pymdownx.blocks
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.inlinehilite
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.tasklist
+  - pymdownx.tilde
 
 nav:
   - Home: index.md
@@ -48,16 +73,58 @@ nav:
 plugins:
   - search
   - marimo
+  - git-revision-date-localized:
+      fallback_to_build_date: true
+  - tags
 
-markdown_extensions:
-  - pymdownx.highlight
-  - pymdownx.superfences
-  - pymdownx.tasklist
-  - pymdownx.emoji
-  - tables
-  - admonition
-  - pymdownx.blocks.admonition
-  - pymdownx.blocks.details
-  - pymdownx.blocks.html
-  - pymdownx.blocks.tab
-  - pymdownx.blocks
+validation:
+  links:
+    anchors: warn
+
+theme:
+  name: material
+  favicon: _static/favicon-32x32.png
+  palette:
+    # Palette toggle for system preference
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      primary: blue
+      accent: blue
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      primary: blue
+      accent: blue
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+
+  features:
+    - content.code.copy
+    - header.autohide
+    - navigation.indexes
+    - navigation.instant
+    - navigation.path
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+    - navigation.footer
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
+
+  font:
+    code: Fira Mono
+    text: PT Sans
