@@ -15,11 +15,6 @@ warnings.filterwarnings("ignore")
 
 # Load metering data
 df = pl.read_parquet("../../src/data/metering_data.parquet")
-print("Data shape:", df.shape)
-print("\nColumns:", df.columns)
-print("\nUnique assets:", df.select("asset_id").n_unique())
-print("\nAsset types:", df.select("asset_type").unique())
-print("\nDate range:")
 
 asset_id = "ASSET_001"
 # filter data for the selected asset

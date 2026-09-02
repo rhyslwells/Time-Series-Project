@@ -63,7 +63,7 @@ nav:
       - Synthetic Metering Data: data/synthetic_metering_data.md
   - Exploration Notebooks:
       - notebooks.md
-      - SARIMA Forecasting: notebooks/sarima_forecasting.md
+      - SARIMA Forecasting: notebooks/sarima_marimo_export.html
   - Coding:
       - MkDocs Setup: coding/mkdocs.md
 
