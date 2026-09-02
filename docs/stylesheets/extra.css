@@ -1,0 +1,19 @@
+/* --- Wider content ---------------------------------------------------------
+   Material for MkDocs caps the page (header, body, footer) at 61rem (~976px)
+   via .md-grid. We use the full viewport width instead. Set a value like
+   1400px here if the fully-fluid width feels too wide for prose. */
+.md-grid {
+  max-width: none;
+}
+
+/* toc.integrate folds the page table of contents into the left sidebar, so the
+   dedicated right-hand column is gone. Let the content take that space. */
+@media screen and (min-width: 76.25em) {
+  .md-sidebar--primary {
+    /* keep the nav tidy; it now also holds the page TOC */
+    width: 12.1rem;
+  }
+  .md-content {
+    max-width: none;
+  }
+}

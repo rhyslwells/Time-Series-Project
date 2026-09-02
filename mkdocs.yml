@@ -117,10 +117,12 @@ theme:
     - navigation.top
     - navigation.tracking
     - navigation.footer
+    - navigation.prune
     - search.highlight
     - search.share
     - search.suggest
     - toc.follow
+    - toc.integrate
 
   font:
     code: Fira Mono
