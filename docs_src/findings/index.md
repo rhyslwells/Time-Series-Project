@@ -5,7 +5,7 @@ Validated discoveries and analysis results from exploration.
 ## Recent Investigations
 
 ### SARIMA Forecasting
-[SARIMA Time Series Forecasting](../notebooks/sarima_marimo_export.html)
+[SARIMA Time Series Forecasting](../notebooks/sarima_forecasting.md)
 
 Exploration notebook: `working_notes/2_basic_forecasting/sarima_marimo.py`
 
