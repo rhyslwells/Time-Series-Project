@@ -8,6 +8,34 @@ Question                          → Document                  Section
 "Is my forecast ready?"           → VISUAL_EXAMPLES.md        Section 6
 "Which model is best?"            → README_FORECASTING        Decision Tree
 
+## Understanding Metrics (In Plain Language)
+
+### MAE: "On average, how far off?"
+- **Formula:** Average absolute difference between forecast and actual
+- **Units:** Same as data (kWh)
+- **Good value for residential:** < 0.5 kWh
+- **Use case:** Check if forecast is systematically over/underestimating
+
+### RMSE: "How bad are the worst mistakes?"
+- **Formula:** Penalizes large errors more (squaring effect)
+- **Units:** Same as data (kWh)
+- **Good value for residential:** < 0.7 kWh
+- **Use case:** When large errors are costly (avoid spikes outside flexibility envelope)
+
+### MAPE: "What percentage off is the forecast?"
+- **Formula:** Average error as % of actual value
+- **Units:** Percentage (%)
+- **Good value for residential:** < 10%
+- **Use case:** Compare across different asset sizes (scale-independent)
+- **Caution:** Breaks if actual ≈ 0 (common in energy off-peak)
+
+### PI Coverage: "When I say 80% confidence, am I right?"
+- **Formula:** % of actuals that fell within [lower, upper] bounds
+- **Units:** Percentage (%), target 80%
+- **Good value:** 78–82% (matches target)
+- **Too low (e.g., 45%)?** → Intervals too narrow, over-confident
+- **Too high (e.g., 95%)?** → Intervals too wide, under-confident
+- **Use case:** For flexibility commitments, coverage is critical
 
 ================================================================================
 INTERPRETATION GUIDELINES

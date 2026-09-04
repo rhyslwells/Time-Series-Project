@@ -2,7 +2,15 @@
 
 ## Overview
 
-This reference covers everything needed to understand, build, compare, and deploy time series forecasts for energy asset management at Flexitricity.
+MAybe we should move the imppmentation of code to here C:\Users\RhysL\Desktop\Time Series Project\docs_src\coding
+
+with theory of models and math ect in 
+
+C:\Users\RhysL\Desktop\Time Series Project\docs_src\theory
+
+This file is a index and should just point to other files
+
+This reference covers everything needed to understand, build, compare, and deploy time series forecasts for assets
 
 **Structure:**
 - **Code:** `ts_model_framework.py` (models + tuning) + `ts_plots.py` (plots)
@@ -18,17 +26,22 @@ This reference covers everything needed to understand, build, compare, and deplo
 ### Step 1: Load Data
 ```python
 import numpy as np
-from ts_model_framework import ModelComparison, SARIMAModel, ExponentialSmoothingModel, LightGBMModel
+from ts_model_framework import (
+    ModelComparison,
+    SARIMAModel,
+    ExponentialSmoothingModel,
+    LightGBMModel,
+)
 
 # Load your time series
 y_train = np.array([...])  # 480 points (10 days × 48 half-hours)
-y_test = np.array([...])   # 192 points (4 days × 48 half-hours)
+y_test = np.array([...])  # 192 points (4 days × 48 half-hours)
 ```
 
 ### Step 2: Compare Models
 ```python
 comp = ModelComparison(y_train, y_test)
-comp.add_model(SARIMAModel(y_train, order=(1,1,1), seasonal_order=(1,1,1,48)))
+comp.add_model(SARIMAModel(y_train, order=(1, 1, 1), seasonal_order=(1, 1, 1, 48)))
 comp.add_model(ExponentialSmoothingModel(y_train, seasonal_periods=48))
 comp.add_model(LightGBMModel(y_train, lags=[1, 2, 48, 96]))
 
@@ -58,34 +71,6 @@ TSPlotter.pi_coverage(y_test, forecast, best_name)
 
 ---
 
-## Understanding Metrics (In Plain Language)
-
-### MAE: "On average, how far off?"
-- **Formula:** Average absolute difference between forecast and actual
-- **Units:** Same as data (kWh)
-- **Good value for residential:** < 0.5 kWh
-- **Use case:** Check if forecast is systematically over/underestimating
-
-### RMSE: "How bad are the worst mistakes?"
-- **Formula:** Penalizes large errors more (squaring effect)
-- **Units:** Same as data (kWh)
-- **Good value for residential:** < 0.7 kWh
-- **Use case:** When large errors are costly (avoid spikes outside flexibility envelope)
-
-### MAPE: "What percentage off is the forecast?"
-- **Formula:** Average error as % of actual value
-- **Units:** Percentage (%)
-- **Good value for residential:** < 10%
-- **Use case:** Compare across different asset sizes (scale-independent)
-- **Caution:** Breaks if actual ≈ 0 (common in energy off-peak)
-
-### PI Coverage: "When I say 80% confidence, am I right?"
-- **Formula:** % of actuals that fell within [lower, upper] bounds
-- **Units:** Percentage (%), target 80%
-- **Good value:** 78–82% (matches target)
-- **Too low (e.g., 45%)?** → Intervals too narrow, over-confident
-- **Too high (e.g., 95%)?** → Intervals too wide, under-confident
-- **Use case:** For flexibility commitments, coverage is critical
 
 ---
 
@@ -343,7 +328,7 @@ Best model: LightGBM with external features
 mae = mean(abs(y_true - forecast))
 
 # RMSE: Root mean squared error (penalizes outliers)
-rmse = sqrt(mean((y_true - forecast)**2))
+rmse = sqrt(mean((y_true - forecast) ** 2))
 
 # MAPE: Mean absolute percentage error
 mape = mean(abs((y_true - forecast) / y_true)) * 100
@@ -399,7 +384,7 @@ if forecast.std() < 0.1:
 elif residual_mean > 0.2:
     print("Systematic bias (forecast too low)")
     # → Check differencing, retrain on recent data
-elif rmse/mae > 1.5:
+elif rmse / mae > 1.5:
     print("Occasional huge errors (outliers)")
     # → Check data quality, use robust model
 ```
@@ -455,7 +440,13 @@ elif mean(residuals) < -0.3:
 ## Full Workflow Example
 
 ```python
-from ts_model_framework import ModelComparison, SARIMAModel, ExponentialSmoothingModel, LightGBMModel, ModelTuner
+from ts_model_framework import (
+    ModelComparison,
+    SARIMAModel,
+    ExponentialSmoothingModel,
+    LightGBMModel,
+    ModelTuner,
+)
 from ts_plots import TSPlotter, ComparisonPlotter
 
 # 1. COMPARE
@@ -484,18 +475,18 @@ if metrics.rmse > threshold:
 if tuning_needed:
     tuner = ModelTuner(SARIMAModel, y_train, y_test)
     param_grid = {
-        "order": [(1,1,1), (2,1,1), (1,2,1)],
-        "seasonal_order": [(1,0,1,48), (1,1,1,48)]
+        "order": [(1, 1, 1), (2, 1, 1), (1, 2, 1)],
+        "seasonal_order": [(1, 0, 1, 48), (1, 1, 1, 48)],
     }
     trials = tuner.grid_search(param_grid)
     best_params = tuner.best_params()
-    
+
     # Refit with tuned params
     final_model = SARIMAModel(y_train, **best_params)
     final_model.fit()
     final_forecast = final_model.forecast(len(y_test))
     final_metrics = ModelEvaluator.evaluate(y_test, final_forecast)
-    
+
     print(f"Improvement: {metrics.rmse} → {final_metrics.rmse}")
 
 # 4. COMPARE FORECASTS
@@ -564,4 +555,4 @@ TimeSeries/
 
 **Version:** 1.0
 **Last updated:** 2025-01-15
-**For:** Flexitricity FlexGo forecasting
+**For:**  FlexGo forecasting

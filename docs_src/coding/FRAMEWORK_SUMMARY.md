@@ -38,22 +38,22 @@ End-to-end workflow in 5 steps
 
 ## Key Design Principles
 
-### ✅ Generalisation
+### Generalisation
 - **Single plotting module** works for SARIMA, ExponentialSmoothing, LightGBM, or custom models
 - Add new models by extending `TSModel` base class
 - Metrics/plots reuse without modification
 
-### ✅ Reusability
+### Reusability
 - All classes follow standard interfaces
 - Output contracts (`ForecastOutput`, `EvaluationMetrics`) are explicit
 - Modular: use tuner alone, or plotter alone, or full workflow
 
-### ✅ Practical for Flexitricity
+###  Practical for 
 - Handles 30-min metering data with daily seasonality (s=48)
 - Prediction intervals quantify forecast uncertainty
 - Grid search for portfolio-level decisions (which model/params best?)
 
-### ✅ No boilerplate
+###  No boilerplate
 - No data loading/preprocessing in core modules
 - Clean separation: framework vs. application logic
 

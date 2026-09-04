@@ -298,6 +298,7 @@ In Section 3, add another model:
 ```python
 # Add Prophet or LSTM
 from prophet import Prophet
+
 prophet_model = Prophet()
 # ... fit and predict
 ```
@@ -317,6 +318,7 @@ forecast_df.to_csv("forecast_output.csv")
 
 # Save model
 import pickle
+
 pickle.dump(best_model, open("model.pkl", "wb"))
 ```
 
@@ -379,5 +381,5 @@ Check for:
 
 **Version:** 1.0  
 **Created:** January 2025  
-**For:** Flexitricity FlexGo  
+**For:**  FlexGo  
 **Data:** 14 days metering at 30-min intervals

@@ -480,7 +480,7 @@ def _(mo):
     mo.md("""
 ## Summary
 
-✅ Complete SARIMA forecasting pipeline demonstrated:
+Complete SARIMA forecasting pipeline demonstrated:
 
 1. **Load & Explore** — 14-day metering data (30-min intervals)
 2. **Train/Test Split** — 10 days train, 4 days test
