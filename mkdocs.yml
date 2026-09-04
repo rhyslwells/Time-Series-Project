@@ -64,7 +64,15 @@ nav:
   - Exploration Notebooks:
       - notebooks.md
       - SARIMA Forecasting: notebooks/sarima_forecasting.md
+  - Theory:
+      - theory/index.md
+      - Metrics: theory/metrics.md
+      - Models: theory/models.md
+      - Diagnostics: theory/diagnostics.md
+      - Decisions: theory/decisions.md
   - Coding:
+      - coding/index.md
+      - Framework Usage: coding/framework_usage.md
       - MkDocs Setup: coding/mkdocs.md
 
 plugins:
