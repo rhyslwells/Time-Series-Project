@@ -1,4 +1,4 @@
-#forecasting #timeseries #ml #energy #optimisation #flexgo
+#forecasting #timeseries #ml #energy #optimisation #
 
 If you treat the forecast as a first-class data product rather than simply "the next five days of meter values", there is quite a lot you can derive from it.
 

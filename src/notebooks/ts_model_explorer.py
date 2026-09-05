@@ -36,6 +36,36 @@ def _(mo):
     5. Shows how to interpret results
     
     Navigate using the sidebar to explore different sections.
+    
+    Common Questions
+
+    **Q: Why is RMSE > MAE?**
+    A: RMSE squares errors, so large mistakes get penalized more. This is by design—it forces the model to avoid huge spikes.
+
+    **Q: Why does coverage matter more than RMSE?**
+    A: For , you commit flexibility based on prediction intervals. If coverage is low (e.g., 45%), your commitments will breach frequently, breaching SLAs.
+
+    **Q: What if coverage is 95% (too high)?**
+    A: Model is over-conservative. Intervals too wide. You're not selling enough flexibility. Retrain or use tighter bounds (90% instead of 80%).
+
+    **Q: When should I retrain?**
+    A: - Coverage drops < 70% (immediately!)
+    - RMSE increases 20% (weekly check)
+    - New season (seasonal patterns change)
+    - Equipment change (asset behavior changed)
+
+    **Q: How do I improve RMSE?**
+    A: - Increase SARIMA complexity: Try SARIMA(2,1,1) or (1,2,1)
+    - Add longer lags to LightGBM: [1, 2, 48, 96, 336]
+    - Switch to different model if stuck
+
+    **Q: How do I improve coverage?**
+    A: - If coverage too low: Widen intervals (multiply by 1.2)
+    - If coverage too high: Narrow intervals or retrain
+    - For SARIMA/ExpSmoothing: Use damped_trend=True
+    - Consider quantile regression (predict P10/P90 separately)
+
+
     """)
     return
 
@@ -270,7 +300,7 @@ def _(mo):
     
     **Ideal:** Coverage ≈ 80% (±5% acceptable)
     
-    **Why it matters for FlexGo:**
+    **Why it matters for :**
     If you commit flexibility based on prediction intervals:
     - Low coverage → Surprise breaches
     - High coverage → Wasted conservatism
@@ -583,7 +613,7 @@ def _(mo, best_model, np, y_test, best_forecast):
     **Bad case 1: Under-coverage (Coverage < 70%)**
     - Many reds (> 30%)
     - Model over-confident
-    - For FlexGo: Flexibility commitments will breach
+    - For : Flexibility commitments will breach
     - When you commit based on envelope, surprises happen frequently
     
     **Bad case 2: Over-coverage (Coverage > 90%)**
@@ -649,7 +679,7 @@ def _(mo):
     mo.md("""
     ## Section 6: Interpretation Guide
     
-    How to interpret these results for FlexGo flexibility forecasting.
+    How to interpret these results for  flexibility forecasting.
     """)
     return
 
@@ -826,7 +856,7 @@ def _(mo, best_model_name, best_metrics):
     - If coverage too low: Try ExponentialSmoothing with damped_trend=True
     - If systematic bias: Retrain on recent data (last 7–14 days)
     
-    **For FlexGo Integration:**
+    **For  Integration:**
     - Use prediction interval as flexibility envelope
     - Width represents uncertainty range
     - Coverage tells you reliability of commitment
@@ -854,7 +884,7 @@ def _(mo):
     ✓ Detailed metrics (MAE, RMSE, MAPE, PI Coverage)
     ✓ 4 diagnostic plots with mathematical explanations
     ✓ Production-ready checklist
-    ✓ Interpretation guide for FlexGo
+    ✓ Interpretation guide for 
     
     **Key takeaways:**
     1. Lower RMSE doesn't guarantee good model (check coverage too!)
