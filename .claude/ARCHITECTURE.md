@@ -1,6 +1,6 @@
 # Forecasting System Architecture
 
-## Core Layers (from main_idea.md)
+## Core Layers
 
 1. **Raw metering** — Raw data (30-min intervals, kWh)
 2. **Forecast models** — Point & distribution forecasts (yhat, P10, P50, P90)
@@ -31,7 +31,3 @@
 - Captures full weeks (includes weekday/weekend patterns)
 - Small enough for quick iteration
 - Sufficient for seasonal/weekly features
-
-## Reference
-
-See `working_notes/main_idea.md` for detailed 15-section system design.

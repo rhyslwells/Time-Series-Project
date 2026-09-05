@@ -40,7 +40,7 @@ Before implementing changes to:
 - New model types or aggregation approaches
 - Major restructuring of src/
 
-**Always ask first.** Otherwise proceed with implementation based on framework in notes.md.
+**Always ask first.** Otherwise proceed with implementation based on the framework in this file and ARCHITECTURE.md.
 
 ## Behavior When Uncertain
 

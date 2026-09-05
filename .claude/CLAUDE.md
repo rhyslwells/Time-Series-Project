@@ -47,7 +47,6 @@ Embedded assistant for energy systems forecasting. Help with: model setup, time 
 - New model types or aggregation approaches
 - Major src/ restructuring
 
-**Otherwise:** proceed based on framework in `working_notes/main_idea.md` (15-section system design).
 
 ---
 

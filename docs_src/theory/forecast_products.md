@@ -1,6 +1,6 @@
 # Forecast Products
 
-The model outputs in [Models](models.md) are inputs to a larger system, not the end goal. This page covers the theory for turning a per-timestep forecast into the derived signals that system needs — see `working_notes/main_idea.md` for the full design rationale.
+The model outputs in [Models](models.md) are inputs to a larger system, not the end goal. This page covers the theory for turning a per-timestep forecast into the derived signals that system needs.
 
 ## The forecast as a distribution
 

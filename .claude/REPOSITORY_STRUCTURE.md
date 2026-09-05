@@ -11,7 +11,6 @@ Time-Series-Project/
 │   └── data/                      # Generated parquet data
 │
 ├── working_notes/                 # Exploration & documentation
-│   ├── main_idea.md               # System architecture
 │   ├── todos.md                   # Task tracking
 │   └── 1_produce_data/            # Data generation
 │       ├── notes.md
