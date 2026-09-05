@@ -16,7 +16,7 @@
         <link rel="prev" href="../models/">
       
       
-        <link rel="next" href="../decisions/">
+        <link rel="next" href="../forecast_products/">
       
       
         
@@ -1020,7 +1020,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../decisions/" class="md-nav__link">
+      <a href="../model-model-decisions.md" class="md-nav__link">
         
   
   
@@ -1213,12 +1213,12 @@
 <p><strong>Underfit (forecast flat-lines):</strong> the actual line swings but the forecast barely moves — the model settled on predicting close to the mean every time. Coverage can look fine only because the interval is very wide, not because the model is confident. Cause: over-differencing (d too high) removed real signal, or too little AR/MA capacity. Fix: reduce d, increase p, or switch to LightGBM if the pattern is non-linear.</p>
 <p><strong>Systematically biased:</strong> point forecast tracks reasonably but sits consistently above or below actual — check the residual mean, not just MAE/RMSE, since a biased-but-small error can still look acceptable on those alone. Cause: seasonal pattern shifted (e.g. trained on a different season) or a driving variable (temperature, occupancy) is missing. Fix: retrain on recent data, or add the missing feature.</p>
 <h2 id="residuals-diagnostic-time-series-histogram">Residuals diagnostic (time series + histogram)<a class="headerlink" href="#residuals-diagnostic-time-series-histogram" title="Permanent link">&para;</a></h2>
-<p><strong>Good case:</strong> residuals bounce randomly around 0 with no trend, mostly within ±2× the model's own uncertainty band, and the histogram is roughly bell-shaped and centered at 0.</p>
+<p><strong>Good case:</strong> residuals bounce randomly around 0 with no trend, mostly within ±2x the model's own uncertainty band, and the histogram is roughly bell-shaped and centered at 0.</p>
 <p><strong>Autocorrelated residuals:</strong> consecutive residuals cluster on the same side (several positive in a row, then several negative) instead of bouncing randomly. This means the model missed structure — errors compound instead of self-correcting. Fix: increase differencing (d/D) or AR terms (p/P).</p>
 <p><strong>Systematic bias:</strong> residuals sit almost entirely on one side of zero and the histogram is visibly skewed. All-positive means the forecast underestimates; all-negative means it overestimates. Fix: check for a missing trend term (ensure d ≥ 1), or retrain on data that better represents current conditions.</p>
 <p><strong>Heavy tails:</strong> the histogram has a normal-looking center but disproportionately tall bars at the extremes. The normal-residual assumption behind the PI calculation breaks down, so real-world coverage will run below what the model reports. Fix: remove/inspect outliers in training data, use a more robust model, or predict quantiles directly instead of assuming normality.</p>
 <h2 id="uncertainty-width-over-time">Uncertainty width over time<a class="headerlink" href="#uncertainty-width-over-time" title="Permanent link">&para;</a></h2>
-<p><strong>Good case:</strong> width tracks actual volatility — narrow during stable stretches (e.g. midday for an office), wider during transitions (morning ramp-up, evening ramp-down). Mean width roughly matches <code>2 × z × std(residuals)</code>.</p>
+<p><strong>Good case:</strong> width tracks actual volatility — narrow during stable stretches (e.g. midday for an office), wider during transitions (morning ramp-up, evening ramp-down). Mean width roughly matches <code>2 x z x std(residuals)</code>.</p>
 <p><strong>Flat width:</strong> the interval is the same size at every hour, meaning the model isn't adapting its confidence to conditions — over-wide during predictable periods (wasted conservatism) and under-wide during volatile ones (under-confident when it matters most). Usually means the interval was computed from a single global residual std rather than a conditional one; for LightGBM in particular, consider a residual-std model or explicit quantile models.</p>
 <p><strong>Exploding width:</strong> the interval balloons far faster than the forecast horizon justifies (e.g. tripling over a few hours). Typically comes from naive error propagation (std growing with $\sqrt{\text{horizon}}$) rather than recalibration against real data. Fix: cap the width, or use a recursive forecasting approach that treats each step's own forecast as the new anchor.</p>
 <h2 id="pi-coverage-greenred-scatter">PI coverage (green/red scatter)<a class="headerlink" href="#pi-coverage-greenred-scatter" title="Permanent link">&para;</a></h2>
@@ -1228,7 +1228,7 @@
 <p><strong>Clustered reds (time-of-day pattern):</strong> coverage looks fine in aggregate but reds concentrate in a specific window (e.g. daytime hours) while off-peak hours are all green. The model hasn't captured a time-of-day effect properly — check the seasonal component (SARIMA: P, D &gt; 0) or the hour-of-day feature (LightGBM), and consider retraining on data from the current season.</p>
 <p><strong>All-green (over-coverage):</strong> ~100% coverage against an 80% target means the interval is far wider than necessary. Point forecast may itself be flat (model "giving up" rather than genuinely uncertain) — check <code>forecast.std()</code> isn't near zero before assuming the width is simply conservative-but-correct.</p>
 <h2 id="ranking-models-against-each-other">Ranking models against each other<a class="headerlink" href="#ranking-models-against-each-other" title="Permanent link">&para;</a></h2>
-<p>When RMSE and coverage disagree — one model has the lowest error but the other is better calibrated — coverage should usually win for anything feeding a flexibility commitment: a narrow-but-wrong interval breaches commitments, while a slightly wider one just costs some upside. A 1-2 point coverage gap from target is easy to correct (manual widening); a systematically miscalibrated model is not. See <a href="../decisions/">Decisions</a> for the full selection logic.</p>
+<p>When RMSE and coverage disagree — one model has the lowest error but the other is better calibrated — coverage should usually win for anything feeding a flexibility commitment: a narrow-but-wrong interval breaches commitments, while a slightly wider one just costs some upside. A 1-2 point coverage gap from target is easy to correct (manual widening); a systematically miscalibrated model is not. See <a href="model-decisions.md">Decisions</a> for the full selection logic.</p>
 
 
 
@@ -1249,7 +1249,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 5, 2026 09:31:34 UTC">September 5, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 5, 2026 16:35:53 UTC">September 5, 2026</span>
   </span>
 
     
@@ -1302,13 +1302,13 @@
         
         
           
-          <a href="../decisions/" class="md-footer__link md-footer__link--next" aria-label="Next: Decisions">
+          <a href="../forecast_products/" class="md-footer__link md-footer__link--next" aria-label="Next: Forecast Products">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Decisions
+                Forecast Products
               </div>
             </div>
             <div class="md-footer__button md-icon">

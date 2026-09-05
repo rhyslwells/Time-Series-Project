@@ -13,7 +13,7 @@
       
       
       
-        <link rel="prev" href="../decisions/">
+        <link rel="prev" href="../diagnostics/">
       
       
         <link rel="next" href="../../coding/">
@@ -918,7 +918,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../decisions/" class="md-nav__link">
+      <a href="../model-model-decisions.md" class="md-nav__link">
         
   
   
@@ -1283,7 +1283,7 @@
 
 
 <h1 id="forecast-products">Forecast Products<a class="headerlink" href="#forecast-products" title="Permanent link">&para;</a></h1>
-<p>The model outputs in <a href="../models/">Models</a> are inputs to a larger system, not the end goal. This page covers the theory for turning a per-timestep forecast into the derived signals that system needs.</p>
+<p>The model outputs in <a href="../models/">Models</a> are inputs to a larger system. This page covers the theory for turning a per-timestep forecast into the derived signals that system needs.</p>
 <h2 id="the-forecast-as-a-distribution">The forecast as a distribution<a class="headerlink" href="#the-forecast-as-a-distribution" title="Permanent link">&para;</a></h2>
 <p>Treat each forecast as a distribution, not a single number: $E[Y_t]$, $P_{10}(Y_t)$, $P_{50}(Y_t)$, $P_{90}(Y_t)$ (or whatever interval the model supports). A point forecast alone answers "what will happen"; the distribution also answers "how sure are we", which is what every signal below is built from.</p>
 <h2 id="asset-level-derived-signals">Asset-level derived signals<a class="headerlink" href="#asset-level-derived-signals" title="Permanent link">&para;</a></h2>
@@ -1301,13 +1301,13 @@
 <h2 id="baseline-and-response-estimation">Baseline and response estimation<a class="headerlink" href="#baseline-and-response-estimation" title="Permanent link">&para;</a></h2>
 <p>For demand response, the forecast (made <em>without</em> knowledge of the intervention) serves as the counterfactual baseline:</p>
 <p>$$\text{Response} = \text{Baseline forecast} - \text{Observed metering}$$</p>
-<p>e.g. expected 4.2 MW, observed 2.8 MW → estimated response 1.4 MW. This is how forecast quality translates directly into measurement quality for anything being evaluated against a baseline.</p>
+<p>e.g. expected 4.2 MW, observed 2.8 MW -&gt; estimated response 1.4 MW. This is how forecast quality translates directly into measurement quality for anything being evaluated against a baseline.</p>
 <h2 id="anomaly-detection-via-residuals">Anomaly detection via residuals<a class="headerlink" href="#anomaly-detection-via-residuals" title="Permanent link">&para;</a></h2>
 <p>The residual $e_t = y_t - \hat{y}_t$ (see <a href="../diagnostics/">Diagnostics</a> for what it says about model fit) can also be read the other way: as a monitor on the <em>asset</em>, once the model itself is trusted. Unusually large or persistent residuals, or a step change in the residual distribution, can indicate an asset going offline, a meter fault, or a genuine behaviour change — a forecast of 4.8 MW against an actual of 0.2 MW is as likely to be a monitoring signal as a forecasting failure.</p>
 <h2 id="model-health-and-concept-drift">Model health and concept drift<a class="headerlink" href="#model-health-and-concept-drift" title="Permanent link">&para;</a></h2>
-<p>Beyond the aggregate MAE/RMSE in <a href="../metrics/">Metrics</a>, error is worth tracking segmented — by day of week, season, weather, or asset operating regime. A model that's accurate Monday-Friday but poor on weekends is telling you something about the model <em>and</em> the asset (a regime that regime it doesn't understand), not just producing a lower average score. This segmented view is what should trigger the retrain/switch decisions in <a href="../decisions/">Decisions</a>, rather than a single rolling aggregate.</p>
+<p>Beyond the aggregate MAE/RMSE in <a href="../metrics/">Metrics</a>, error is worth tracking segmented — by day of week, season, weather, or asset operating regime. A model that's accurate Monday-Friday but poor on weekends is telling you something about the model <em>and</em> the asset (a regime that regime it doesn't understand), not just producing a lower average score. This segmented view is what should trigger the retrain/switch decisions in <a href="model-decisions.md">Decisions</a>, rather than a single rolling aggregate.</p>
 <h2 id="cross-asset-comparison-and-asset-classification">Cross-asset comparison and asset classification<a class="headerlink" href="#cross-asset-comparison-and-asset-classification" title="Permanent link">&para;</a></h2>
-<p>With many asset/model pairs, error metrics become a table (asset × model × MAE/RMSE/bias/coverage) that raises a meta-question: what characteristics of an asset predict which model will work best for it? That points toward a behavioural fingerprint per asset — mean load, variance, coefficient of variation, autocorrelation, seasonality strength, intermittency, ramp frequency, peak-to-average ratio, plus the asset's own forecast error/uncertainty history — used to cluster assets and route each cluster to the model class suited to it, rather than grid-searching every asset individually. This is the theory behind <code>behavioral_fingerprints.parquet</code> in the data pipeline.</p>
+<p>With many asset/model pairs, error metrics become a table (asset x model x MAE/RMSE/bias/coverage) that raises a meta-question: what characteristics of an asset predict which model will work best for it? That points toward a behavioural fingerprint per asset — mean load, variance, coefficient of variation, autocorrelation, seasonality strength, intermittency, ramp frequency, peak-to-average ratio, plus the asset's own forecast error/uncertainty history — used to cluster assets and route each cluster to the model class suited to it, rather than grid-searching every asset individually. This is the theory behind <code>behavioral_fingerprints.parquet</code> in the data pipeline.</p>
 <h2 id="portfolio-forecasting">Portfolio forecasting<a class="headerlink" href="#portfolio-forecasting" title="Permanent link">&para;</a></h2>
 <p>Aggregating per-asset forecasts gives a portfolio forecast, $\hat{Y}<em i_t="i,t">t = \sum_i \hat{Y}</em>$, and the aggregate's expectation is just the sum of expectations. Its <em>uncertainty</em> is not: it depends on the correlation between assets' errors, not the sum of their individual uncertainties. Where asset errors aren't perfectly correlated, the portfolio forecast is more reliable than any individual asset forecast — which is the main reason aggregation is valuable for a multi-asset system, beyond convenience.</p>
 <h2 id="flexibility-forecasting">Flexibility forecasting<a class="headerlink" href="#flexibility-forecasting" title="Permanent link">&para;</a></h2>
@@ -1336,7 +1336,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 5, 2026 09:31:34 UTC">September 5, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 5, 2026 16:35:53 UTC">September 5, 2026</span>
   </span>
 
     
@@ -1372,7 +1372,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../decisions/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Decisions">
+          <a href="../diagnostics/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Diagnostics">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1382,7 +1382,7 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Decisions
+                Diagnostics
               </div>
             </div>
           </a>
