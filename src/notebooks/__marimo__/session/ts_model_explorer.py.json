@@ -1,0 +1,355 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.23.16",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "70fd56afd94de2418a3ce4c9542f3e34",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "b83bda3d4685ed2bf679195694533b13",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"time-series-model-comparison-interpretation\">Time Series Model Comparison &amp; Interpretation</h1>\n<span class=\"paragraph\"><strong>Interactive explorer</strong> for energy metering forecasts using SARIMA, Exponential Smoothing, and LightGBM.</span>\n<span class=\"paragraph\">This notebook loads metering data, fits the 3 models, and renders diagnostic plots.\nFor the math behind each metric/model and how to read each plot, see\n<a href=\"../../docs_src/theory/index.md\"><code>docs_src/theory/</code></a> (metrics, models, diagnostics, decisions).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "b64196d6ea292c36ca4100e6346d94fa",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"section-1-data-loading-exploration\">Section 1: Data Loading &amp; Exploration</h2>\n<span class=\"paragraph\">Load metering data and examine characteristics.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "a4adc52e0d4e3ea5c707582ab08c2a60",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "Data Summary:\n Asset: ASSET_001\n Type: ev_charging\n Records: 672\n Date range: 2025-01-01T00:00:00.000000 to 2025-01-14T23:30:00.000000\n Mean: 1.831 kWh\n Std: 1.447 kWh\n Min: 0.006 kWh\n Max: 4.648 kWh\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "65989c3de8b685d133864658d120933f",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "1dd235008ba0a84309e3e12a40752c57",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stdout",
+          "text": "Train: 480 observations (10.0 days)\nTest: 192 observations (4.0 days)\n",
+          "mimetype": "text/plain"
+        }
+      ]
+    },
+    {
+      "id": "Xref",
+      "code_hash": "ea72884e452fa606ea7a6f328de9ab36",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"about-this-notebook\">About This Notebook</h2>\n<span class=\"paragraph\"><strong>Framework Pattern Used:</strong></span>\n<span class=\"paragraph\">This notebook uses <code>ts_model_framework.py</code> classes to demonstrate best practices:</span>\n<ol>\n<li><strong>ModelComparison</strong> \u2014 Orchestrates fitting + evaluation for multiple models</li>\n<li><strong>TSModel subclasses</strong> \u2014 SARIMAModel, ExponentialSmoothingModel, LightGBMModel</li>\n<li><strong>ForecastOutput</strong> \u2014 Standardised output contract (prediction, lower, upper, uncertainty_width)</li>\n<li><strong>EvaluationMetrics</strong> \u2014 Standardised metrics (mae, rmse, mape, pi_coverage, uncertainty_width)</li>\n<li><strong>TSPlotter</strong> \u2014 Generic plots that work with any model</li>\n</ol>\n<span class=\"paragraph\"><strong>Why this pattern matters:</strong></span>\n<ul>\n<li><strong>Consistency</strong>: All models use same interface (fit \u2192 forecast)</li>\n<li><strong>Extensibility</strong>: Add new models by subclassing TSModel</li>\n<li><strong>Reusability</strong>: Plotting works for any model automatically</li>\n<li><strong>Maintainability</strong>: Changes to framework apply everywhere</li>\n</ul>\n<span class=\"paragraph\"><strong>To add a new model:</strong>\n<div class=\"language-python codehilite\"><pre><span></span><code><span class=\"kn\">from</span><span class=\"w\"> </span><span class=\"nn\">ts_model_framework</span><span class=\"w\"> </span><span class=\"kn\">import</span> <span class=\"n\">TSModel</span>\n\n<span class=\"k\">class</span><span class=\"w\"> </span><span class=\"nc\">MyNewModel</span><span class=\"p\">(</span><span class=\"n\">TSModel</span><span class=\"p\">):</span>\n    <span class=\"k\">def</span><span class=\"w\"> </span><span class=\"nf\">fit</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"p\">):</span>\n        <span class=\"c1\"># Your fitting logic</span>\n        <span class=\"k\">pass</span>\n\n    <span class=\"k\">def</span><span class=\"w\"> </span><span class=\"nf\">forecast</span><span class=\"p\">(</span><span class=\"bp\">self</span><span class=\"p\">,</span> <span class=\"n\">steps</span><span class=\"p\">,</span> <span class=\"n\">confidence_level</span><span class=\"o\">=</span><span class=\"mf\">0.80</span><span class=\"p\">):</span>\n        <span class=\"c1\"># Your forecast logic</span>\n        <span class=\"k\">return</span> <span class=\"n\">ForecastOutput</span><span class=\"p\">(</span><span class=\"o\">...</span><span class=\"p\">)</span>\n\n<span class=\"n\">comp</span><span class=\"o\">.</span><span class=\"n\">add_model</span><span class=\"p\">(</span><span class=\"n\">MyNewModel</span><span class=\"p\">(</span><span class=\"n\">y_train</span><span class=\"p\">))</span>\n<span class=\"c1\"># Everything else works automatically!</span>\n</code></pre></div></span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "e5222450e329659c5a58248752e1b849",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"section-2-understanding-metrics\">Section 2: Understanding Metrics</h2>\n<span class=\"paragraph\">See <a href=\"../../docs_src/theory/metrics.md\"><code>docs_src/theory/metrics.md</code></a> for the formulas,\ninterpretation, and expected ranges by asset type (MAE, RMSE, MAPE, PI coverage).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "052b89e8f7686951935502b6a73a0dea",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"section-3-model-comparison\">Section 3: Model Comparison</h2>\n<span class=\"paragraph\">Compare 3 models using standardised framework classes.</span>\n<span class=\"paragraph\"><strong>Framework Pattern:</strong></span>\n<ol>\n<li>Create ModelComparison instance</li>\n<li>Add models (using TSModel subclasses)</li>\n<li>Fit all models</li>\n<li>Evaluate and rank by RMSE</li>\n</ol>\n<span class=\"paragraph\">This pattern is extensible: add new models by subclassing TSModel.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "7f90e665ee2f10f9a5045d1fa4b12c45",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "exception",
+          "evalue": "No module named 'ts_model_framework'",
+          "traceback": null
+        }
+      ],
+      "console": [
+        {
+          "type": "stream",
+          "name": "stderr",
+          "text": "<span class=\"codehilite\"><div class=\"highlight\"><pre><span></span><span class=\"gt\">Traceback (most recent call last):</span>\n  File <span class=\"nb\">&quot;C:\\Users\\RhysL\\AppData\\Local\\Temp\\marimo_16464\\__marimo__cell_RGSE_.py&quot;</span>, line <span class=\"m\">5</span>, in <span class=\"n\">&lt;module&gt;</span>\n<span class=\"w\">    </span><span class=\"kn\">from</span><span class=\"w\"> </span><span class=\"nn\">ts_model_framework</span><span class=\"w\"> </span><span class=\"kn\">import</span> <span class=\"p\">(</span>\n<span class=\"w\">    </span><span class=\"o\">...&lt;</span><span class=\"mi\">4</span> <span class=\"n\">lines</span><span class=\"o\">&gt;...</span>\n<span class=\"w\">    </span><span class=\"p\">)</span>\n<span class=\"gr\">ModuleNotFoundError</span>: <span class=\"n\">No module named &#39;ts_model_framework&#39;</span>\n</pre></div>\n</span>",
+          "mimetype": "application/vnd.marimo+traceback"
+        }
+      ]
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "44563524567289d16ffa81833ea32713",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "649bf7cfbfdac69a77e419ddf668afae",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"section-4-detailed-plot-analysis\">Section 4: Detailed Plot Analysis</h2>\n<span class=\"paragraph\">Visualise best model's forecast with integrated mathematical explanations.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "4c3218ad38e45fd1a56c91fdfbe6dd49",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "3c7114f92b4c85c462135f930150a019",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "iLit",
+      "code_hash": "4b486136f5cedd5d389ed5c9349a6eba",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"plot-1-forecast-vs-actual\">Plot 1: Forecast vs Actual</h4>\n<span class=\"paragraph\">See <a href=\"../../docs_src/theory/diagnostics.md#forecast-vs-actual-with-prediction-interval\">Diagnostics \u2014 Forecast vs Actual</a>\nfor good vs bad cases and what each failure mode means.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ZHCJ",
+      "code_hash": "3e46b65e1c00b7d4ca3873e3c3e83549",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "ROlb",
+      "code_hash": "2223539b6d26789a770dd8bf38a5adff",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"plot-2-residuals-diagnostic\">Plot 2: Residuals Diagnostic</h4>\n<span class=\"paragraph\">See <a href=\"../../docs_src/theory/diagnostics.md#residuals-diagnostic-time-series--histogram\">Diagnostics \u2014 Residuals</a>\nfor how to read the time-series and histogram panels (bias, autocorrelation, heavy tails).</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "qnkX",
+      "code_hash": "1e14a06fe102516cdb312d012ad1d0df",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "TqIu",
+      "code_hash": "dc6ad54044cb9d7ca7056065b79a48c4",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h4 id=\"plot-3-uncertainty-width-over-time\">Plot 3: Uncertainty Width Over Time</h4>\n<span class=\"paragraph\">See <a href=\"../../docs_src/theory/diagnostics.md#uncertainty-width-over-time\">Diagnostics \u2014 Uncertainty width</a>\nfor good/flat/exploding cases and the calibration formula.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Vxnm",
+      "code_hash": "052e711f556c64ae97fcc337bc0c2b53",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "DnEU",
+      "code_hash": "8f34732ebdc3c9880de9adb6442f684f",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "ulZA",
+      "code_hash": "abadf70d6c9fdacb03512b5d5500183d",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"section-5-comparing-all-models\">Section 5: Comparing All Models</h2>\n<span class=\"paragraph\">Side-by-side comparison of all 3 models.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "ecfG",
+      "code_hash": "eefdb3c41a7b107c85aae074dc39cefe",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "Pvdt",
+      "code_hash": "45936f5fbb7f54c1fc65170c5823e6b3",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "ZBYS",
+      "code_hash": "bac7db7437e65d76ac29323c759e5702",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"section-6-interpretation-guide\">Section 6: Interpretation Guide</h2>\n<span class=\"paragraph\">How to interpret these results for  flexibility forecasting.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "aLJB",
+      "code_hash": "60ed587ee907926cefbfd4f89a7ac59c",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "nHfw",
+      "code_hash": "70eb8bf042710029a1dd3e0327b6857e",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"section-7-mathematics-summary\">Section 7: Mathematics Summary</h2>\n<span class=\"paragraph\">Full formulas for metrics and models are in\n<a href=\"../../docs_src/theory/metrics.md\"><code>docs_src/theory/metrics.md</code></a> and\n<a href=\"../../docs_src/theory/models.md\"><code>docs_src/theory/models.md</code></a> \u2014 not repeated here.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "xXTn",
+      "code_hash": "faa9f6ad53c074a726a6bd03ccf71673",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"section-8-checklist\">Section 8: Checklist</h2>\n<span class=\"paragraph\">Is this forecast production-ready?</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "AjVT",
+      "code_hash": "c183a175c8707c7fe90837916ed994fb",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "pHFh",
+      "code_hash": "e8b097981decf90f9495cc5bc88ca09a",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"section-9-next-steps\">Section 9: Next Steps</h2>\n<span class=\"paragraph\">Recommended actions based on your results.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "NCOB",
+      "code_hash": "4ba7b267209de4426edb08d8d951a124",
+      "outputs": [],
+      "console": []
+    },
+    {
+      "id": "aqbW",
+      "code_hash": "5348af009a58446e22a84d4957e6c5ab",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><hr />\n<h2 id=\"summary\">Summary</h2>\n<span class=\"paragraph\"><strong>Key takeaways:</strong></span>\n<ol>\n<li>Lower RMSE doesn't guarantee good model (check coverage too!)</li>\n<li>PI Coverage should match target (80% \u2192 80% coverage)</li>\n<li>Residuals should be white noise (random, centered at 0)</li>\n<li>Uncertainty width should vary by time-of-day</li>\n<li>Monitor weekly; retrain if metrics degrade</li>\n</ol>\n<span class=\"paragraph\">For the theory behind all of this, see <a href=\"../../docs_src/theory/index.md\"><code>docs_src/theory/index.md</code></a>.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    }
+  ]
+}
