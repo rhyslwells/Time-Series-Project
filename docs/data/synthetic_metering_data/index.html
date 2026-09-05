@@ -13,10 +13,10 @@
       
       
       
-        <link rel="prev" href="../data_generation/">
+        <link rel="prev" href="../feature_engineering/">
       
       
-        <link rel="next" href="../../notebooks/">
+        <link rel="next" href="../../notebooks/sarima_forecasting/">
       
       
         
@@ -346,7 +346,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../notebooks/" class="md-tabs__link">
+        <a href="../../notebooks.md" class="md-tabs__link">
           
   
   
@@ -646,6 +646,8 @@
       
         
       
+        
+      
     
     
     
@@ -718,6 +720,34 @@
     
   
     Data Generation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../feature_engineering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feature Engineering
   
 
     
@@ -947,17 +977,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#reproducibility" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Reproducibility
-      
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1005,7 +1024,7 @@
   
   
   
-    <a href="../../notebooks/" class="md-nav__link">
+    <a href="../../notebooks.md" class="md-nav__link">
       
   
   
@@ -1231,16 +1250,10 @@
 <p>This document describes the characteristics, patterns, and behavior of the synthetic metering dataset (src\data\metering_data.parquet) used for model development and testing.</p>
 <h2 id="dataset-overview">Dataset Overview<a class="headerlink" href="#dataset-overview" title="Permanent link">&para;</a></h2>
 <p><strong>Purpose:</strong> Provide realistic, reproducible metering data for developing and validating energy forecasting systems.</p>
-<p><strong>Temporal Coverage:</strong>
-- Start: 2025-01-01 (Wednesday)
-- End: 2025-01-14 (Tuesday)
-- Duration: 14 days (2 full weeks)
-- Frequency: 30-minute intervals
-- Total records: 10,080 (15 assets × 14 days × 48 intervals)</p>
-<p><strong>Assets:</strong>
-- Count: 15
-- Types: 2 (EV charging, Solar+Battery storage)
-- Time series per asset: 1,344 complete records</p>
+<p>For generation parameters (seed, asset counts, interval, total records) see
+<a href="../data_generation/">Data Generation and Calculations</a>. Relevant here: the series runs
+2025-01-01 (Wednesday) to 2025-01-14 (Tuesday) — two full weeks, so weekday/weekend
+effects appear twice — at 1,344 complete records per asset.</p>
 <hr />
 <h2 id="asset-types-and-behavioral-patterns">Asset Types and Behavioral Patterns<a class="headerlink" href="#asset-types-and-behavioral-patterns" title="Permanent link">&para;</a></h2>
 <h3 id="ev-charging-stations-8-assets">EV Charging Stations (8 assets)<a class="headerlink" href="#ev-charging-stations-8-assets" title="Permanent link">&para;</a></h3>
@@ -1391,14 +1404,6 @@
 </tr>
 </tbody>
 </table>
-<hr />
-<h2 id="reproducibility">Reproducibility<a class="headerlink" href="#reproducibility" title="Permanent link">&para;</a></h2>
-<p>To regenerate this data:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">cd</span><span class="w"> </span>working_notes/1_produce_data
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>python<span class="w"> </span>generate_data.py<span class="w">      </span><span class="c1"># Creates metering_data_raw.csv</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>python<span class="w"> </span>inspect_data.py<span class="w">       </span><span class="c1"># Creates src/data/*.parquet files</span>
-</span></code></pre></div></p>
-<p>Outputs will be identical due to seed=42 reproducibility.</p>
 
 
 
@@ -1419,7 +1424,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 5, 2026 09:00:13 UTC">September 5, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 5, 2026 09:20:33 UTC">September 5, 2026</span>
   </span>
 
     
@@ -1455,7 +1460,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../data_generation/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Data Generation">
+          <a href="../feature_engineering/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Feature Engineering">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1465,20 +1470,20 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Data Generation
+                Feature Engineering
               </div>
             </div>
           </a>
         
         
           
-          <a href="../../notebooks/" class="md-footer__link md-footer__link--next" aria-label="Next: Exploration Notebooks">
+          <a href="../../notebooks/sarima_forecasting/" class="md-footer__link md-footer__link--next" aria-label="Next: SARIMA Forecasting">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Exploration Notebooks
+                SARIMA Forecasting
               </div>
             </div>
             <div class="md-footer__button md-icon">
