@@ -894,6 +894,28 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
+  <a href="#expected-ranges-by-asset-type" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected ranges by asset type
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#sanity-checks-before-trusting-a-forecast" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sanity checks before trusting a forecast
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#mae-mean-absolute-error" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -931,28 +953,6 @@
     <span class="md-ellipsis">
       
         PI Coverage
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#expected-ranges-by-asset-type" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Expected ranges by asset type
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#sanity-checks-before-trusting-a-forecast" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Sanity checks before trusting a forecast
       
     </span>
   </a>
@@ -1031,7 +1031,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../decisions/" class="md-nav__link">
+      <a href="../model-model-decisions.md" class="md-nav__link">
         
   
   
@@ -1217,33 +1217,6 @@
 
 
 <h1 id="metrics">Metrics<a class="headerlink" href="#metrics" title="Permanent link">&para;</a></h1>
-<h2 id="mae-mean-absolute-error">MAE — Mean Absolute Error<a class="headerlink" href="#mae-mean-absolute-error" title="Permanent link">&para;</a></h2>
-<p>$$\text{MAE} = \frac{1}{n} \sum_{t=1}^{n} |y_t - \hat{y}_t|$$</p>
-<p>Average absolute difference between actual and forecast, in the same units as the data (kWh). Scale-dependent: 0.1 kWh is excellent for a 0.1 kWh asset and poor for a 5 kWh asset — always read it against the asset-type ranges below.</p>
-<h2 id="rmse-root-mean-squared-error">RMSE — Root Mean Squared Error<a class="headerlink" href="#rmse-root-mean-squared-error" title="Permanent link">&para;</a></h2>
-<p>$$\text{RMSE} = \sqrt{\frac{1}{n} \sum_{t=1}^{n} (y_t - \hat{y}_t)^2}$$</p>
-<p>Squaring means large errors dominate the sum, so RMSE is always ≥ MAE and the <em>gap</em> between them is diagnostic:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">ratio</span> <span class="o">=</span> <span class="n">rmse</span> <span class="o">/</span> <span class="n">mae</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="c1"># &lt; 1.2   consistent errors, no outliers</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="c1"># 1.2-1.5 some outliers, normal</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># &gt; 1.5   frequent large errors — check data quality / model fit</span>
-</span></code></pre></div>
-<h2 id="mape-mean-absolute-percentage-error">MAPE — Mean Absolute Percentage Error<a class="headerlink" href="#mape-mean-absolute-percentage-error" title="Permanent link">&para;</a></h2>
-<p>$$\text{MAPE} = \frac{100}{n} \sum_{t=1}^{n} \left|\frac{y_t - \hat{y}_t}{y_t}\right|$$</p>
-<p>Scale-independent, so it's the right metric for comparing forecast quality across differently-sized assets. <strong>Pitfall:</strong> blows up when $y_t \approx 0$ (common in energy off-peak periods) — use $\max(|y_t|, \epsilon)$ in the denominator, or exclude near-zero values.</p>
-<h2 id="pi-coverage">PI Coverage<a class="headerlink" href="#pi-coverage" title="Permanent link">&para;</a></h2>
-<p>$$\text{Coverage} = \frac{1}{n} \sum_{t=1}^{n} \mathbb{1}[y_t \in [\hat{L}_t, \hat{U}_t]]$$</p>
-<p>The share of actuals that fall inside the prediction interval. For an 80% PI, coverage should land near 80%.</p>
-<ul>
-<li><strong>Undercoverage</strong> (e.g. 45%): intervals too narrow, model over-confident — flexibility commitments will breach.</li>
-<li><strong>Overcoverage</strong> (e.g. 95%): intervals too wide, model under-confident — wasted conservatism, missed revenue.</li>
-</ul>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">norm</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="n">z_80</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.90</span><span class="p">)</span>   <span class="c1"># 1.282</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="n">upper</span> <span class="o">=</span> <span class="n">forecast</span> <span class="o">+</span> <span class="n">z_80</span> <span class="o">*</span> <span class="n">std</span><span class="p">(</span><span class="n">residuals</span><span class="p">)</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="n">lower</span> <span class="o">=</span> <span class="n">forecast</span> <span class="o">-</span> <span class="n">z_80</span> <span class="o">*</span> <span class="n">std</span><span class="p">(</span><span class="n">residuals</span><span class="p">)</span>
-</span></code></pre></div>
-<p>Sanity check: <code>mean_width ≈ 2 * z * std(residuals)</code>; a gap larger than ~0.2 kWh means the interval calculation doesn't match the residual distribution.</p>
 <h2 id="expected-ranges-by-asset-type">Expected ranges by asset type<a class="headerlink" href="#expected-ranges-by-asset-type" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -1289,11 +1262,39 @@
 </table>
 <p>Why the spread: residential demand follows a stable daily routine, commercial adds occupancy and HVAC non-linearity, and EV charging arrival/duration is close to a Poisson process — each step up trades predictability for MAE/MAPE headroom.</p>
 <h2 id="sanity-checks-before-trusting-a-forecast">Sanity checks before trusting a forecast<a class="headerlink" href="#sanity-checks-before-trusting-a-forecast" title="Permanent link">&para;</a></h2>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">assert</span> <span class="p">(</span><span class="n">forecast</span><span class="o">.</span><span class="n">lower</span> <span class="o">&lt;</span> <span class="n">forecast</span><span class="o">.</span><span class="n">prediction</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="k">assert</span> <span class="p">(</span><span class="n">forecast</span><span class="o">.</span><span class="n">upper</span> <span class="o">&gt;</span> <span class="n">forecast</span><span class="o">.</span><span class="n">prediction</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">assert</span> <span class="mf">0.7</span> <span class="o">&lt;</span> <span class="n">coverage</span> <span class="o">&lt;</span> <span class="mf">0.95</span>
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="k">assert</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">forecast</span><span class="o">.</span><span class="n">prediction</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">assert</span> <span class="p">(</span><span class="n">forecast</span><span class="o">.</span><span class="n">lower</span> <span class="o">&lt;</span> <span class="n">forecast</span><span class="o">.</span><span class="n">prediction</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="k">assert</span> <span class="p">(</span><span class="n">forecast</span><span class="o">.</span><span class="n">upper</span> <span class="o">&gt;</span> <span class="n">forecast</span><span class="o">.</span><span class="n">prediction</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="k">assert</span> <span class="mf">0.7</span> <span class="o">&lt;</span> <span class="n">coverage</span> <span class="o">&lt;</span> <span class="mf">0.95</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">assert</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">forecast</span><span class="o">.</span><span class="n">prediction</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
 </span></code></pre></div>
+<h2 id="mae-mean-absolute-error">MAE — Mean Absolute Error<a class="headerlink" href="#mae-mean-absolute-error" title="Permanent link">&para;</a></h2>
+<p>$$\text{MAE} = \frac{1}{n} \sum_{t=1}^{n} |y_t - \hat{y}_t|$$</p>
+<p>Average absolute difference between actual and forecast, in the same units as the data (kWh). Scale-dependent: 0.1 kWh is excellent for a 0.1 kWh asset and poor for a 5 kWh asset — always read it against the asset-type ranges below.</p>
+<h2 id="rmse-root-mean-squared-error">RMSE — Root Mean Squared Error<a class="headerlink" href="#rmse-root-mean-squared-error" title="Permanent link">&para;</a></h2>
+<p>$$\text{RMSE} = \sqrt{\frac{1}{n} \sum_{t=1}^{n} (y_t - \hat{y}_t)^2}$$</p>
+<p>Squaring means large errors dominate the sum, so RMSE is always ≥ MAE and the <em>gap</em> between them is diagnostic:</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">ratio</span> <span class="o">=</span> <span class="n">rmse</span> <span class="o">/</span> <span class="n">mae</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># &lt; 1.2   consistent errors, no outliers</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># 1.2-1.5 some outliers, normal</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># &gt; 1.5   frequent large errors — check data quality / model fit</span>
+</span></code></pre></div>
+<h2 id="mape-mean-absolute-percentage-error">MAPE — Mean Absolute Percentage Error<a class="headerlink" href="#mape-mean-absolute-percentage-error" title="Permanent link">&para;</a></h2>
+<p>$$\text{MAPE} = \frac{100}{n} \sum_{t=1}^{n} \left|\frac{y_t - \hat{y}_t}{y_t}\right|$$</p>
+<p>Scale-independent, so it's the right metric for comparing forecast quality across differently-sized assets. <strong>Pitfall:</strong> blows up when $y_t \approx 0$ (common in energy off-peak periods) — use $\max(|y_t|, \epsilon)$ in the denominator, or exclude near-zero values.</p>
+<h2 id="pi-coverage">PI Coverage<a class="headerlink" href="#pi-coverage" title="Permanent link">&para;</a></h2>
+<p>$$\text{Coverage} = \frac{1}{n} \sum_{t=1}^{n} \mathbb{1}[y_t \in [\hat{L}_t, \hat{U}_t]]$$</p>
+<p>The share of actuals that fall inside the prediction interval. For an 80% PI, coverage should land near 80%.</p>
+<ul>
+<li><strong>Undercoverage</strong> (e.g. 45%): intervals too narrow, model over-confident — flexibility commitments will breach.</li>
+<li><strong>Overcoverage</strong> (e.g. 95%): intervals too wide, model under-confident — wasted conservatism, missed revenue.</li>
+</ul>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">norm</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="n">z_80</span> <span class="o">=</span> <span class="n">norm</span><span class="o">.</span><span class="n">ppf</span><span class="p">(</span><span class="mf">0.90</span><span class="p">)</span>  <span class="c1"># 1.282</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="n">upper</span> <span class="o">=</span> <span class="n">forecast</span> <span class="o">+</span> <span class="n">z_80</span> <span class="o">*</span> <span class="n">std</span><span class="p">(</span><span class="n">residuals</span><span class="p">)</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="n">lower</span> <span class="o">=</span> <span class="n">forecast</span> <span class="o">-</span> <span class="n">z_80</span> <span class="o">*</span> <span class="n">std</span><span class="p">(</span><span class="n">residuals</span><span class="p">)</span>
+</span></code></pre></div>
+<p>Sanity check: <code>mean_width ≈ 2 * z * std(residuals)</code>; a gap larger than ~0.2 kWh means the interval calculation doesn't match the residual distribution.</p>
 
 
 
@@ -1314,7 +1315,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 5, 2026 09:31:34 UTC">September 5, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 5, 2026 16:35:53 UTC">September 5, 2026</span>
   </span>
 
     
