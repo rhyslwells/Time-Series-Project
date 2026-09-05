@@ -8,15 +8,19 @@ Keep the core `src/` directory focused and clean. Use `archive/` for experimenta
 Time-Series-Project/
 ├── src/                          # Production code
 │   ├── __init__.py
-│   └── data/                      # Generated parquet data
+│   └── data/                      # Data generation pipeline + its output
+│       ├── generate_raw_data.py
+│       ├── generate_daily_metrics.py
+│       ├── generate_metering_features.py
+│       ├── metering_data_raw.csv
+│       ├── metering_data.parquet
+│       ├── daily_metrics.parquet
+│       └── metering_data_with_features.parquet
 │
 ├── working_notes/                 # Exploration & documentation
 │   ├── todos.md                   # Task tracking
-│   └── 1_produce_data/            # Data generation
-│       ├── notes.md
-│       ├── generate_data.py
-│       ├── inspect_data.py
-│       └── metering_data_raw.csv
+│   └── 1_produce_data/            # Notes only (scripts live in src/data/)
+│       └── notes.md
 │
 ├── archive/                       # Experimental work (old code)
 ├── docs_src/                      # Documentation source (tracked)
@@ -46,11 +50,18 @@ Before creating new files or directories:
 
 Do not create supplementary scaffolding or examples unless explicitly requested.
 
+The data generation scripts in `src/data/` are the one exception to "scripts live in
+working_notes/": they were promoted to production code because their output
+(`src/data/*.parquet`) is a production data contract, and keeping generator and
+generated data in the same directory keeps that contract auditable in one place.
+
 ## Key Production Files
 
 | File | Purpose |
 |------|---------|
+| `generate_raw_data.py` | Synthesizes metering_data_raw.csv (14 days x 15 assets x 30-min) |
+| `generate_daily_metrics.py` | Reads the raw CSV, writes metering_data.parquet + daily_metrics.parquet |
+| `generate_metering_features.py` | Joins daily_metrics.parquet onto metering_data.parquet, broadcast per day |
 | `metering_data.parquet` | Raw 30-min metering (10,080 rows) |
-| `daily_metrics.parquet` | Daily aggregates (210 rows) |
-| `ramp_rates.parquet` | Asset ramp statistics (15 rows) |
-| `behavioral_fingerprints.parquet` | Asset features (15 rows) |
+| `daily_metrics.parquet` | Daily aggregates + behavioral metrics (210 rows) |
+| `metering_data_with_features.parquet` | 30-min metering + daily features broadcast across each day's 48 rows (10,080 rows) |

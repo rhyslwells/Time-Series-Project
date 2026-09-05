@@ -12,3 +12,7 @@ Characteristics, patterns, and behavioral profiles of the synthetic dataset.
 
 How synthetic metering data is generated and the calculations performed to produce daily metrics, behavioral features, and ramp rate analysis.
 
+[Feature Engineering](feature_engineering.md)
+
+How daily behavioral metrics are joined back onto the 30-minute metering series to produce a model-ready table.
+

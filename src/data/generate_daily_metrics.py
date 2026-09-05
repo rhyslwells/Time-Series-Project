@@ -114,8 +114,7 @@ def print_daily_metrics(daily):
     print()
 
 def save_parquet_files(df, daily):
-    data_dir = Path(__file__).parent.parent.parent / 'src' / 'data'
-    data_dir.mkdir(parents=True, exist_ok=True)
+    data_dir = Path(__file__).parent
 
     metering_path = data_dir / 'metering_data.parquet'
     daily_path = data_dir / 'daily_metrics.parquet'

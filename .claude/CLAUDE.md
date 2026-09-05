@@ -29,10 +29,10 @@ Embedded assistant for energy systems forecasting. Help with: model setup, time 
 
 - Layer-separated architecture ensures reusability and swappable components
 - Standard forecast contracts: `asset_id`, `timestamp`, `prediction`, `uncertainty`, `model_version`
-- Data: 14 days × 15 assets (EV + solar) × 30-min intervals → 4 parquet files in `src/data/`
+- Data: 14 days × 15 assets (EV + solar) × 30-min intervals → 3 parquet files in `src/data/`
 
 **Repository structure:**
-- `src/` — production-ready code only
+- `src/` — production-ready code (includes the data generation scripts in `src/data/`, since their output is a production data contract)
 - `archive/` — experimental work freely added
 - `working_notes/` — exploration (not committed)
 - `docs_src/` — solid, tracked findings
@@ -52,13 +52,11 @@ Embedded assistant for energy systems forecasting. Help with: model setup, time 
 
 ## Data Pipeline (Quick Reference)
 
-**Generate phase:** `working_notes/1_produce_data/generate_data.py` → `metering_data_raw.csv`
+All three generation scripts live in `src/data/`, alongside their output:
 
-**Inspect & export phase:** `working_notes/1_produce_data/inspect_data.py` → parquet files in `src/data/`:
-- `metering_data.parquet` — Raw (10,080 rows)
-- `daily_metrics.parquet` — Daily aggregates (210 rows)
-- `ramp_rates.parquet` — Ramp stats (15 rows)
-- `behavioral_fingerprints.parquet` — Clustering features (15 rows)
+1. `generate_raw_data.py` → `metering_data_raw.csv`
+2. `generate_daily_metrics.py` → `metering_data.parquet` (raw, 10,080 rows), `daily_metrics.parquet` (daily aggregates + behavioral metrics, 210 rows)
+3. `generate_metering_features.py` → `metering_data_with_features.parquet` (metering_data.parquet joined with daily_metrics.parquet, broadcast across each day's 48 half-hour rows, `feat_`-prefixed columns, 10,080 rows)
 
 ---
 
@@ -78,7 +76,7 @@ Embedded assistant for energy systems forecasting. Help with: model setup, time 
 
 - **Python stack:** polars, scikit-learn, statsmodels, numpy
 - **Notebooks:** marimo (consolidation), IPython (exploration)
-- **Data I/O:** parquet (production), CSV (working_notes/)
+- **Data I/O:** parquet and the intermediate raw CSV, both in `src/data/`
 - **Documentation:** mkdocs, tracked in docs_src/
 
 See individual docs for specific API details and implementation patterns.

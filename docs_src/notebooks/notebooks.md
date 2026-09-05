@@ -1,5 +1,7 @@
 # Exploration Notebooks
 
+notebooks are in src/notebooks
+
 Interactive marimo notebooks documenting ongoing investigations. These are living documents that evolve as we explore.
 
 ## How to Use

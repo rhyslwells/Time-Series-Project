@@ -60,6 +60,7 @@ nav:
   - Data:
       - data/index.md
       - Data Generation: data/data_generation.md
+      - Feature Engineering: data/feature_engineering.md
       - Synthetic Metering Data: data/synthetic_metering_data.md
   - Exploration Notebooks:
       - notebooks.md

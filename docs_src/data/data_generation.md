@@ -2,11 +2,11 @@
 
 This document describes how synthetic metering data is generated and the calculations performed to produce analysis-ready datasets.
 
-**Source:** `working_notes/1_produce_data/` scripts (generate_data.py, inspect_data.py)
+**Source:** `src/data/` scripts (generate_raw_data.py, generate_daily_metrics.py). For the third pipeline stage, which joins these daily metrics back onto the 30-minute series, see [Feature Engineering](feature_engineering.md).
 
 ## Generation Process
 
-### Step 1: Synthetic Metering Generation (generate_data.py)
+### Step 1: Synthetic Metering Generation (generate_raw_data.py)
 
 Synthetic metering data is created with realistic behavioral patterns for 15 assets over 14 days (2025-01-01 to 2025-01-14) at 30-minute intervals.
 
@@ -37,7 +37,7 @@ Synthetic metering data is created with realistic behavioral patterns for 15 ass
 
 ## Analysis and Calculations
 
-### Step 2: Daily Metrics Computation (inspect_data.py)
+### Step 2: Daily Metrics Computation (generate_daily_metrics.py)
 
 Raw metering data is aggregated and analyzed to produce daily-level metrics for each asset.
 
@@ -168,4 +168,12 @@ Previously, behavioral metrics and ramp rates were stored separately (15 rows ea
 2. **Adaptive forecasting:** Yesterday's coefficient_of_variation informs today's uncertainty bands
 3. **Single fact table:** Simplifies data contracts and downstream logic
 4. **Drift detection:** Time-series of behavioral metrics reveals asset state changes
+
+---
+
+## Next Step
+
+`daily_metrics.parquet` is joined back onto the 30-minute series to produce a model-ready
+table with per-interval and daily-context features side by side. See
+[Feature Engineering](feature_engineering.md).
 

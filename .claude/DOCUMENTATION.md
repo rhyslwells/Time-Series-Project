@@ -24,3 +24,10 @@ Documentation should:
 | `working_notes/` | Exploration notes, reference materials | No |
 | Code comments | Non-obvious WHY, hidden constraints, workarounds | N/A |
 | Commit messages | Context for changes | Yes |
+
+## Diagrams and Visualizations
+
+- **Always use Mermaid diagrams** for data pipelines, process flows, and architecture — not ASCII art
+- Mermaid syntax: ```` ```mermaid ... ``` ````
+- Mermaid renders natively in mkdocs and supports flowcharts, graphs, sequence diagrams, and more
+- ASCII art becomes unreadable when edited, hard to version, and can't be styled

@@ -6,17 +6,10 @@ This document describes the characteristics, patterns, and behavior of the synth
 
 **Purpose:** Provide realistic, reproducible metering data for developing and validating energy forecasting systems.
 
-**Temporal Coverage:**
-- Start: 2025-01-01 (Wednesday)
-- End: 2025-01-14 (Tuesday)
-- Duration: 14 days (2 full weeks)
-- Frequency: 30-minute intervals
-- Total records: 10,080 (15 assets × 14 days × 48 intervals)
-
-**Assets:**
-- Count: 15
-- Types: 2 (EV charging, Solar+Battery storage)
-- Time series per asset: 1,344 complete records
+For generation parameters (seed, asset counts, interval, total records) see
+[Data Generation and Calculations](data_generation.md). Relevant here: the series runs
+2025-01-01 (Wednesday) to 2025-01-14 (Tuesday) — two full weeks, so weekday/weekend
+effects appear twice — at 1,344 complete records per asset.
 
 ---
 
@@ -184,16 +177,3 @@ The data includes realistic noise to make patterns non-trivial for forecasting:
 |----------|------|---|---|---|---|
 | ASSET_001-008 | EV Charging | ~1.8 | ~0.79 | ~2.2 | Predictable peaks |
 | ASSET_009-015 | Solar+Battery | ~0.03 | ~45 | ~90 | Net exporter |
-
----
-
-## Reproducibility
-
-To regenerate this data:
-```bash
-cd working_notes/1_produce_data
-python generate_data.py      # Creates metering_data_raw.csv
-python inspect_data.py       # Creates src/data/*.parquet files
-```
-
-Outputs will be identical due to seed=42 reproducibility.

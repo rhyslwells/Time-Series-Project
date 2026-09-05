@@ -1,6 +1,7 @@
 import numpy as np
 import polars as pl
 from datetime import datetime, timedelta
+from pathlib import Path
 import warnings
 
 warnings.filterwarnings('ignore')
@@ -104,8 +105,9 @@ if __name__ == "__main__":
         start_date="2025-01-01"
     )
 
-    df.write_csv('metering_data_raw.csv')
+    output_path = Path(__file__).parent / 'metering_data_raw.csv'
+    df.write_csv(output_path)
     print(f"Generated {len(df)} metering records")
     print(f"Assets: {df['asset_id'].n_unique()}")
     print(f"Date range: {df['timestamp'].min()} to {df['timestamp'].max()}")
-    print(f"\nData saved to metering_data_raw.csv")
+    print(f"\nData saved to {output_path}")
