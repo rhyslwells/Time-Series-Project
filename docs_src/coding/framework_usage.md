@@ -6,10 +6,15 @@ How to use `ts_model_framework.py` (models, comparison, tuning) and `ts_plots.py
 
 ```python
 import numpy as np
-from ts_model_framework import ModelComparison, SARIMAModel, ExponentialSmoothingModel, LightGBMModel
+from ts_model_framework import (
+    ModelComparison,
+    SARIMAModel,
+    ExponentialSmoothingModel,
+    LightGBMModel,
+)
 
 y_train = np.array([...])  # e.g. 480 points = 10 days x 48 half-hours
-y_test = np.array([...])   # e.g. 192 points = 4 days x 48 half-hours
+y_test = np.array([...])  # e.g. 192 points = 4 days x 48 half-hours
 
 comp = ModelComparison(y_train, y_test)
 comp.add_model(SARIMAModel(y_train, order=(1, 1, 1), seasonal_order=(1, 1, 1, 48)))
@@ -42,8 +47,8 @@ from ts_plots import ComparisonPlotter
 forecasts = {name: data["forecast"] for name, data in comp.results.items()}
 metrics_dict = {name: data["metrics"] for name, data in comp.results.items()}
 
-ComparisonPlotter.forecast_comparison(y_test, forecasts)      # overlaid forecasts
-ComparisonPlotter.metrics_comparison(metrics_dict)             # MAE/RMSE/MAPE/coverage bar chart
+ComparisonPlotter.forecast_comparison(y_test, forecasts)  # overlaid forecasts
+ComparisonPlotter.metrics_comparison(metrics_dict)  # MAE/RMSE/MAPE/coverage bar chart
 ```
 
 ## Output contracts
@@ -51,10 +56,11 @@ ComparisonPlotter.metrics_comparison(metrics_dict)             # MAE/RMSE/MAPE/c
 ```python
 @dataclass
 class ForecastOutput:
-    prediction: np.ndarray        # point forecast
-    lower: np.ndarray             # lower bound (P10)
-    upper: np.ndarray             # upper bound (P90)
-    uncertainty_width: np.ndarray # upper - lower
+    prediction: np.ndarray  # point forecast
+    lower: np.ndarray  # lower bound (P10)
+    upper: np.ndarray  # upper bound (P90)
+    uncertainty_width: np.ndarray  # upper - lower
+
 
 @dataclass
 class EvaluationMetrics:
@@ -85,7 +91,11 @@ Typical grids for the other two models:
 
 ```python
 # ExponentialSmoothingModel
-param_grid = {"trend": ["add", "mul"], "seasonal": ["add", "mul"], "damped_trend": [True, False]}
+param_grid = {
+    "trend": ["add", "mul"],
+    "seasonal": ["add", "mul"],
+    "damped_trend": [True, False],
+}
 
 # LightGBMModel
 param_grid = {
@@ -115,7 +125,7 @@ print(f"RMSE: {metrics.rmse} -> {final_metrics.rmse}")
 5. Refit with tuned params, save forecast output (CSV) and ranking table
 ```
 
-Deploy once `final_metrics` clears the [production-ready checklist](../theory/decisions.md#production-ready-checklist):
+Deploy once `final_metrics` clears the [production-ready checklist](../theory/model-decisions.md#production-ready-checklist):
 
 ```python
 if final_metrics.pi_coverage > 0.75 and final_metrics.rmse < threshold:

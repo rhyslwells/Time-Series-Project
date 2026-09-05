@@ -14,6 +14,12 @@ uv sync --group docs
 
 uv run marimo export html working_notes/2_basic_forecasting/sarima_marimo.py -o docs_src/notebooks/sarima_marimo_export.html --no-include-code -f 2>&1
 
+store the html here: C:\Users\RhysL\Desktop\Time Series Project\docs_src\notebooks
+
+and a md file link it there too.
+
+
+we store the files here: C:\Users\RhysL\Desktop\Time Series Project\src\notebooks
 
 ===
 ld is clean. Summary of the final state:

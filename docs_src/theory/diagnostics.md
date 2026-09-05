@@ -14,7 +14,7 @@ How to read each of the four diagnostic plots produced by `ts_plots.TSPlotter`, 
 
 ## Residuals diagnostic (time series + histogram)
 
-**Good case:** residuals bounce randomly around 0 with no trend, mostly within ±2× the model's own uncertainty band, and the histogram is roughly bell-shaped and centered at 0.
+**Good case:** residuals bounce randomly around 0 with no trend, mostly within ±2x the model's own uncertainty band, and the histogram is roughly bell-shaped and centered at 0.
 
 **Autocorrelated residuals:** consecutive residuals cluster on the same side (several positive in a row, then several negative) instead of bouncing randomly. This means the model missed structure — errors compound instead of self-correcting. Fix: increase differencing (d/D) or AR terms (p/P).
 
@@ -24,7 +24,7 @@ How to read each of the four diagnostic plots produced by `ts_plots.TSPlotter`, 
 
 ## Uncertainty width over time
 
-**Good case:** width tracks actual volatility — narrow during stable stretches (e.g. midday for an office), wider during transitions (morning ramp-up, evening ramp-down). Mean width roughly matches `2 × z × std(residuals)`.
+**Good case:** width tracks actual volatility — narrow during stable stretches (e.g. midday for an office), wider during transitions (morning ramp-up, evening ramp-down). Mean width roughly matches `2 x z x std(residuals)`.
 
 **Flat width:** the interval is the same size at every hour, meaning the model isn't adapting its confidence to conditions — over-wide during predictable periods (wasted conservatism) and under-wide during volatile ones (under-confident when it matters most). Usually means the interval was computed from a single global residual std rather than a conditional one; for LightGBM in particular, consider a residual-std model or explicit quantile models.
 
@@ -44,4 +44,4 @@ Each point is colored by whether the actual fell inside (green) or outside (red)
 
 ## Ranking models against each other
 
-When RMSE and coverage disagree — one model has the lowest error but the other is better calibrated — coverage should usually win for anything feeding a flexibility commitment: a narrow-but-wrong interval breaches commitments, while a slightly wider one just costs some upside. A 1-2 point coverage gap from target is easy to correct (manual widening); a systematically miscalibrated model is not. See [Decisions](decisions.md) for the full selection logic.
+When RMSE and coverage disagree — one model has the lowest error but the other is better calibrated — coverage should usually win for anything feeding a flexibility commitment: a narrow-but-wrong interval breaches commitments, while a slightly wider one just costs some upside. A 1-2 point coverage gap from target is easy to correct (manual widening); a systematically miscalibrated model is not. See [Decisions](model-decisions.md) for the full selection logic.

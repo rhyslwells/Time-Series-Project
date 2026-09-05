@@ -70,7 +70,7 @@ nav:
       - Metrics: theory/metrics.md
       - Models: theory/models.md
       - Diagnostics: theory/diagnostics.md
-      - Decisions: theory/decisions.md
+      - Decisions: theory/model-model-decisions.md
       - Forecast Products: theory/forecast_products.md
   - Coding:
       - coding/index.md

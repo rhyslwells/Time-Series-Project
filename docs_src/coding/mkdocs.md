@@ -125,7 +125,7 @@ Use relative markdown links:
 
 ```markdown
 # From findings/ to theory/
-See [Decisions](../theory/decisions.md)
+See [Decisions](../theory/model-decisions.md)
 
 # From docs_src root to notebook
 Explore the [SARIMA Forecasting](notebooks/sarima_forecasting.md)

@@ -1,27 +1,16 @@
 # Time Series Forecasting
 
-A forecasting system for energy assets with multi-layer analysis and flexibility optimization.
+A forecasting system for energy assets with multi-layer analysis.
 
-See [theory/](theory/) for the system design and architectural decisions.
+## Concepts Explored
 
-## Key Concepts
+1. Forecasting with plots
+2. Different models applied and compared for a given asset and time period.
 
-This project implements a layered forecasting approach:
-
-1. Raw metering data
-2. Point forecasts with uncertainty
-3. Derived features (daily energy, peaks, ramps)
-4. Asset profiling and behavior classification
-5. ...
-
-
-## Key Principles
-
-1. **Forecast as intermediate layer**: Not a final output, but input to downstream analysis
-2. **Uncertainty-driven**: Always include prediction intervals, not just point estimates
-3. **Asset profiling**: Classify assets by behavioral fingerprints
-4. **Swappable models**: Standard forecast contract enables model replacement
-5. **Portfolio view**: Leverage correlation and aggregation benefits
+## Concepts to explore in future
+1. **Asset profiling**: Classify assets by behavioral fingerprints
+2. Making use of daily metrics.
+3. **Uncertainty quantification**: Understand prediction intervals and confidence levels for forecasts.
 
 ## Documentation
 

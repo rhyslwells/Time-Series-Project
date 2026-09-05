@@ -1,6 +1,6 @@
 # Forecast Products
 
-The model outputs in [Models](models.md) are inputs to a larger system, not the end goal. This page covers the theory for turning a per-timestep forecast into the derived signals that system needs.
+The model outputs in [Models](models.md) are inputs to a larger system. This page covers the theory for turning a per-timestep forecast into the derived signals that system needs.
 
 ## The forecast as a distribution
 
@@ -36,7 +36,7 @@ For demand response, the forecast (made *without* knowledge of the intervention)
 
 $$\text{Response} = \text{Baseline forecast} - \text{Observed metering}$$
 
-e.g. expected 4.2 MW, observed 2.8 MW → estimated response 1.4 MW. This is how forecast quality translates directly into measurement quality for anything being evaluated against a baseline.
+e.g. expected 4.2 MW, observed 2.8 MW -> estimated response 1.4 MW. This is how forecast quality translates directly into measurement quality for anything being evaluated against a baseline.
 
 ## Anomaly detection via residuals
 
@@ -44,11 +44,11 @@ The residual $e_t = y_t - \hat{y}_t$ (see [Diagnostics](diagnostics.md) for what
 
 ## Model health and concept drift
 
-Beyond the aggregate MAE/RMSE in [Metrics](metrics.md), error is worth tracking segmented — by day of week, season, weather, or asset operating regime. A model that's accurate Monday-Friday but poor on weekends is telling you something about the model *and* the asset (a regime that regime it doesn't understand), not just producing a lower average score. This segmented view is what should trigger the retrain/switch decisions in [Decisions](decisions.md), rather than a single rolling aggregate.
+Beyond the aggregate MAE/RMSE in [Metrics](metrics.md), error is worth tracking segmented — by day of week, season, weather, or asset operating regime. A model that's accurate Monday-Friday but poor on weekends is telling you something about the model *and* the asset (a regime that regime it doesn't understand), not just producing a lower average score. This segmented view is what should trigger the retrain/switch decisions in [Decisions](model-decisions.md), rather than a single rolling aggregate.
 
 ## Cross-asset comparison and asset classification
 
-With many asset/model pairs, error metrics become a table (asset × model × MAE/RMSE/bias/coverage) that raises a meta-question: what characteristics of an asset predict which model will work best for it? That points toward a behavioural fingerprint per asset — mean load, variance, coefficient of variation, autocorrelation, seasonality strength, intermittency, ramp frequency, peak-to-average ratio, plus the asset's own forecast error/uncertainty history — used to cluster assets and route each cluster to the model class suited to it, rather than grid-searching every asset individually. This is the theory behind `behavioral_fingerprints.parquet` in the data pipeline.
+With many asset/model pairs, error metrics become a table (asset x model x MAE/RMSE/bias/coverage) that raises a meta-question: what characteristics of an asset predict which model will work best for it? That points toward a behavioural fingerprint per asset — mean load, variance, coefficient of variation, autocorrelation, seasonality strength, intermittency, ramp frequency, peak-to-average ratio, plus the asset's own forecast error/uncertainty history — used to cluster assets and route each cluster to the model class suited to it, rather than grid-searching every asset individually. This is the theory behind `behavioral_fingerprints.parquet` in the data pipeline.
 
 ## Portfolio forecasting
 

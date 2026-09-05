@@ -1,4 +1,4 @@
-# Decisions
+# Model Decisions
 
 ## Which model is best?
 
@@ -52,4 +52,4 @@ Model-specific tuning directions are in [Models](models.md#choosing-between-them
 - [ ] Uncertainty width varies with time-of-day rather than flat
 - [ ] Coverage roughly uniform across hours (no clustered under/over-coverage)
 
-All checked → deploy. Two or more unchecked → tune or reconsider the model class before deploying.
+All checked -> deploy. Two or more unchecked -> tune or reconsider the model class before deploying.
