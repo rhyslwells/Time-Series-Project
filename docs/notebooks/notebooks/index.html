@@ -896,67 +896,49 @@
 
 
 <h1 id="exploration-notebooks">Exploration Notebooks<a class="headerlink" href="#exploration-notebooks" title="Permanent link">&para;</a></h1>
-<p>notebooks are in src/notebooks</p>
 <p>Interactive marimo notebooks documenting ongoing investigations. These are living documents that evolve as we explore.</p>
-<h2 id="how-to-use">How to Use<a class="headerlink" href="#how-to-use" title="Permanent link">&para;</a></h2>
-<ol>
-<li>Each notebook is a <code>.md</code> file in the repository root</li>
-<li>View summaries here, then open in marimo:</li>
-</ol>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>uv<span class="w"> </span>run<span class="w"> </span>marimo<span class="w"> </span>edit<span class="w"> </span>&lt;notebook&gt;.md
+<p>Notebooks are stored in <code>src/notebooks/</code>.</p>
+<h2 id="how-to-use-notebooks">How to Use Notebooks<a class="headerlink" href="#how-to-use-notebooks" title="Permanent link">&para;</a></h2>
+<h3 id="editing-locally">Editing Locally<a class="headerlink" href="#editing-locally" title="Permanent link">&para;</a></h3>
+<p>Open any marimo notebook for interactive editing:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>uv<span class="w"> </span>run<span class="w"> </span>marimo<span class="w"> </span>edit<span class="w"> </span>src/notebooks/notebook_name.py
 </span></code></pre></div>
-<ol>
-<li>Notebooks contain executable Python cells, visualizations, and markdown explanations</li>
-<li>When validated, findings move to the Findings section and design rationale to Theory</li>
-</ol>
-<h2 id="available-notebooks">Available Notebooks<a class="headerlink" href="#available-notebooks" title="Permanent link">&para;</a></h2>
-<h3 id="status-legend">Status Legend<a class="headerlink" href="#status-legend" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>Planning</strong>: Not started, outline ready</li>
-<li><strong>In progress</strong>: Active exploration</li>
-<li><strong>Validated</strong>: Results documented in Findings</li>
-<li><strong>Production</strong>: Implemented in src/</li>
-</ul>
-<h3 id="foundational">Foundational<a class="headerlink" href="#foundational" title="Permanent link">&para;</a></h3>
-<ul>
-<li><strong>forecast_basics_exploration.md</strong>: Basic point forecasting with uncertainty intervals</li>
-<li>Status: Planning</li>
-<li>
-<p>Finding: Forecast Basics Exploration</p>
-</li>
-<li>
-<p><strong>asset_classification_exploration.md</strong>: Behavioral profiling and clustering</p>
-</li>
-<li>Status: Planning</li>
-<li>
-<p>Finding: Asset Classification Exploration</p>
-</li>
-<li>
-<p><strong>asset_profiling_exploration.md</strong>: Detailed asset fingerprinting</p>
-</li>
-<li>Status: Planning</li>
-<li>
-<p>Finding: Asset Profiling Exploration</p>
-</li>
-<li>
-<p><strong>forecast_uncertainty_exploration.md</strong>: Quantifying prediction interval quality</p>
-</li>
-<li>Status: Planning</li>
-<li>Finding: Forecast Uncertainty Exploration</li>
-</ul>
-<h2 id="creating-a-new-notebook">Creating a New Notebook<a class="headerlink" href="#creating-a-new-notebook" title="Permanent link">&para;</a></h2>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>run<span class="w"> </span>marimo<span class="w"> </span>edit<span class="w"> </span>new_topic_exploration.md
+<h3 id="exporting-to-documentation">Exporting to Documentation<a class="headerlink" href="#exporting-to-documentation" title="Permanent link">&para;</a></h3>
+<p>Once a notebook is complete, export it as a static HTML artifact for embedding in documentation:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">cd</span><span class="w"> </span>src/notebooks
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>uv<span class="w"> </span>run<span class="w"> </span>marimo<span class="w"> </span><span class="nb">export</span><span class="w"> </span>html<span class="w"> </span>notebook.py<span class="w"> </span>-o<span class="w"> </span><span class="s2">"../../docs_src/notebooks/notebook_export.html"</span><span class="w"> </span>--include-code<span class="w"> </span>-f
 </span></code></pre></div>
-<p>Follow this structure:</p>
+<p>Then create a markdown file in <code>docs_src/notebooks/</code> that embeds it:</p>
+<div class="language-markdown highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="gh"># Notebook Title</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>[<span class="nt">Full notebook with code and outputs</span>](<span class="na">../notebook_export.html</span>)
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>&lt;iframe src="../notebook_export.html" style="width:100%;height:600px;border:none;"&gt;&lt;/iframe&gt;
+</span></code></pre></div>
+<h3 id="workflow-after-export">Workflow After Export<a class="headerlink" href="#workflow-after-export" title="Permanent link">&para;</a></h3>
+<p>After exporting, the HTML file becomes a build artifact — regenerate it after any notebook edits using the export command above.</p>
+<h2 id="notebook-structure">Notebook Structure<a class="headerlink" href="#notebook-structure" title="Permanent link">&para;</a></h2>
+<p>When creating a new notebook, follow this structure:</p>
 <ol>
 <li><strong>Overview</strong> section explaining the investigation</li>
-<li><strong>Hypotheses</strong> or questions being explored</li>
-<li><strong>Data preparation</strong> with examples</li>
+<li><strong>Questions</strong> or hypotheses being explored</li>
 <li><strong>Analysis</strong> with visualizations</li>
 <li><strong>Findings</strong> section summarizing conclusions</li>
 <li><strong>Next steps</strong> for follow-up work</li>
 </ol>
-<p>When validated, create a markdown file in <code>docs/findings/</code> linking back to the notebook.</p>
+<h2 id="available-notebooks-in-srcnotebooks">Available Notebooks in <code>src/notebooks/</code><a class="headerlink" href="#available-notebooks-in-srcnotebooks" title="Permanent link">&para;</a></h2>
+<p>Add notebooks here with links and descriptions:</p>
+<h2 id="resources">Resources<a class="headerlink" href="#resources" title="Permanent link">&para;</a></h2>
+<ul>
+<li><a href="https://github.com/marimo-team/marimo/tree/main/examples">marimo Examples</a> — Starting point for building your own marimo scripts</li>
+<li><a href="https://github.com/marimo-team/mkdocs-marimo/tree/main/docs/getting-started">mkdocs-marimo Getting Started</a> — Integration with documentation sites</li>
+<li><a href="https://marimo-team.github.io/mkdocs-marimo/getting-started/blocks/">marimo Blocks Documentation</a> — Reference for marimo cell and block features</li>
+</ul>
+<h2 id="build-serve-locally">Build &amp; Serve Locally<a class="headerlink" href="#build-serve-locally" title="Permanent link">&para;</a></h2>
+<p>Ensure docs dependencies are installed:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--group<span class="w"> </span>docs
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>uv<span class="w"> </span>run<span class="w"> </span>mkdocs<span class="w"> </span>serve
+</span></code></pre></div>
 
 
 
@@ -977,7 +959,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 5, 2026 16:35:53 UTC">September 5, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 5, 2026 16:45:05 UTC">September 5, 2026</span>
   </span>
 
     
