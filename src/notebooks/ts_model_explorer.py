@@ -1,3 +1,39 @@
+"""
+Time Series Model Comparison & Interpretation
+==============================================
+
+Purpose:
+    Fit SARIMA, Exponential Smoothing, and LightGBM on one asset's metering
+    data, compare them on RMSE/MAE/MAPE/PI coverage, and render diagnostic
+    plots for the best model plus a side-by-side comparison of all three.
+
+Data:
+    src/data/metering_data.parquet, filtered to a single asset_id, split
+    into train/test (last 4 days held out as test).
+
+Depends on:
+    src/ts_model_framework.py — SARIMAModel, ExponentialSmoothingModel,
+        LightGBMModel, ModelComparison
+    src/ts_plots.py — TSPlotter, ComparisonPlotter
+
+Flow (sections):
+    1. Data Loading & Exploration   — load, plot full series, train/test split
+    2. Understanding Metrics        — pointer to docs (no computation)
+    3. Model Comparison             — fit all 3 models, rank by RMSE
+    4. Detailed Plot Analysis       — 4 diagnostic plots for the best model
+       (forecast vs actual, residuals, uncertainty width, PI coverage)
+    5. Comparing All Models         — overlay forecasts, metrics table
+    6. Interpretation Guide         — best model's metrics translated into
+       a flexibility-commitment example
+    7. Mathematics Summary          — pointer to docs (no computation)
+    8. Checklist                   — pass/fail production-readiness checks
+    9. Next Steps                  — deploy/retrain recommendation
+
+Theory & interpretation (formulas, good-vs-bad plots, retrain triggers):
+    see docs_src/theory/ (metrics.md, models.md, diagnostics.md,
+    model-decisions.md) — not duplicated in this notebook's markdown cells.
+"""
+
 import marimo
 
 __generated_with = "0.23.16"
@@ -34,6 +70,7 @@ def _(mo):
     return
 
 
+## Section 1: Data Loading & Exploration
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -104,6 +141,7 @@ def _(y):
     return y_test, y_train
 
 
+## About This Notebook
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -145,6 +183,7 @@ def _(mo):
     return
 
 
+## Section 2: Understanding Metrics
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -156,6 +195,7 @@ def _(mo):
     return
 
 
+## Section 3: Model Comparison
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -216,6 +256,7 @@ def _(y_test, y_train):
     return comp, results_df
 
 
+### Model Ranking (by RMSE)
 @app.cell(hide_code=True)
 def _(mo, results_df):
     mo.md(f"""
@@ -237,6 +278,7 @@ def _(mo, results_df):
     return
 
 
+## Section 4: Detailed Plot Analysis
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -275,6 +317,7 @@ def _(best_forecast, best_metrics, best_model_name, mo, y_test):
     return
 
 
+#### Plot 1: Forecast vs Actual
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -297,6 +340,7 @@ def _(best_forecast, best_model_name, mo, y_test):
     return
 
 
+#### Plot 2: Residuals Diagnostic
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -319,6 +363,7 @@ def _(best_forecast, best_model_name, mo):
     return
 
 
+#### Plot 3: Uncertainty Width Over Time
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -341,6 +386,7 @@ def _(best_forecast, best_model_name, mo, y_test):
     return
 
 
+#### Plot 4: PI Coverage (Green/Red Scatter)
 @app.cell(hide_code=True)
 def _(best_forecast, mo, np, y_test):
     in_bounds = (y_test >= best_forecast["lower"]) & (y_test <= best_forecast["upper"])
@@ -357,6 +403,7 @@ def _(best_forecast, mo, np, y_test):
     return
 
 
+## Section 5: Comparing All Models
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -392,6 +439,7 @@ def _(ComparisonPlotter, comp, mo):
     return
 
 
+## Section 6: Interpretation Guide
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -402,6 +450,7 @@ def _(mo):
     return
 
 
+### For Your Asset
 @app.cell(hide_code=True)
 def _(best_forecast, best_metrics, best_model_name, mo):
     mo.md(f"""
@@ -442,6 +491,7 @@ def _(best_forecast, best_metrics, best_model_name, mo):
     return
 
 
+## Section 7: Mathematics Summary
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -454,6 +504,7 @@ def _(mo):
     return
 
 
+## Section 8: Checklist
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -495,6 +546,7 @@ def _(best_metrics):
     return
 
 
+## Section 9: Next Steps
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -505,6 +557,7 @@ def _(mo):
     return
 
 
+### Recommendations
 @app.cell(hide_code=True)
 def _(best_metrics, best_model_name, mo):
     mo.md(f"""
@@ -520,6 +573,7 @@ def _(best_metrics, best_model_name, mo):
     return
 
 
+## Summary
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
