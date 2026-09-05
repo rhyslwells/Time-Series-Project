@@ -11,19 +11,23 @@ Examples:
 - Asset behavior patterns discovered through exploration
 - Model performance comparisons
 - Data quality issues and how they were resolved
-- Methodology validations
-
-### `methodology/`
-Documented approaches and processes. How you decided to do something and why.
-
-Examples:
-- Feature engineering decisions
-- Model selection rationale
-- Data preprocessing pipelines
-- Validation strategies
 
 ### `data/`
-Data-related documentation.
+Data-related documentation and data contracts.
+
+### `theory/`
+Methodological foundations and design rationale. How we decided to approach something and why.
+
+Examples:
+- Forecasting layer architecture
+- Model selection approaches
+- Feature engineering strategies
+
+### `notebooks/`
+Consolidation notebooks and exploration guides.
+
+### `coding/`
+Code patterns, style guides, and implementation reference material.
 
 ---
 

@@ -14,7 +14,7 @@ uv run marimo edit <notebook>.md
 ```
 
 3. Notebooks contain executable Python cells, visualizations, and markdown explanations
-4. When validated, findings move to the Findings section and methodology to Methodology
+4. When validated, findings move to the Findings section and design rationale to Theory
 
 ## Available Notebooks
 

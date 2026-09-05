@@ -2,7 +2,7 @@
 
 A forecasting system for energy assets with multi-layer analysis and flexibility optimization.
 
-See [Architecture](architecture.md) for the system design.
+See [theory/](theory/) for the system design and architectural decisions.
 
 ## Key Concepts
 
@@ -14,6 +14,18 @@ This project implements a layered forecasting approach:
 4. Asset profiling and behavior classification
 5. ...
 
-## Exploration
 
-Active investigations are documented in [Exploration Notebooks](notebooks.md).
+## Key Principles
+
+1. **Forecast as intermediate layer**: Not a final output, but input to downstream analysis
+2. **Uncertainty-driven**: Always include prediction intervals, not just point estimates
+3. **Asset profiling**: Classify assets by behavioral fingerprints
+4. **Swappable models**: Standard forecast contract enables model replacement
+5. **Portfolio view**: Leverage correlation and aggregation benefits
+
+## Documentation
+
+- **[Findings](findings/)** — Validated discoveries from analysis and modeling
+- **[Data](data/)** — Data contracts and generation documentation
+- **[Theory](theory/)** — Design rationale and methodological foundations
+- **[Notebooks](notebooks/)** — Consolidation notebooks and exploration guides

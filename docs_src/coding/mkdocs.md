@@ -17,11 +17,10 @@ This project uses MkDocs with Material theme to generate a documentation site pu
 project/
 ├── docs_src/                    Source markdown files
 │   ├── index.md
-│   ├── architecture.md
 │   ├── findings/
-│   ├── methodology/
+│   ├── theory/
 │   ├── data/
-│   ├── notebooks.md
+│   ├── notebooks/
 │   └── coding/
 │
 ├── docs/                        Built HTML (auto-generated)
@@ -125,11 +124,11 @@ Edit `docs_src/` instead.
 Use relative markdown links:
 
 ```markdown
-# From findings/my_finding.md to methodology page
-See [Model Selection](../methodology/model_selection.md)
+# From findings/ to theory/
+See [Decisions](../theory/decisions.md)
 
-# From docs_src root to marimo notebook in repo root
-Explore the [investigation](../asset_profiling_exploration.md)
+# From docs_src root to notebook
+Explore the [SARIMA Forecasting](notebooks/sarima_forecasting.md)
 ```
 
 ## Troubleshooting
