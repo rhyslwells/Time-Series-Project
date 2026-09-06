@@ -13,7 +13,7 @@
       
       
       
-        <link rel="prev" href="../../data/synthetic_metering_data/">
+        <link rel="prev" href="../sarima/">
       
       
         <link rel="next" href="../../theory/">
@@ -27,7 +27,7 @@
     
     
       
-        <title>SARIMA Forecasting - Time Series Forecasting</title>
+        <title>Model Comparison - Time Series Forecasting</title>
       
     
     
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#sarima-time-series-forecasting" class="md-skip">
+        <a href="#time-series-model-comparison-interpretation" class="md-skip">
           Skip to content
         </a>
       
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              SARIMA Forecasting
+              Model Comparison
             
           </span>
         </div>
@@ -703,6 +703,8 @@
       
         
       
+        
+      
     
     
     
@@ -783,6 +785,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../sarima/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    SARIMA Forecasting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -802,7 +832,7 @@
   <span class="md-ellipsis">
     
   
-    SARIMA Forecasting
+    Model Comparison
   
 
     
@@ -1020,18 +1050,19 @@
   
 
 
-<h1 id="sarima-time-series-forecasting">SARIMA Time Series Forecasting<a class="headerlink" href="#sarima-time-series-forecasting" title="Permanent link">&para;</a></h1>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>working_notes/2_basic_forecasting
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>uv<span class="w"> </span>run<span class="w"> </span>marimo<span class="w"> </span><span class="nb">export</span><span class="w"> </span>html<span class="w"> </span>sarima_marimo.py<span class="w"> </span>-o<span class="w"> </span><span class="s2">"../../docs_src/notebooks/sarima_marimo_export.html"</span><span class="w"> </span>--include-code<span class="w"> </span>-f
-</span></code></pre></div>
+<h1 id="time-series-model-comparison-interpretation">Time Series Model Comparison &amp; Interpretation<a class="headerlink" href="#time-series-model-comparison-interpretation" title="Permanent link">&para;</a></h1>
+<p><a href="../ts_model_explorer_export.html" rel="noopener" target="_blank">Open the full-screen version</a></p>
 <p><iframe
-  src="../sarima_marimo_export.html"
-  title="SARIMA forecasting notebook"
+  src="ts_model_explorer_export.html"
+  title="Time Series model comparison notebook"
   loading="lazy"
   style="width: 100%; height: 85vh; border: 1px solid var(--md-default-fg-color--lightest); border-radius: 4px;">
 </iframe>
 </p>
-<p><a href="../sarima_marimo_export.html" rel="noopener" target="_blank">Open the full-screen version</a></p>
+<p>To run this notebook locally, use the following command:
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="nb">cd</span><span class="w"> </span>src/notebooks
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>uv<span class="w"> </span>run<span class="w"> </span>marimo<span class="w"> </span>edit<span class="w"> </span>ts_model_explorer.py
+</span></code></pre></div></p>
 
 
 
@@ -1052,7 +1083,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 6, 2026 15:05:43 UTC">September 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 6, 2026 17:19:03 UTC">September 6, 2026</span>
   </span>
 
     
@@ -1088,7 +1119,7 @@
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../data/synthetic_metering_data/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Synthetic Metering Data">
+          <a href="../sarima/" class="md-footer__link md-footer__link--prev" aria-label="Previous: SARIMA Forecasting">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1098,7 +1129,7 @@
                 Previous
               </span>
               <div class="md-ellipsis">
-                Synthetic Metering Data
+                SARIMA Forecasting
               </div>
             </div>
           </a>
