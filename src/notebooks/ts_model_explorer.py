@@ -36,7 +36,7 @@ Theory & interpretation (formulas, good-vs-bad plots, retrain triggers):
 
 import marimo
 
-__generated_with = "0.23.16"
+__generated_with = "0.24.0"
 app = marimo.App(width="full")
 
 
@@ -70,7 +70,47 @@ def _(mo):
     return
 
 
-## Section 1: Data Loading & Exploration
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    ## About This Notebook
+
+    **Framework Pattern Used:**
+
+    This notebook uses `ts_model_framework.py` classes to demonstrate best practices:
+
+    1. **ModelComparison** — Orchestrates fitting + evaluation for multiple models
+    2. **TSModel subclasses** — SARIMAModel, ExponentialSmoothingModel, LightGBMModel
+    3. **ForecastOutput** — Standardised output contract (prediction, lower, upper, uncertainty_width)
+    4. **EvaluationMetrics** — Standardised metrics (mae, rmse, mape, pi_coverage, uncertainty_width)
+    5. **TSPlotter** — Generic plots that work with any model
+
+    **Why this pattern matters:**
+    - **Consistency**: All models use same interface (fit → forecast)
+    - **Extensibility**: Add new models by subclassing TSModel
+    - **Reusability**: Plotting works for any model automatically
+    - **Maintainability**: Changes to framework apply everywhere
+
+    **To add a new model:**
+    ```python
+    from ts_model_framework import TSModel
+
+    class MyNewModel(TSModel):
+        def fit(self):
+            # Your fitting logic
+            pass
+
+        def forecast(self, steps, confidence_level=0.80):
+            # Your forecast logic
+            return ForecastOutput(...)
+
+    comp.add_model(MyNewModel(y_train))
+    # Everything else works automatically!
+    ```
+    """)
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -141,49 +181,6 @@ def _(y):
     return y_test, y_train
 
 
-## About This Notebook
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md("""
-    ## About This Notebook
-
-    **Framework Pattern Used:**
-
-    This notebook uses `ts_model_framework.py` classes to demonstrate best practices:
-
-    1. **ModelComparison** — Orchestrates fitting + evaluation for multiple models
-    2. **TSModel subclasses** — SARIMAModel, ExponentialSmoothingModel, LightGBMModel
-    3. **ForecastOutput** — Standardised output contract (prediction, lower, upper, uncertainty_width)
-    4. **EvaluationMetrics** — Standardised metrics (mae, rmse, mape, pi_coverage, uncertainty_width)
-    5. **TSPlotter** — Generic plots that work with any model
-
-    **Why this pattern matters:**
-    - **Consistency**: All models use same interface (fit → forecast)
-    - **Extensibility**: Add new models by subclassing TSModel
-    - **Reusability**: Plotting works for any model automatically
-    - **Maintainability**: Changes to framework apply everywhere
-
-    **To add a new model:**
-    ```python
-    from ts_model_framework import TSModel
-
-    class MyNewModel(TSModel):
-        def fit(self):
-            # Your fitting logic
-            pass
-
-        def forecast(self, steps, confidence_level=0.80):
-            # Your forecast logic
-            return ForecastOutput(...)
-
-    comp.add_model(MyNewModel(y_train))
-    # Everything else works automatically!
-    ```
-    """)
-    return
-
-
-## Section 2: Understanding Metrics
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -195,7 +192,6 @@ def _(mo):
     return
 
 
-## Section 3: Model Comparison
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -249,14 +245,13 @@ def _(y_test, y_train):
     print("\nEvaluating forecasts...")
     results_df = comp.evaluate_all(confidence_level=0.80)
 
-    print("\n" + "=" * 60)
+
     print("MODEL COMPARISON RESULTS")
 
     print(results_df.to_string())
     return comp, results_df
 
 
-### Model Ranking (by RMSE)
 @app.cell(hide_code=True)
 def _(mo, results_df):
     mo.md(f"""
@@ -278,7 +273,6 @@ def _(mo, results_df):
     return
 
 
-## Section 4: Detailed Plot Analysis
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -317,7 +311,6 @@ def _(best_forecast, best_metrics, best_model_name, mo, y_test):
     return
 
 
-#### Plot 1: Forecast vs Actual
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -340,7 +333,6 @@ def _(best_forecast, best_model_name, mo, y_test):
     return
 
 
-#### Plot 2: Residuals Diagnostic
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -363,7 +355,6 @@ def _(best_forecast, best_model_name, mo):
     return
 
 
-#### Plot 3: Uncertainty Width Over Time
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -386,7 +377,6 @@ def _(best_forecast, best_model_name, mo, y_test):
     return
 
 
-#### Plot 4: PI Coverage (Green/Red Scatter)
 @app.cell(hide_code=True)
 def _(best_forecast, mo, np, y_test):
     in_bounds = (y_test >= best_forecast["lower"]) & (y_test <= best_forecast["upper"])
@@ -403,7 +393,6 @@ def _(best_forecast, mo, np, y_test):
     return
 
 
-## Section 5: Comparing All Models
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -439,7 +428,6 @@ def _(ComparisonPlotter, comp, mo):
     return
 
 
-## Section 6: Interpretation Guide
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -450,7 +438,6 @@ def _(mo):
     return
 
 
-### For Your Asset
 @app.cell(hide_code=True)
 def _(best_forecast, best_metrics, best_model_name, mo):
     mo.md(f"""
@@ -491,7 +478,6 @@ def _(best_forecast, best_metrics, best_model_name, mo):
     return
 
 
-## Section 7: Mathematics Summary
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -504,7 +490,6 @@ def _(mo):
     return
 
 
-## Section 8: Checklist
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -546,7 +531,6 @@ def _(best_metrics):
     return
 
 
-## Section 9: Next Steps
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
@@ -557,7 +541,6 @@ def _(mo):
     return
 
 
-### Recommendations
 @app.cell(hide_code=True)
 def _(best_metrics, best_model_name, mo):
     mo.md(f"""
@@ -569,26 +552,6 @@ def _(best_metrics, best_model_name, mo):
 
     Full selection logic, retrain triggers, tuning priority, and the production-ready checklist
     are in [`docs_src/theory/model-decisions.md`](../../docs_src/theory/model-decisions.md).
-    """)
-    return
-
-
-## Summary
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md("""
-    ---
-
-    ## Summary
-
-    **Key takeaways:**
-    1. Lower RMSE doesn't guarantee good model (check coverage too!)
-    2. PI Coverage should match target (80% → 80% coverage)
-    3. Residuals should be white noise (random, centered at 0)
-    4. Uncertainty width should vary by time-of-day
-    5. Monitor weekly; retrain if metrics degrade
-
-    For the theory behind all of this, see [`docs_src/theory/index.md`](../../docs_src/theory/index.md).
     """)
     return
 

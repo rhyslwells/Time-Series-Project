@@ -43,7 +43,6 @@ def load_data(asset_id: str, test_days: int = 4) -> tuple:
 def step1_compare_models(y_train: np.ndarray, y_test: np.ndarray) -> pd.DataFrame:
     """Compare three baseline models"""
 
-    print("\n" + "=" * 60)
     print("STEP 1: Model Comparison (Baseline)")
     print("=" * 60)
 
@@ -76,7 +75,6 @@ def step1_compare_models(y_train: np.ndarray, y_test: np.ndarray) -> pd.DataFram
 def step2_diagnostic_plots(comparator: ModelComparison, best_name: str):
     """Generate diagnostic plots for best model"""
 
-    print("\n" + "=" * 60)
     print(f"STEP 2: Diagnostics for {best_name}")
     print("=" * 60)
 
@@ -107,8 +105,7 @@ def step2_diagnostic_plots(comparator: ModelComparison, best_name: str):
 def step3_compare_all_forecasts(comparator: ModelComparison):
     """Plot all model forecasts side-by-side"""
 
-    print("\n" + "=" * 60)
-    print("STEP 3: Forecast Comparison (All Models)")
+    t Comparison (All Models)")
     print("=" * 60)
 
     forecasts = {name: data["forecast"] for name, data in comparator.results.items()}
@@ -128,7 +125,7 @@ def step3_compare_all_forecasts(comparator: ModelComparison):
 def step4_tune_best_model(y_train: np.ndarray, y_test: np.ndarray, best_name: str):
     """Hyperparameter tuning for best model"""
 
-    print("\n" + "=" * 60)
+    
     print(f"STEP 4: Hyperparameter Tuning for {best_name}")
     print("=" * 60)
 
@@ -194,7 +191,7 @@ def step5_final_model(
 ):
     """Refit best model with tuned params and generate final output"""
 
-    print("\n" + "=" * 60)
+    
     print(f"STEP 5: Final Model ({best_name} with tuned params)")
     print("=" * 60)
 
@@ -260,7 +257,7 @@ def main():
         y_train, y_test, best_name, best_params
     )
 
-    print("\n" + "=" * 60)
+    
     print("✓ Workflow Complete")
     print("=" * 60)
 
