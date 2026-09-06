@@ -42,7 +42,6 @@ def step1_compare_models(y_train: np.ndarray, y_test: np.ndarray) -> tuple:
     """Compare three baseline models"""
 
     print("STEP 1: Model Comparison (Baseline)")
-    print("=" * 60)
 
     comparator = ModelComparison(y_train, y_test)
 
@@ -74,7 +73,6 @@ def step2_diagnostic_plots(comparator: ModelComparison, best_name: str):
     """Generate diagnostic plots for best model"""
 
     print(f"STEP 2: Diagnostics for {best_name}")
-    print("=" * 60)
 
     forecast = comparator.get_forecast(best_name)
     metrics = comparator.results[best_name]["metrics"]
@@ -104,7 +102,6 @@ def step3_compare_all_forecasts(comparator: ModelComparison):
     """Plot all model forecasts side-by-side"""
 
     print("STEP 3: Forecast Comparison (All Models)")
-    print("=" * 60)
 
     forecasts = {name: data["forecast"] for name, data in comparator.results.items()}
 
@@ -123,9 +120,7 @@ def step3_compare_all_forecasts(comparator: ModelComparison):
 def step4_tune_best_model(y_train: np.ndarray, y_test: np.ndarray, best_name: str):
     """Hyperparameter tuning for best model"""
 
-    
     print(f"STEP 4: Hyperparameter Tuning for {best_name}")
-    print("=" * 60)
 
     if best_name == "SARIMA":
         print("Grid searching SARIMA(p,d,q)x(P,D,Q,s)...")
@@ -189,9 +184,7 @@ def step5_final_model(
 ):
     """Refit best model with tuned params and generate final output"""
 
-    
     print(f"STEP 5: Final Model ({best_name} with tuned params)")
-    print("=" * 60)
 
     if best_name == "SARIMA":
         model = SARIMAModel(y_train, **best_params)
@@ -255,9 +248,7 @@ def main():
         y_train, y_test, best_name, best_params
     )
 
-    
     print("[ok] Workflow Complete")
-    print("=" * 60)
 
     print(f"\nFinal Summary:")
     print(f"  Best Model: {best_name}")

@@ -1,5 +1,9 @@
 # Project Setup & Development Todos
 
+## Notes
+
+
+
 ## Completed
 
 ## In Progress

@@ -120,7 +120,7 @@ def _(mo):
 @app.cell
 def _(np, pl):
     # Load data
-    df = pl.read_parquet("src/data/metering_data.parquet")
+    df = pl.read_parquet("../../src/data/metering_data.parquet")
     asset_id = "ASSET_001"
     asset_data = df.filter(pl.col("asset_id") == asset_id).sort("timestamp")
 
@@ -237,7 +237,7 @@ def _(y_test, y_train):
 
     print("MODEL COMPARISON RESULTS")
 
-    print(results_df.to_string())
+    print(results_df)
     return ComparisonPlotter, TSPlotter, comp, results_df
 
 
@@ -246,7 +246,9 @@ def _(mo, results_df):
     mo.md(f"""
     ### Model Ranking (by RMSE)
 
-    {results_df.to_markdown()}
+    ```
+    {results_df}
+    ```
 
     **Interpretation:**
     - **RMSE** (lower is better): Point forecast accuracy
@@ -275,7 +277,7 @@ def _(mo):
 @app.cell
 def _(comp, results_df):
     # Get best model from comparison
-    best_model_name = results_df.index[0]  # First row is lowest RMSE
+    best_model_name = results_df["Model"][0]  # First row is lowest RMSE (sorted by Rank)
     best_forecast = comp.get_forecast(best_model_name)
     best_metrics = comp.results[best_model_name]["metrics"]
 
@@ -286,11 +288,11 @@ def _(comp, results_df):
 @app.cell
 def _(TSPlotter, best_forecast, best_metrics, best_model_name, mo, y_test):
     # Plot 1: Forecast vs Actual
-    fig = TSPlotter.forecast_vs_actual(
+    fig2 = TSPlotter.forecast_vs_actual(
         y_test, best_forecast, best_model_name, best_metrics
     )
 
-    mo.ui.plotly(fig)
+    mo.ui.plotly(fig2)
     return
 
 
@@ -308,9 +310,9 @@ def _(mo):
 @app.cell
 def _(TSPlotter, best_forecast, best_model_name, mo, y_test):
     # Plot 2: Residuals Diagnostic
-    fig = TSPlotter.residuals_diagnostic(y_test, best_forecast, best_model_name)
+    fig3 = TSPlotter.residuals_diagnostic(y_test, best_forecast, best_model_name)
 
-    mo.ui.plotly(fig)
+    mo.ui.plotly(fig3)
     return
 
 
@@ -328,9 +330,9 @@ def _(mo):
 @app.cell
 def _(TSPlotter, best_forecast, best_model_name, mo):
     # Plot 3: Uncertainty Width
-    fig = TSPlotter.uncertainty_analysis(best_forecast, best_model_name)
+    fig4 = TSPlotter.uncertainty_analysis(best_forecast, best_model_name)
 
-    mo.ui.plotly(fig)
+    mo.ui.plotly(fig4)
     return
 
 
@@ -348,15 +350,15 @@ def _(mo):
 @app.cell
 def _(TSPlotter, best_forecast, best_model_name, mo, y_test):
     # Plot 4: PI Coverage
-    fig = TSPlotter.pi_coverage(y_test, best_forecast, best_model_name)
+    fig5 = TSPlotter.pi_coverage(y_test, best_forecast, best_model_name)
 
-    mo.ui.plotly(fig)
+    mo.ui.plotly(fig5)
     return
 
 
 @app.cell(hide_code=True)
 def _(best_forecast, mo, np, y_test):
-    in_bounds = (y_test >= best_forecast["lower"]) & (y_test <= best_forecast["upper"])
+    in_bounds = (y_test >= best_forecast.lower) & (y_test <= best_forecast.upper)
     coverage_pct = np.mean(in_bounds) * 100
 
     mo.md(f"""
@@ -386,9 +388,9 @@ def _(ComparisonPlotter, comp, mo, y_test):
     forecasts = {name: comp.get_forecast(name) for name in comp.results.keys()}
 
     # Plot: All model forecasts overlaid
-    fig = ComparisonPlotter.forecast_comparison(y_test, forecasts, sample_size=96)
+    fig6 = ComparisonPlotter.forecast_comparison(y_test, forecasts, sample_size=96)
 
-    mo.ui.plotly(fig)
+    mo.ui.plotly(fig6)
     return
 
 
@@ -397,9 +399,9 @@ def _(ComparisonPlotter, comp, mo):
     # Metrics comparison table
     metrics_dict = {name: data["metrics"] for name, data in comp.results.items()}
 
-    fig = ComparisonPlotter.metrics_comparison(metrics_dict)
+    fig7 = ComparisonPlotter.metrics_comparison(metrics_dict)
 
-    mo.ui.plotly(fig)
+    mo.ui.plotly(fig7)
     return
 
 
@@ -478,11 +480,11 @@ def _(mo):
 @app.cell
 def _(best_metrics):
     checks = {
-        "RMSE < 0.7 kWh (residential)": best_metrics.rmse < 0.7,
-        "RMSE < 1.3 kWh (commercial)": best_metrics.rmse < 1.3,
-        "MAE < 0.5 kWh (residential)": best_metrics.mae < 0.5,
-        "MAPE < 15%": best_metrics.mape < 15,
-        "PI Coverage 75–85% (target ±5%)": 75 <= best_metrics.pi_coverage <= 85,
+        f"RMSE {best_metrics.rmse:.2f} < 0.7 kWh (residential)": best_metrics.rmse < 0.7,
+        f"RMSE {best_metrics.rmse:.2f} < 1.3 kWh (commercial)": best_metrics.rmse < 1.3,
+        f"MAE {best_metrics.mae:.2f} < 0.5 kWh (residential)": best_metrics.mae < 0.5,
+        f"MAPE {best_metrics.mape:.2f}% < 15%": best_metrics.mape < 15,
+        f"PI Coverage {best_metrics.pi_coverage:.0f}% (target ±5%)": 75 <= best_metrics.pi_coverage <= 85,
         "No systematic bias": True,  # Check residuals histogram (Section 4)
         "Residuals bell-shaped": True,  # Check histogram (Section 4)
     }
