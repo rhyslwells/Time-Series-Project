@@ -313,25 +313,31 @@ def _(mo):
 
 
 @app.cell
-def _(TSPlotter, forecast_output, metrics, y_test):
+def _(TSPlotter, forecast_output, metrics, test_timestamps, y_test):
     # Plot 1: Forecast vs Actual with prediction interval
-    fig1 = TSPlotter.forecast_vs_actual(y_test, forecast_output, "SARIMA", metrics)
+    fig1 = TSPlotter.forecast_vs_actual(
+        y_test, forecast_output, "SARIMA", metrics, x=test_timestamps
+    )
     fig1
     return
 
 
 @app.cell
-def _(TSPlotter, forecast_output, y_test):
+def _(TSPlotter, forecast_output, test_timestamps, y_test):
     # Plot 2: Residual diagnostics
-    fig2 = TSPlotter.residuals_diagnostic(y_test, forecast_output, "SARIMA")
+    fig2 = TSPlotter.residuals_diagnostic(
+        y_test, forecast_output, "SARIMA", x=test_timestamps
+    )
     fig2
     return
 
 
 @app.cell
-def _(TSPlotter, forecast_output, y_test):
+def _(TSPlotter, forecast_output, test_timestamps, y_test):
     # Plot 3: Prediction interval coverage
-    fig3 = TSPlotter.pi_coverage(y_test, forecast_output, "SARIMA")
+    fig3 = TSPlotter.pi_coverage(
+        y_test, forecast_output, "SARIMA", x=test_timestamps
+    )
     fig3
     return
 

@@ -21,11 +21,12 @@ class TSPlotter:
         y_test: np.ndarray,
         forecast: ForecastOutput,
         model_name: str = "Model",
-        metrics: EvaluationMetrics = None
+        metrics: EvaluationMetrics = None,
+        x=None
     ) -> go.Figure:
         """Plot: Forecast vs Actual with prediction intervals"""
-        
-        x_range = list(range(len(y_test)))
+
+        x_range = list(x) if x is not None else list(range(len(y_test)))
         
         fig = go.Figure()
         
@@ -62,25 +63,26 @@ class TSPlotter:
         
         fig.update_layout(
             title=title,
-            xaxis_title="Time Step",
+            xaxis_title="Time" if x is not None else "Time Step",
             yaxis_title="Value (kWh)",
             height=500,
             width=1200,
             hovermode='x unified'
         )
-        
+
         return fig
-    
+
     @staticmethod
     def residuals_diagnostic(
         y_test: np.ndarray,
         forecast: ForecastOutput,
-        model_name: str = "Model"
+        model_name: str = "Model",
+        x=None
     ) -> go.Figure:
         """Plot: Residuals with uncertainty overlay"""
-        
+
         residuals = y_test - forecast.prediction
-        x_range = list(range(len(y_test)))
+        x_range = list(x) if x is not None else list(range(len(y_test)))
         
         fig = make_subplots(
             rows=2, cols=1,
@@ -126,7 +128,7 @@ class TSPlotter:
         fig.update_yaxes(title_text="Residual (kWh)", row=1, col=1)
         fig.update_yaxes(title_text="Uncertainty Width", row=1, col=1, secondary_y=True)
         fig.update_yaxes(title_text="Frequency", row=2, col=1)
-        fig.update_xaxes(title_text="Time Step", row=1, col=1)
+        fig.update_xaxes(title_text="Time" if x is not None else "Time Step", row=1, col=1)
         fig.update_xaxes(title_text="Residual Value", row=2, col=1)
         
         fig.update_layout(
@@ -178,11 +180,12 @@ class TSPlotter:
     def pi_coverage(
         y_test: np.ndarray,
         forecast: ForecastOutput,
-        model_name: str = "Model"
+        model_name: str = "Model",
+        x=None
     ) -> go.Figure:
         """Plot: Prediction interval coverage (in/out of bounds)"""
-        
-        x_range = list(range(len(y_test)))
+
+        x_range = list(x) if x is not None else list(range(len(y_test)))
         
         in_bounds = (y_test >= forecast.lower) & (y_test <= forecast.upper)
         
@@ -221,7 +224,7 @@ class TSPlotter:
         
         fig.update_layout(
             title=f"{model_name}: PI Coverage (actual: {coverage_pct:.1f}%, target: 80%)",
-            xaxis_title="Time Step",
+            xaxis_title="Time" if x is not None else "Time Step",
             yaxis_title="Value (kWh)",
             height=450,
             width=1200,
