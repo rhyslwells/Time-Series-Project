@@ -28,9 +28,20 @@ Then create a markdown file in `docs_src/notebooks/` that embeds it:
 ```markdown
 # Notebook Title
 
-[Full notebook with code and outputs](../notebook_export.html)
+[Open the full-screen version](notebook_export.html){ target="_blank" rel="noopener" }
 
-<iframe src="../notebook_export.html" style="width:100%;height:600px;border:none;"></iframe>
+<iframe
+  src="notebook_export.html"
+  title="Notebook title"
+  loading="lazy"
+  style="width: 100%; height: 85vh; border: 1px solid var(--md-default-fg-color--lightest); border-radius: 4px;">
+</iframe>
+
+To run this notebook locally, use the following command:
+```bash
+cd src/notebooks
+uv run marimo edit notebook.py
+```
 ```
 
 ### Workflow After Export
@@ -46,11 +57,6 @@ When creating a new notebook, follow this structure:
 3. **Analysis** with visualizations
 4. **Findings** section summarizing conclusions
 5. **Next steps** for follow-up work
-
-## Available Notebooks in `src/notebooks/`
-
-Add notebooks here with links and descriptions:
-
 
 ## Resources
 

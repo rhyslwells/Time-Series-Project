@@ -64,7 +64,8 @@ nav:
       - Synthetic Metering Data: data/synthetic_metering_data.md
   - Exploration Notebooks:
       - notebooks.md
-      - SARIMA Forecasting: notebooks/sarima_forecasting.md
+      - SARIMA Forecasting: notebooks/sarima.md
+      - Model Comparison: notebooks/ts_model_explorer.md
   - Theory:
       - theory/index.md
       - Metrics: theory/metrics.md
