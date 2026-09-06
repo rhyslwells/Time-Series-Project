@@ -45,11 +45,7 @@ def _():
     import marimo as mo
     import polars as pl
     import numpy as np
-    import pandas as pd
-    from datetime import datetime
     import plotly.graph_objects as go
-    from plotly.subplots import make_subplots
-    from scipy.stats import norm
     import warnings
 
     warnings.filterwarnings("ignore")
@@ -197,15 +193,8 @@ def _(mo):
     mo.md("""
     ## Section 3: Model Comparison
 
-    Compare 3 models using standardised framework classes.
-
-    **Framework Pattern:**
-    1. Create ModelComparison instance
-    2. Add models (using TSModel subclasses)
-    3. Fit all models
-    4. Evaluate and rank by RMSE
-
-    This pattern is extensible: add new models by subclassing TSModel.
+    Compare 3 models using standardised framework classes (see "About This Notebook" above
+    for the framework pattern).
     """)
     return
 
@@ -223,6 +212,7 @@ def _(y_test, y_train):
         LightGBMModel,
         ModelComparison,
     )
+    from ts_plots import TSPlotter, ComparisonPlotter
 
     print("INITIALIZING MODEL COMPARISON")
 
@@ -245,11 +235,10 @@ def _(y_test, y_train):
     print("\nEvaluating forecasts...")
     results_df = comp.evaluate_all(confidence_level=0.80)
 
-
     print("MODEL COMPARISON RESULTS")
 
     print(results_df.to_string())
-    return comp, results_df
+    return ComparisonPlotter, TSPlotter, comp, results_df
 
 
 @app.cell(hide_code=True)
@@ -290,18 +279,12 @@ def _(comp, results_df):
     best_forecast = comp.get_forecast(best_model_name)
     best_metrics = comp.results[best_model_name]["metrics"]
 
-    print(f"Best Model: {best_model_name}")
-    print(f"  MAE: {best_metrics.mae:.4f} kWh")
-    print(f"  RMSE: {best_metrics.rmse:.4f} kWh")
-    print(f"  MAPE: {best_metrics.mape:.2f}%")
-    print(f"  PI Coverage: {best_metrics.pi_coverage:.1f}%")
+    print(f"Best Model: {best_model_name} (metrics detailed in Section 6)")
     return best_forecast, best_metrics, best_model_name
 
 
 @app.cell
-def _(best_forecast, best_metrics, best_model_name, mo, y_test):
-    from ts_plots import TSPlotter
-
+def _(TSPlotter, best_forecast, best_metrics, best_model_name, mo, y_test):
     # Plot 1: Forecast vs Actual
     fig = TSPlotter.forecast_vs_actual(
         y_test, best_forecast, best_model_name, best_metrics
@@ -323,9 +306,7 @@ def _(mo):
 
 
 @app.cell
-def _(best_forecast, best_model_name, mo, y_test):
-    from ts_plots import TSPlotter
-
+def _(TSPlotter, best_forecast, best_model_name, mo, y_test):
     # Plot 2: Residuals Diagnostic
     fig = TSPlotter.residuals_diagnostic(y_test, best_forecast, best_model_name)
 
@@ -345,9 +326,7 @@ def _(mo):
 
 
 @app.cell
-def _(best_forecast, best_model_name, mo):
-    from ts_plots import TSPlotter
-
+def _(TSPlotter, best_forecast, best_model_name, mo):
     # Plot 3: Uncertainty Width
     fig = TSPlotter.uncertainty_analysis(best_forecast, best_model_name)
 
@@ -367,9 +346,7 @@ def _(mo):
 
 
 @app.cell
-def _(best_forecast, best_model_name, mo, y_test):
-    from ts_plots import TSPlotter
-
+def _(TSPlotter, best_forecast, best_model_name, mo, y_test):
     # Plot 4: PI Coverage
     fig = TSPlotter.pi_coverage(y_test, best_forecast, best_model_name)
 
@@ -404,9 +381,7 @@ def _(mo):
 
 
 @app.cell
-def _(comp, mo, y_test):
-    from ts_plots import ComparisonPlotter
-
+def _(ComparisonPlotter, comp, mo, y_test):
     # Get all forecasts
     forecasts = {name: comp.get_forecast(name) for name in comp.results.keys()}
 
@@ -414,7 +389,7 @@ def _(comp, mo, y_test):
     fig = ComparisonPlotter.forecast_comparison(y_test, forecasts, sample_size=96)
 
     mo.ui.plotly(fig)
-    return (ComparisonPlotter,)
+    return
 
 
 @app.cell
@@ -507,8 +482,7 @@ def _(best_metrics):
         "RMSE < 1.3 kWh (commercial)": best_metrics.rmse < 1.3,
         "MAE < 0.5 kWh (residential)": best_metrics.mae < 0.5,
         "MAPE < 15%": best_metrics.mape < 15,
-        "PI Coverage 75–85%": 75 <= best_metrics.pi_coverage <= 85,
-        "Coverage ≈ target (±5%)": 75 <= best_metrics.pi_coverage <= 85,
+        "PI Coverage 75–85% (target ±5%)": 75 <= best_metrics.pi_coverage <= 85,
         "No systematic bias": True,  # Check residuals histogram (Section 4)
         "Residuals bell-shaped": True,  # Check histogram (Section 4)
     }
@@ -522,7 +496,7 @@ def _(best_metrics):
     passed = sum(checks.values())
     total = len(checks)
     print(f"\nScore: {passed}/{total}")
-    if passed >= 6:
+    if passed >= 5:
         print("✓ LIKELY PRODUCTION-READY")
     elif passed >= 4:
         print("⚠ ACCEPTABLE, MONITOR CAREFULLY")
@@ -548,7 +522,7 @@ def _(best_metrics, best_model_name, mo):
 
     **Best Model: {best_model_name}**
 
-    {f"Deploy {best_model_name}" if best_metrics.pi_coverage > 75 else f"Retrain {best_model_name} - coverage below 75%"}.
+    {f"Deploy {best_model_name}" if 75 <= best_metrics.pi_coverage <= 85 else f"Retrain {best_model_name} - coverage outside 75-85% target range"}.
 
     Full selection logic, retrain triggers, tuning priority, and the production-ready checklist
     are in [`docs_src/theory/model-decisions.md`](../../docs_src/theory/model-decisions.md).
