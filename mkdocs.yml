@@ -55,15 +55,13 @@ nav:
   - Findings:
       - findings/index.md
       - Asset Profiling: findings/asset_profiling.md
-  - Methodology:
-      - methodology/index.md
   - Data:
       - data/index.md
       - Data Generation: data/data_generation.md
       - Feature Engineering: data/feature_engineering.md
       - Synthetic Metering Data: data/synthetic_metering_data.md
   - Exploration Notebooks:
-      - notebooks.md
+      - Notebooks: notebooks/notebooks.md
       - SARIMA Forecasting: notebooks/sarima.md
       - Model Comparison: notebooks/ts_model_explorer.md
   - Theory:
