@@ -125,7 +125,7 @@ asset_type: string                  # 'ev_charging' or 'solar_battery'
 
 ---
 
-### daily_metrics.parquet (Daily Aggregates + Behavioral Features)
+### daily_metrics.parquet - Daily Aggregates and Behavioral Features
 
 **Schema:**
 ```

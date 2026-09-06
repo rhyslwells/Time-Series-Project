@@ -44,7 +44,7 @@ The residual $e_t = y_t - \hat{y}_t$ (see [Diagnostics](diagnostics.md) for what
 
 ## Model health and concept drift
 
-Beyond the aggregate MAE/RMSE in [Metrics](metrics.md), error is worth tracking segmented — by day of week, season, weather, or asset operating regime. A model that's accurate Monday-Friday but poor on weekends is telling you something about the model *and* the asset (a regime that regime it doesn't understand), not just producing a lower average score. This segmented view is what should trigger the retrain/switch decisions in [Decisions](model-decisions.md), rather than a single rolling aggregate.
+Beyond the aggregate MAE/RMSE in [Metrics](metrics.md), error is worth tracking segmented — by day of week, season, weather, or asset operating regime. A model that's accurate Monday-Friday but poor on weekends is telling you something about the model *and* the asset (a regime that regime it doesn't understand), not just producing a lower average score. This segmented view is what should trigger the retrain/switch decisions in [Decisions](models-decisions.md), rather than a single rolling aggregate.
 
 ## Cross-asset comparison and asset classification
 

@@ -28,8 +28,8 @@ Users land here, find their task (trend removal, seasonality detection, walk-for
 
 ## Documentation
 
-- **[Data](data/)** — Data descriptions and generation documentation
-- **[Theory](theory/)** — Design rationale and methodological foundations
-- **[Findings](findings/)** — Notes on forecasting tasks and the resources that support them
-- **[Notebooks](notebooks/)** — Exploration notebooks covering forecasting tasks
+- **[Data](data/index.md)** — Data descriptions and generation documentation
+- **[Theory](theory/index.md)** — Design rationale and methodological foundations
+- **[Findings](findings/index.md)** — Notes on forecasting tasks and the resources that support them
+- **[Notebooks](notebooks/notebooks.md)** — Exploration notebooks covering forecasting tasks
 

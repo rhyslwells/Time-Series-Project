@@ -44,4 +44,4 @@ Each point is colored by whether the actual fell inside (green) or outside (red)
 
 ## Ranking models against each other
 
-When RMSE and coverage disagree — one model has the lowest error but the other is better calibrated — coverage should usually win for anything feeding a flexibility commitment: a narrow-but-wrong interval breaches commitments, while a slightly wider one just costs some upside. A 1-2 point coverage gap from target is easy to correct (manual widening); a systematically miscalibrated model is not. See [Decisions](model-decisions.md) for the full selection logic.
+When RMSE and coverage disagree — one model has the lowest error but the other is better calibrated — coverage should usually win for anything feeding a flexibility commitment: a narrow-but-wrong interval breaches commitments, while a slightly wider one just costs some upside. A 1-2 point coverage gap from target is easy to correct (manual widening); a systematically miscalibrated model is not. See [Decisions](models-decisions.md) for the full selection logic.

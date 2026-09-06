@@ -53,7 +53,7 @@ which are constant across it.
 [Data Generation and Calculations](data_generation.md#metering_dataparquet-raw-time-series)),
 plus every column from `daily_metrics.parquet` renamed with a `feat_` prefix — same
 fields and meanings as documented in that page's
-[daily_metrics.parquet schema](data_generation.md#daily_metricsparquet-daily-aggregates--behavioral-features),
+[daily_metrics.parquet schema](data_generation.md#daily_metricsparquet-daily-aggregates-and-behavioral-features),
 just repeated per 30-min row instead of per asset-day:
 
 | daily_metrics.parquet column | becomes |

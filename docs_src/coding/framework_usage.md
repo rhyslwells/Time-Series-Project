@@ -125,7 +125,7 @@ print(f"RMSE: {metrics.rmse} -> {final_metrics.rmse}")
 5. Refit with tuned params, save forecast output (CSV) and ranking table
 ```
 
-Deploy once `final_metrics` clears the [production-ready checklist](../theory/model-decisions.md#production-ready-checklist):
+Deploy once `final_metrics` clears the [production-ready checklist](../theory/models-decisions.md#production-ready-checklist):
 
 ```python
 if final_metrics.pi_coverage > 0.75 and final_metrics.rmse < threshold:
