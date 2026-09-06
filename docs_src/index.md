@@ -1,20 +1,35 @@
 # Time Series Forecasting
 
-A forecasting system for energy assets with multi-layer analysis.
+A multi-layer forecasting system for energy assets.
 
-## Concepts Explored
+**Goal: build a reusable library of code snippets for time series forecasting on energy assets, organized by forecasting task and designed for low-friction implementation.**
+
+This is a curated collection of production-ready code patterns from the time series forecasting framework—SARIMA, Exponential Smoothing, LightGBM, and diagnostic tools—presented as self-contained snippets with hand-written narrative guidance.
+
+Users land here, find their task (trend removal, seasonality detection, walk-forward validation, anomaly detection, model tuning, or evaluation), copy the pattern, and adapt it to their own use case.
+
+## Concepts explored
 
 1. Forecasting with plots
-2. Different models applied and compared for a given asset and time period.
+2. Comparing different models for a given asset and time period
+3. Core forecasting tasks:
+    - Trend removal and deseasonalization
+    - Seasonality detection
+    - Walk-forward validation
+    - Anomaly detection
+    - Model selection and tuning
+    - Forecast evaluation
 
 ## Concepts to explore in future
-1. **Asset profiling**: Classify assets by behavioral fingerprints
-2. Making use of daily metrics.
-3. **Uncertainty quantification**: Understand prediction intervals and confidence levels for forecasts.
+
+1. **Asset profiling**: classify assets by behavioral fingerprint
+2. **Daily metrics**: make use of the daily aggregate metrics
+3. **Uncertainty quantification**: understand prediction intervals and confidence levels for forecasts
 
 ## Documentation
 
-- **[Findings](findings/)** — Validated discoveries from analysis and modeling
-- **[Data](data/)** — Data contracts and generation documentation
+- **[Data](data/)** — Data descriptions and generation documentation
 - **[Theory](theory/)** — Design rationale and methodological foundations
-- **[Notebooks](notebooks/)** — Consolidation notebooks and exploration guides
+- **[Findings](findings/)** — Notes on forecasting tasks and the resources that support them
+- **[Notebooks](notebooks/)** — Exploration notebooks covering forecasting tasks
+

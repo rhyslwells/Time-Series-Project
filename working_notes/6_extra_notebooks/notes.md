@@ -9,6 +9,14 @@ non-stationary residuals, high autocorrelation). Use the framework's ModelEvalua
 and actual metering data. Show which models have clean residuals and which need 
 investigation. Include diagnostic checklists: what each plot tells you and when to 
 worry.
+
+Use the following for inspiration on structure: C:\Users\RhysL\Desktop\Time Series Project\src\notebooks\ts_model_explorer.py
+
+If necessary add additional helper functions to the framework to support residual analysis and diagnostics in C:\Users\RhysL\Desktop\Time Series Project\src poissibly in a new script. These will be shared arcoss the repo.
+
+on in  C:\Users\RhysL\Desktop\Time Series Project\src\ts_model_framework.py
+
+
 ```
 
 **2. `ts_model_tuning.py`**
