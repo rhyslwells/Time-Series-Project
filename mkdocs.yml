@@ -51,7 +51,6 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - Architecture: architecture.md
   - Findings:
       - findings/index.md
       - Asset Profiling: findings/asset_profiling.md
