@@ -2,12 +2,23 @@
 
 ## Polars (Not Pandas)
 
-All data operations use **polars** exclusively:
+All data operations use **polars** exclusively — data generation, feature engineering,
+loading series for models, and assembling result/ranking tables. Do not import pandas.
 
 - **Performance**: lazy evaluation, columnar storage
 - **Efficiency**: memory-efficient, parquet-native I/O
 - **Type preservation**: datetime, float64 precision
 - **Future-proof**: supports all downstream operations
+
+### Boundary with modeling libraries
+
+`statsmodels`, `scikit-learn`, and `lightgbm` operate on **numpy arrays**, not dataframes.
+The forecasting framework (`src/ts_model_framework.py`) follows this split:
+
+- polars reads the parquet and selects the series; `.to_numpy()` hands it to the model
+- models pass numpy arrays internally and return `ForecastOutput` (numpy arrays)
+- results, rankings, and forecast output tables are built back up as `pl.DataFrame`
+- any pandas objects returned by statsmodels are unwrapped immediately with `np.asarray()`
 
 ### Polars API
 

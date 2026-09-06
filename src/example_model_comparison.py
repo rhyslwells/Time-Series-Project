@@ -9,8 +9,6 @@ Example: Model Comparison & Tuning Workflow
 """
 
 import numpy as np
-import pandas as pd
-from datetime import datetime
 import polars as pl
 
 from ts_model_framework import (
@@ -40,7 +38,7 @@ def load_data(asset_id: str, test_days: int = 4) -> tuple:
     return y_train, y_test, timestamps
 
 
-def step1_compare_models(y_train: np.ndarray, y_test: np.ndarray) -> pd.DataFrame:
+def step1_compare_models(y_train: np.ndarray, y_test: np.ndarray) -> tuple:
     """Compare three baseline models"""
 
     print("STEP 1: Model Comparison (Baseline)")
@@ -61,11 +59,11 @@ def step1_compare_models(y_train: np.ndarray, y_test: np.ndarray) -> pd.DataFram
     # Evaluate
     ranking = comparator.evaluate_all()
     print("\nRanking (by RMSE):")
-    print(ranking.to_string(index=False))
+    print(ranking)
 
     # Best model
     best_name, best_metrics = comparator.best_model()
-    print(f"\n✓ Best Model: {best_name}")
+    print(f"\n[ok] Best Model: {best_name}")
     print(f"  {best_metrics}")
 
     # Save for next steps
@@ -84,28 +82,28 @@ def step2_diagnostic_plots(comparator: ModelComparison, best_name: str):
     # Plot 1: Forecast vs Actual
     fig1 = TSPlotter.forecast_vs_actual(comparator.y_test, forecast, best_name, metrics)
     fig1.write_html(f"{best_name}_forecast_vs_actual.html")
-    print(f"✓ Saved: {best_name}_forecast_vs_actual.html")
+    print(f"[ok] Saved: {best_name}_forecast_vs_actual.html")
 
     # Plot 2: Residuals
     fig2 = TSPlotter.residuals_diagnostic(comparator.y_test, forecast, best_name)
     fig2.write_html(f"{best_name}_residuals.html")
-    print(f"✓ Saved: {best_name}_residuals.html")
+    print(f"[ok] Saved: {best_name}_residuals.html")
 
     # Plot 3: Uncertainty
     fig3 = TSPlotter.uncertainty_analysis(forecast, best_name)
     fig3.write_html(f"{best_name}_uncertainty.html")
-    print(f"✓ Saved: {best_name}_uncertainty.html")
+    print(f"[ok] Saved: {best_name}_uncertainty.html")
 
     # Plot 4: PI Coverage
     fig4 = TSPlotter.pi_coverage(comparator.y_test, forecast, best_name)
     fig4.write_html(f"{best_name}_pi_coverage.html")
-    print(f"✓ Saved: {best_name}_pi_coverage.html")
+    print(f"[ok] Saved: {best_name}_pi_coverage.html")
 
 
 def step3_compare_all_forecasts(comparator: ModelComparison):
     """Plot all model forecasts side-by-side"""
 
-    t Comparison (All Models)")
+    print("STEP 3: Forecast Comparison (All Models)")
     print("=" * 60)
 
     forecasts = {name: data["forecast"] for name, data in comparator.results.items()}
@@ -113,13 +111,13 @@ def step3_compare_all_forecasts(comparator: ModelComparison):
     # Plot 1: Overlaid forecasts
     fig1 = ComparisonPlotter.forecast_comparison(comparator.y_test, forecasts)
     fig1.write_html("all_models_forecast_comparison.html")
-    print("✓ Saved: all_models_forecast_comparison.html")
+    print("[ok] Saved: all_models_forecast_comparison.html")
 
     # Plot 2: Metrics comparison
     metrics_dict = {name: data["metrics"] for name, data in comparator.results.items()}
     fig2 = ComparisonPlotter.metrics_comparison(metrics_dict)
     fig2.write_html("all_models_metrics_comparison.html")
-    print("✓ Saved: all_models_metrics_comparison.html")
+    print("[ok] Saved: all_models_metrics_comparison.html")
 
 
 def step4_tune_best_model(y_train: np.ndarray, y_test: np.ndarray, best_name: str):
@@ -130,7 +128,7 @@ def step4_tune_best_model(y_train: np.ndarray, y_test: np.ndarray, best_name: st
     print("=" * 60)
 
     if best_name == "SARIMA":
-        print("Grid searching SARIMA(p,d,q) × (P,D,Q,s)...")
+        print("Grid searching SARIMA(p,d,q)x(P,D,Q,s)...")
 
         tuner = ModelTuner(SARIMAModel, y_train, y_test)
 
@@ -142,10 +140,10 @@ def step4_tune_best_model(y_train: np.ndarray, y_test: np.ndarray, best_name: st
 
         trials = tuner.grid_search(param_grid)
         print("\nTuning Results (top 5):")
-        print(trials.head(5).to_string(index=False))
+        print(trials.head(5))
 
         best_params = tuner.best_params()
-        print(f"\n✓ Best params: {best_params}")
+        print(f"\n[ok] Best params: {best_params}")
 
         return best_params
 
@@ -162,10 +160,10 @@ def step4_tune_best_model(y_train: np.ndarray, y_test: np.ndarray, best_name: st
 
         trials = tuner.grid_search(param_grid)
         print("\nTuning Results:")
-        print(trials.head(5).to_string(index=False))
+        print(trials.head(5))
 
         best_params = tuner.best_params()
-        print(f"\n✓ Best params: {best_params}")
+        print(f"\n[ok] Best params: {best_params}")
 
         return best_params
 
@@ -178,10 +176,10 @@ def step4_tune_best_model(y_train: np.ndarray, y_test: np.ndarray, best_name: st
 
         trials = tuner.grid_search(param_grid)
         print("\nTuning Results:")
-        print(trials.head(5).to_string(index=False))
+        print(trials.head(5))
 
         best_params = tuner.best_params()
-        print(f"\n✓ Best params: {best_params}")
+        print(f"\n[ok] Best params: {best_params}")
 
         return best_params
 
@@ -206,7 +204,7 @@ def step5_final_model(
     forecast = model.forecast(len(y_test))
     metrics = ModelEvaluator.evaluate(y_test, forecast)
 
-    print(f"\n✓ Final Model Performance:")
+    print(f"\n[ok] Final Model Performance:")
     print(f"  {metrics}")
 
     # Generate final plots
@@ -214,10 +212,10 @@ def step5_final_model(
         y_test, forecast, f"{best_name} (Tuned)", metrics
     )
     fig1.write_html(f"{best_name}_final_forecast.html")
-    print(f"\n✓ Saved: {best_name}_final_forecast.html")
+    print(f"\n[ok] Saved: {best_name}_final_forecast.html")
 
     # Standard output contract
-    forecast_df = pd.DataFrame(
+    forecast_df = pl.DataFrame(
         {
             "prediction": forecast.prediction,
             "lower": forecast.lower,
@@ -227,14 +225,14 @@ def step5_final_model(
         }
     )
 
-    forecast_df.to_csv(f"{best_name}_forecast_output.csv", index=False)
-    print(f"✓ Saved: {best_name}_forecast_output.csv")
+    forecast_df.write_csv(f"{best_name}_forecast_output.csv")
+    print(f"[ok] Saved: {best_name}_forecast_output.csv")
 
     return model, forecast, metrics
 
 
 def main():
-    """Full workflow: compare → diagnose → tune → finalize"""
+    """Full workflow: compare -> diagnose -> tune -> finalize"""
 
     # Load data
     y_train, y_test, _ = load_data("ASSET_001", test_days=4)
@@ -258,7 +256,7 @@ def main():
     )
 
     
-    print("✓ Workflow Complete")
+    print("[ok] Workflow Complete")
     print("=" * 60)
 
     print(f"\nFinal Summary:")

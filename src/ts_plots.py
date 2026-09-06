@@ -6,7 +6,7 @@ Generic time series model plotting module
 """
 
 import numpy as np
-import pandas as pd
+import polars as pl
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from typing import Dict, List
@@ -320,6 +320,6 @@ class ComparisonPlotter:
         return fig
     
     @staticmethod
-    def ranking_table(ranking_df: pd.DataFrame) -> str:
+    def ranking_table(ranking_df: pl.DataFrame) -> str:
         """Pretty-print ranking table"""
-        return ranking_df.to_string(index=False)
+        return str(ranking_df)

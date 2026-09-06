@@ -28,8 +28,12 @@ Embedded assistant for energy systems forecasting. Help with: model setup, time 
 **Layers (raw metering → forecasts → derived features → flexibility → optimization)**
 
 - Layer-separated architecture ensures reusability and swappable components
-- Standard forecast contracts: `asset_id`, `timestamp`, `prediction`, `uncertainty`, `model_version`
 - Data: 14 days × 15 assets (EV + solar) × 30-min intervals → 3 parquet files in `src/data/`
+- Forecasting framework in `src/ts_model_framework.py`: `TSModel` subclasses (SARIMA, ExponentialSmoothing, LightGBM) plus `ModelEvaluator` / `ModelComparison` / `ModelTuner`; diagnostics in `src/ts_plots.py`
+- Forecast contracts:
+  - In-memory: `ForecastOutput` (`prediction`, `lower`, `upper`, `uncertainty_width`) + `EvaluationMetrics`
+  - Persisted/cross-layer (target): `asset_id`, `timestamp`, `prediction`, `uncertainty`, `model_version`
+- Data ops are polars-only; models exchange numpy arrays (statsmodels/sklearn/lightgbm internals)
 
 **Repository structure:**
 - `src/` — production-ready code (includes the data generation scripts in `src/data/`, since their output is a production data contract)
@@ -57,6 +61,15 @@ All three generation scripts live in `src/data/`, alongside their output:
 1. `generate_raw_data.py` → `metering_data_raw.csv`
 2. `generate_daily_metrics.py` → `metering_data.parquet` (raw, 10,080 rows), `daily_metrics.parquet` (daily aggregates + behavioral metrics, 210 rows)
 3. `generate_metering_features.py` → `metering_data_with_features.parquet` (metering_data.parquet joined with daily_metrics.parquet, broadcast across each day's 48 half-hour rows, `feat_`-prefixed columns, 10,080 rows)
+
+---
+
+## Forecasting Framework (Quick Reference)
+
+- `src/ts_model_framework.py` — `SARIMAModel`, `ExponentialSmoothingModel`, `LightGBMModel` (all `TSModel`); `ModelEvaluator`, `ModelComparison`, `ModelTuner`; `ForecastOutput`, `EvaluationMetrics`
+- `src/ts_plots.py` — `TSPlotter` (forecast vs actual, residuals, uncertainty, PI coverage), `ComparisonPlotter`
+- `src/example_model_comparison.py` — runnable load → compare → diagnose → tune → finalize walkthrough
+- Models consume/produce numpy arrays; every dataframe and file IO is polars
 
 ---
 

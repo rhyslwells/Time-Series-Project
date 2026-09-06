@@ -8,6 +8,12 @@ Keep the core `src/` directory focused and clean. Use `archive/` for experimenta
 Time-Series-Project/
 ├── src/                          # Production code
 │   ├── __init__.py
+│   ├── ts_model_framework.py      # Forecasting framework (models, evaluation, tuning, comparison)
+│   ├── ts_plots.py                # Generic plotly diagnostics for any ForecastOutput
+│   ├── example_model_comparison.py# Worked compare -> diagnose -> tune -> finalize workflow
+│   ├── notebooks/                 # Marimo notebooks kept alongside the framework
+│   │   ├── ts_model_explorer.py
+│   │   └── sarima_marimo.py
 │   └── data/                      # Data generation pipeline + its output
 │       ├── generate_raw_data.py
 │       ├── generate_daily_metrics.py
@@ -17,13 +23,16 @@ Time-Series-Project/
 │       ├── daily_metrics.parquet
 │       └── metering_data_with_features.parquet
 │
-├── working_notes/                 # Exploration & documentation
+├── working_notes/                 # Exploration & notes (staged, not a package)
 │   ├── todos.md                   # Task tracking
-│   └── 1_produce_data/            # Notes only (scripts live in src/data/)
-│       └── notes.md
+│   ├── 0_archive/                 # Superseded exploration
+│   ├── 2_basic_forecasting/       # Early single-model forecasting
+│   ├── 3_framework/               # Notes behind ts_model_framework.py
+│   ├── 5_forecast_products/       # Forecast-as-product exploration
+│   └── 6_extra_notebooks/         # Misc notebook ideas
 │
 ├── archive/                       # Experimental work (old code)
-├── docs_src/                      # Documentation source (tracked)
+├── docs_src/                      # Documentation source (tracked): coding/, data/, theory/, findings/, notebooks/
 ├── docs/                          # Generated docs
 ├── .claude/                       # This directory
 │   ├── CLAUDE.md                  # Routing index
@@ -45,7 +54,7 @@ Before creating new files or directories:
 
 1. **src/** → only stable, reusable production code (models, pipelines, utilities)
 2. **archive/** → freely add exploratory work, reference implementations, scripts
-3. **working_notes/** → temporary exploration and quick iterations (not committed)
+3. **working_notes/** → staged exploration notes and quick iterations (committed, but low-ceremony; not import-safe)
 4. **docs_src/** → solid, tracked documentation and methodology
 
 Do not create supplementary scaffolding or examples unless explicitly requested.
@@ -57,6 +66,8 @@ generated data in the same directory keeps that contract auditable in one place.
 
 ## Key Production Files
 
+### Data pipeline (`src/data/`)
+
 | File | Purpose |
 |------|---------|
 | `generate_raw_data.py` | Synthesizes metering_data_raw.csv (14 days x 15 assets x 30-min) |
@@ -65,3 +76,13 @@ generated data in the same directory keeps that contract auditable in one place.
 | `metering_data.parquet` | Raw 30-min metering (10,080 rows) |
 | `daily_metrics.parquet` | Daily aggregates + behavioral metrics (210 rows) |
 | `metering_data_with_features.parquet` | 30-min metering + daily features broadcast across each day's 48 rows (10,080 rows) |
+
+### Forecasting framework (`src/`)
+
+| File | Purpose |
+|------|---------|
+| `ts_model_framework.py` | `TSModel` base class + `SARIMAModel`, `ExponentialSmoothingModel`, `LightGBMModel`; `ModelEvaluator`, `ModelComparison`, `ModelTuner`; `ForecastOutput` / `EvaluationMetrics` contracts |
+| `ts_plots.py` | `TSPlotter` and `ComparisonPlotter` — plotly diagnostics driven by `ForecastOutput` (forecast vs actual, residuals, uncertainty, PI coverage) |
+| `example_model_comparison.py` | Runnable end-to-end example: load -> compare -> diagnose -> tune -> finalize |
+
+Models take and return numpy arrays; all dataframe construction and IO uses polars (see DATA_STACK.md).

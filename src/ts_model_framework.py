@@ -7,7 +7,7 @@ Generalised Time Series Forecasting Framework
 """
 
 import numpy as np
-import pandas as pd
+import polars as pl
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, asdict
 from typing import Dict, Tuple, List, Optional
@@ -77,7 +77,7 @@ class TSModel(ABC):
 
 
 class SARIMAModel(TSModel):
-    """SARIMA(p,d,q)×(P,D,Q,s) wrapper"""
+    """SARIMA(p,d,q)x(P,D,Q,s) wrapper"""
     
     def __init__(self, y_train: np.ndarray, order: Tuple = (1,1,1), 
                  seasonal_order: Tuple = (1,1,1,48)):
@@ -161,19 +161,18 @@ class ExponentialSmoothingModel(TSModel):
         if not self.fitted:
             raise RuntimeError("Model not fitted. Call fit() first.")
         
-        yhat = self.model.forecast(steps=steps)
-        
+        yhat = np.asarray(self.model.forecast(steps=steps))
+
         # Estimate prediction intervals from residuals
-        residuals = self.model.resid
-        residual_std = np.std(residuals)
+        residual_std = np.std(np.asarray(self.model.resid))
         z_score = norm.ppf((1 + confidence_level) / 2)
         margin = z_score * residual_std
-        
+
         return ForecastOutput(
-            prediction=yhat.values,
-            lower=yhat.values - margin,
-            upper=yhat.values + margin,
-            uncertainty_width=np.full_like(yhat.values, 2 * margin)
+            prediction=yhat,
+            lower=yhat - margin,
+            upper=yhat + margin,
+            uncertainty_width=np.full_like(yhat, 2 * margin)
         )
     
     def get_params(self) -> Dict:
@@ -334,11 +333,11 @@ class ModelComparison:
         for name, model in self.models.items():
             try:
                 model.fit()
-                print(f"✓ {name} fitted")
+                print(f"[ok] {name} fitted")
             except Exception as e:
-                print(f"✗ {name} failed: {e}")
+                print(f"[fail] {name} failed: {e}")
     
-    def evaluate_all(self, confidence_level: float = 0.80) -> pd.DataFrame:
+    def evaluate_all(self, confidence_level: float = 0.80) -> pl.DataFrame:
         """Evaluate all models and return ranking"""
         results = {}
         
@@ -356,13 +355,13 @@ class ModelComparison:
                     'params': model.get_params()
                 }
             except Exception as e:
-                print(f"✗ {name} evaluation failed: {e}")
+                print(f"[fail] {name} evaluation failed: {e}")
         
         self.results = results
         return self._ranking_table()
     
-    def _ranking_table(self) -> pd.DataFrame:
-        """Create ranking table with scores"""
+    def _ranking_table(self) -> pl.DataFrame:
+        """Create ranking table with scores, ranked by RMSE (lower is better)"""
         rows = []
         for name, data in self.results.items():
             metrics = data['metrics']
@@ -374,11 +373,12 @@ class ModelComparison:
                 'PI Coverage %': metrics.pi_coverage,
                 'Uncertainty Width': metrics.mean_uncertainty_width,
             })
-        
-        df = pd.DataFrame(rows)
-        # Rank by RMSE (lower is better)
-        df['Rank'] = df['RMSE'].rank()
-        return df.sort_values('Rank')
+
+        return (
+            pl.DataFrame(rows)
+            .with_columns(pl.col('RMSE').rank().alias('Rank'))
+            .sort('Rank')
+        )
     
     def best_model(self) -> Tuple[str, EvaluationMetrics]:
         """Return best model name and metrics"""
@@ -402,8 +402,8 @@ class ModelTuner:
         self.y_test = y_test
         self.trials = []
         
-    def grid_search(self, param_grid: Dict[str, List], 
-                   confidence_level: float = 0.80) -> pd.DataFrame:
+    def grid_search(self, param_grid: Dict[str, List],
+                   confidence_level: float = 0.80) -> pl.DataFrame:
         """Grid search over parameter combinations"""
         import itertools
         
@@ -425,12 +425,12 @@ class ModelTuner:
                     'forecast': forecast
                 })
             except Exception as e:
-                print(f"✗ Params {params} failed: {e}")
+                print(f"[fail] Params {params} failed: {e}")
         
         return self._trials_table()
     
-    def _trials_table(self) -> pd.DataFrame:
-        """Return trials as ranked dataframe"""
+    def _trials_table(self) -> pl.DataFrame:
+        """Return trials as a dataframe ranked by RMSE (lower is better)"""
         rows = []
         for trial in self.trials:
             params = trial['params']
@@ -441,12 +441,14 @@ class ModelTuner:
                 'MAPE': metrics.mape,
                 'PI Coverage %': metrics.pi_coverage,
             }
-            row.update({f"param_{k}": v for k, v in params.items()})
+            row.update({f"param_{k}": str(v) for k, v in params.items()})
             rows.append(row)
-        
-        df = pd.DataFrame(rows)
-        df['Rank'] = df['RMSE'].rank()
-        return df.sort_values('Rank')
+
+        return (
+            pl.DataFrame(rows)
+            .with_columns(pl.col('RMSE').rank().alias('Rank'))
+            .sort('Rank')
+        )
     
     def best_params(self) -> Dict:
         """Return best hyperparameters"""

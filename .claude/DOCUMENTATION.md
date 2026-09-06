@@ -21,9 +21,19 @@ Documentation should:
 | Location | Purpose | Tracked |
 |----------|---------|---------|
 | `docs_src/` | Methodology, findings, system design | Yes |
-| `working_notes/` | Exploration notes, reference materials | No |
+| `working_notes/` | Exploration notes, reference materials | Yes (low-ceremony) |
 | Code comments | Non-obvious WHY, hidden constraints, workarounds | N/A |
 | Commit messages | Context for changes | Yes |
+
+### `docs_src/` subsections
+
+| Path | Contents |
+|------|----------|
+| `docs_src/coding/` | Framework usage, mkdocs setup |
+| `docs_src/data/` | Data generation, synthetic metering, feature engineering |
+| `docs_src/theory/` | Models, model decisions, metrics, diagnostics, forecast products |
+| `docs_src/findings/` | Task-oriented notes (e.g. asset profiling) |
+| `docs_src/notebooks/` | Notebook write-ups (e.g. SARIMA forecasting) |
 
 ## Diagrams and Visualizations
 
