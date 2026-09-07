@@ -42,16 +42,10 @@ Synthetic metering data is created with realistic behavioral patterns for 15 ass
 
 2. **Solar + Battery Storage (7 assets)** — net metering (generation - consumption - discharge):
    - Solar generation: half-sine over 06:00-18:00, peak 2.5 at local noon
-   - Consumption: `0.8 + 0.3 sin(2π hour / 24)`, then scaled by a constant 0.85 (see caveat below)
+   - Consumption: `0.8 + 0.3 sin(2π hour / 24)`, then scaled by a weekday factor: 1.0 (Mon-Fri) or 0.85 (Sat-Sun)
    - Battery discharge: -0.5 over 18:00-22:00
    - Gaussian noise added, std = 8% of (max solar + 0.5); values are **not** clipped, so negatives occur
    - Negative values represent net export to grid
-
-!!! warning "Known generator issue — solar has no weekday/weekend variation"
-    `generate_raw_data.py:44` scales consumption by `1.0 if (day_of_week < 5).all() else 0.85`.
-    Because `day_of_week` spans the whole 14-day array, `.all()` is always `False`, so the
-    factor collapses to a constant `0.85`. Solar assets therefore have no weekday/weekend
-    effect. Listed in the [code bug report](#reported-code-issues).
 
 **Output:** `metering_data_raw.csv` — a committed intermediate file (the input to Step 2), not a scratch file.
 
@@ -94,7 +88,7 @@ Negative ramp = decrease in load/generation
     `generate_daily_metrics.py:35` computes `pl.col('ramp_kw').mean()` — the signed mean, not
     the mean absolute change. For a series that returns to a similar level each day the signed
     mean sits near zero, so **`max_abs_ramp_kw` is the ramp-magnitude column**, not this one.
-    Whether the signed mean is intended or a bug is in the [code bug report](#reported-code-issues).
+    See [Known issues](#known-issues).
 
 #### Behavioral metrics
 
@@ -207,16 +201,13 @@ table with per-interval and daily-context features side by side. See
 
 ---
 
-## Reported code issues
+## Known issues
 
-Suspected bugs in the generation scripts, surfaced during a documentation review. None are
-fixed yet; they are recorded here so the docs above can describe the data as it actually is.
+Open items surfaced during a documentation review. Both are intentional-for-now: the docs
+describe the data as it actually is, and neither blocks use.
 
 | Location | Issue | Effect |
 |----------|-------|--------|
-| `generate_raw_data.py:44` | `(day_of_week < 5).all()` over the whole array is always `False` | Solar assets get a constant `0.85` consumption factor — no weekday/weekend variation |
-| `generate_daily_metrics.py:35` | `mean_ramp_kw` uses `.mean()` (signed), while its schema gloss and downstream naming imply mean-absolute | Column is near zero for level-reverting assets; easy to misread as "no ramps" |
-| `ts_model_framework.py` (MAPE) | MAPE stored as sklearn's 0-1 fraction but printed with a `%` suffix | Threshold comparisons like "MAPE < 15%" are off by 100x |
-| `generate_metering_data(n_assets=...)` | `n_assets` parameter is accepted but unused; asset count is fixed by `asset_types` | Passing `n_assets=15` is a no-op coincidence, not a control |
-| `daily_metrics.parquet` column names | `daily_peak_kw` / `daily_min_kw` / `daily_avg_kw` / `daily_std_kw` are statistics of a kWh-per-30-min quantity, not kW | `_kw` suffix implies power; a true kW value is 2× the stored number. Consider renaming to `_kwh_hh` or similar |
+| `generate_daily_metrics.py:35` | `mean_ramp_kw` uses `.mean()` (signed), while its schema gloss and downstream naming imply mean-absolute | Column is near zero for level-reverting assets; easy to misread as "no ramps". `max_abs_ramp_kw` is the magnitude column |
+| `daily_metrics.parquet` column names | `daily_peak_kw` / `daily_min_kw` / `daily_avg_kw` / `daily_std_kw` are statistics of a kWh-per-30-min quantity, not kW | `_kw` suffix implies power; a true kW value is 2× the stored number. Rename to `_kwh_hh` or similar deferred |
 

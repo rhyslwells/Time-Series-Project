@@ -1217,7 +1217,7 @@ is just the base load. Night charging runs 22:00-02:00, not 21:00-02:00.</p>
 - Evening battery discharge supports grid</p>
 <p><strong>Daily Pattern (net = solar generation − consumption − battery discharge):</strong>
 <div class="language-text highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Solar generation: half-sine over 06:00-18:00, peak 2.5 at ~12:00, zero otherwise
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Consumption:      0.8 + 0.3 sin(2π hour / 24), scaled by a constant 0.85
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Consumption:      0.8 + 0.3 sin(2π hour / 24), scaled ×1.0 on weekdays, ×0.85 on weekends
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Battery discharge: 0.5 subtracted over 18:00-22:00
 </span></code></pre></div>
 Overnight the net is roughly −consumption (a small import); midday the solar term dominates
@@ -1225,11 +1225,9 @@ and the net goes strongly negative (export); the evening discharge deepens the 1
 <p><strong>Value Interpretation:</strong>
 - Positive values: Net consumption (importing from grid)
 - Negative values: Net export (generation exceeds consumption)</p>
-<div class="admonition warning">
-<p class="admonition-title">No weekday/weekend variation</p>
-<p>Unlike EV assets, solar assets are identical on weekdays and weekends — the intended
-0.85 weekend factor is applied on every day (see <a href="../data_generation/#reported-code-issues">generator issue</a>).</p>
-</div>
+<p><strong>Weekday/weekend variation:</strong> consumption is scaled ×1.0 on weekdays and ×0.85 on
+weekends, so weekend nights import slightly less and the weekend net sits marginally
+higher than the weekday net. The effect is small next to the daily solar swing.</p>
 <p><strong>Behavioral Metrics (indicative — computed from a prior run, not re-verified here):</strong>
 - Mean load: near zero (net exporter)
 - Coefficient of variation: very large (mean near zero makes CV unstable)
@@ -1249,23 +1247,23 @@ and the net goes strongly negative (export); the evening discharge deepens the 1
 - Maximum: about +4.2 kW (EV weekday evening peak, plus noise)
 - Mean across all records: order of 1 kW (EV assets dominate the count)</p>
 <p><strong>Negative Values:</strong>
-- Count: 2,767 records — 27.5% of the 10,080 rows (2,767 / 10,080)
-- Source: Solar+battery assets during generation periods (2,767 / 4,704 solar rows ≈ 59%)
+- Count: 2,811 records — 27.9% of the 10,080 rows (2,811 / 10,080)
+- Source: Solar+battery assets during generation periods (2,811 / 4,704 solar rows ≈ 60%)
 - Status: Expected (net export to grid)</p>
 <p><strong>Distribution by Asset Type (indicative):</strong>
 | Type | Positive (%) | Negative (%) | Mean (kW) |
 |------|-------------|-------------|-----------|
 | EV Charging | ~100% | ~0% | ~1.8 |
-| Solar+Battery | ~41% | ~59% | near zero |</p>
+| Solar+Battery | ~40% | ~60% | near zero |</p>
 <h3 id="temporal-patterns">Temporal patterns<a class="headerlink" href="#temporal-patterns" title="Permanent link">&para;</a></h3>
 <p><strong>Weekday/Weekend Patterns:</strong>
 - EV assets: weekday values are exactly 1.2/0.8 = 1.5× the weekend values (50% higher), before noise
-- Solar assets: none — the weekend factor is inert (see warning above)</p>
+- Solar assets: consumption ×1.0 weekday vs ×0.85 weekend — a small shift in the net, dominated by the daily solar cycle</p>
 <p><strong>Daily Seasonality (all assets):</strong>
 - EV: Strong 24-hour cycle
 - Solar: Strong 24-hour cycle (inverted vs EV)</p>
 <p><strong>Weekly Patterns:</strong>
-- EV assets only: a weekday/weekend step, repeated across the two weeks
+- All assets: a weekday/weekend step (pronounced for EV, small for solar), repeated across the two weeks
 - Two weeks give exactly two realisations of the weekly cycle — barely enough to estimate a weekly component (see <a href="../../theory/models/">Models</a>)</p>
 <hr />
 <h2 id="realistic-noise">Realistic noise<a class="headerlink" href="#realistic-noise" title="Permanent link">&para;</a></h2>
@@ -1356,7 +1354,7 @@ and the net goes strongly negative (export); the evening discharge deepens the 1
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 7, 2026 19:20:53 UTC">September 7, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 7, 2026 19:49:21 UTC">September 7, 2026</span>
   </span>
 
     

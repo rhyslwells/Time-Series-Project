@@ -22,8 +22,12 @@ from ts_model_framework import (
 from ts_plots import TSPlotter, ComparisonPlotter
 
 
-def load_data(asset_id: str, test_days: int = 4) -> tuple:
-    """Load metering data and split train/test"""
+def load_data(asset_id: str, test_days: int = 4, val_days: int = 3) -> tuple:
+    """Load metering data and split train/validation/test.
+
+    Validation is used for hyperparameter tuning; test is held back for the
+    single final report so tuned metrics are not optimistically biased.
+    """
 
     df = pl.read_parquet("../../src/data/metering_data.parquet")
     asset_data = df.filter(pl.col("asset_id") == asset_id).sort("timestamp")
@@ -32,10 +36,12 @@ def load_data(asset_id: str, test_days: int = 4) -> tuple:
     timestamps = asset_data.select("timestamp").to_numpy().flatten()
 
     test_split_idx = len(y) - (test_days * 48)
-    y_train = y[:test_split_idx]
+    val_split_idx = test_split_idx - (val_days * 48)
+    y_train = y[:val_split_idx]
+    y_val = y[val_split_idx:test_split_idx]
     y_test = y[test_split_idx:]
 
-    return y_train, y_test, timestamps
+    return y_train, y_val, y_test, timestamps
 
 
 def step1_compare_models(y_train: np.ndarray, y_test: np.ndarray) -> tuple:
@@ -117,15 +123,15 @@ def step3_compare_all_forecasts(comparator: ModelComparison):
     print("[ok] Saved: all_models_metrics_comparison.html")
 
 
-def step4_tune_best_model(y_train: np.ndarray, y_test: np.ndarray, best_name: str):
-    """Hyperparameter tuning for best model"""
+def step4_tune_best_model(y_train: np.ndarray, y_val: np.ndarray, best_name: str):
+    """Hyperparameter tuning for best model (scored on the validation set)"""
 
     print(f"STEP 4: Hyperparameter Tuning for {best_name}")
 
     if best_name == "SARIMA":
         print("Grid searching SARIMA(p,d,q)x(P,D,Q,s)...")
 
-        tuner = ModelTuner(SARIMAModel, y_train, y_test)
+        tuner = ModelTuner(SARIMAModel, y_train, y_val)
 
         # Define parameter grid (small for speed)
         param_grid = {
@@ -145,7 +151,7 @@ def step4_tune_best_model(y_train: np.ndarray, y_test: np.ndarray, best_name: st
     elif best_name == "ExponentialSmoothing":
         print("Grid searching Exponential Smoothing (trend, seasonal, damped)...")
 
-        tuner = ModelTuner(ExponentialSmoothingModel, y_train, y_test)
+        tuner = ModelTuner(ExponentialSmoothingModel, y_train, y_val)
 
         param_grid = {
             "trend": ["add", "mul"],
@@ -165,7 +171,7 @@ def step4_tune_best_model(y_train: np.ndarray, y_test: np.ndarray, best_name: st
     elif best_name == "LightGBM":
         print("Grid searching LightGBM (num_leaves, learning_rate)...")
 
-        tuner = ModelTuner(LightGBMModel, y_train, y_test)
+        tuner = ModelTuner(LightGBMModel, y_train, y_val)
 
         param_grid = {"num_leaves": [15, 31, 63], "learning_rate": [0.01, 0.05, 0.1]}
 
@@ -228,11 +234,14 @@ def main():
     """Full workflow: compare -> diagnose -> tune -> finalize"""
 
     # Load data
-    y_train, y_test, _ = load_data("ASSET_001", test_days=4)
-    print(f"\nData loaded: {len(y_train)} train, {len(y_test)} test samples")
+    y_train, y_val, y_test, _ = load_data("ASSET_001", test_days=4, val_days=3)
+    print(
+        f"\nData loaded: {len(y_train)} train, {len(y_val)} val, "
+        f"{len(y_test)} test samples"
+    )
 
-    # Step 1: Compare baseline models
-    ranking, comparator, best_name = step1_compare_models(y_train, y_test)
+    # Step 1: Compare baseline models (trained on train, scored on val)
+    ranking, comparator, best_name = step1_compare_models(y_train, y_val)
 
     # Step 2: Diagnostics for best model
     step2_diagnostic_plots(comparator, best_name)
@@ -240,12 +249,13 @@ def main():
     # Step 3: Compare all forecasts
     step3_compare_all_forecasts(comparator)
 
-    # Step 4: Tune best model
-    best_params = step4_tune_best_model(y_train, y_test, best_name)
+    # Step 4: Tune best model (scored on val)
+    best_params = step4_tune_best_model(y_train, y_val, best_name)
 
-    # Step 5: Final model with tuned params
+    # Step 5: Refit on train+val, report once on the held-back test set
+    y_fit = np.concatenate([y_train, y_val])
     final_model, final_forecast, final_metrics = step5_final_model(
-        y_train, y_test, best_name, best_params
+        y_fit, y_test, best_name, best_params
     )
 
     print("[ok] Workflow Complete")

@@ -66,7 +66,7 @@ is just the base load. Night charging runs 22:00-02:00, not 21:00-02:00.
 **Daily Pattern (net = solar generation − consumption − battery discharge):**
 ```
 Solar generation: half-sine over 06:00-18:00, peak 2.5 at ~12:00, zero otherwise
-Consumption:      0.8 + 0.3 sin(2π hour / 24), scaled by a constant 0.85
+Consumption:      0.8 + 0.3 sin(2π hour / 24), scaled ×1.0 on weekdays, ×0.85 on weekends
 Battery discharge: 0.5 subtracted over 18:00-22:00
 ```
 Overnight the net is roughly −consumption (a small import); midday the solar term dominates
@@ -76,9 +76,9 @@ and the net goes strongly negative (export); the evening discharge deepens the 1
 - Positive values: Net consumption (importing from grid)
 - Negative values: Net export (generation exceeds consumption)
 
-!!! warning "No weekday/weekend variation"
-    Unlike EV assets, solar assets are identical on weekdays and weekends — the intended
-    0.85 weekend factor is applied on every day (see [generator issue](data_generation.md#reported-code-issues)).
+**Weekday/weekend variation:** consumption is scaled ×1.0 on weekdays and ×0.85 on
+weekends, so weekend nights import slightly less and the weekend net sits marginally
+higher than the weekday net. The effect is small next to the daily solar swing.
 
 **Behavioral Metrics (indicative — computed from a prior run, not re-verified here):**
 - Mean load: near zero (net exporter)
@@ -105,28 +105,28 @@ and the net goes strongly negative (export); the evening discharge deepens the 1
 - Mean across all records: order of 1 kW (EV assets dominate the count)
 
 **Negative Values:**
-- Count: 2,767 records — 27.5% of the 10,080 rows (2,767 / 10,080)
-- Source: Solar+battery assets during generation periods (2,767 / 4,704 solar rows ≈ 59%)
+- Count: 2,811 records — 27.9% of the 10,080 rows (2,811 / 10,080)
+- Source: Solar+battery assets during generation periods (2,811 / 4,704 solar rows ≈ 60%)
 - Status: Expected (net export to grid)
 
 **Distribution by Asset Type (indicative):**
 | Type | Positive (%) | Negative (%) | Mean (kW) |
 |------|-------------|-------------|-----------|
 | EV Charging | ~100% | ~0% | ~1.8 |
-| Solar+Battery | ~41% | ~59% | near zero |
+| Solar+Battery | ~40% | ~60% | near zero |
 
 ### Temporal patterns
 
 **Weekday/Weekend Patterns:**
 - EV assets: weekday values are exactly 1.2/0.8 = 1.5× the weekend values (50% higher), before noise
-- Solar assets: none — the weekend factor is inert (see warning above)
+- Solar assets: consumption ×1.0 weekday vs ×0.85 weekend — a small shift in the net, dominated by the daily solar cycle
 
 **Daily Seasonality (all assets):**
 - EV: Strong 24-hour cycle
 - Solar: Strong 24-hour cycle (inverted vs EV)
 
 **Weekly Patterns:**
-- EV assets only: a weekday/weekend step, repeated across the two weeks
+- All assets: a weekday/weekend step (pronounced for EV, small for solar), repeated across the two weeks
 - Two weeks give exactly two realisations of the weekly cycle — barely enough to estimate a weekly component (see [Models](../theory/models.md))
 
 ---

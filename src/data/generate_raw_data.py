@@ -41,7 +41,7 @@ def generate_solar_battery_pattern(timestamps, asset_id, noise_level=0.08):
             solar_generation[i] = 0
 
     consumption = 0.8 + 0.3 * np.sin((hour_of_day / 24) * 2 * np.pi)
-    consumption = consumption * (1.0 if (day_of_week < 5).all() else 0.85)
+    consumption = consumption * np.where(day_of_week < 5, 1.0, 0.85)
 
     battery_discharge = 0.5 * ((hour_of_day >= 18) & (hour_of_day < 22)).astype(float)
 
@@ -63,9 +63,11 @@ def generate_metering_data(
     np.random.seed(random_seed)
 
     if asset_types is None:
+        n_ev = round(n_assets * 8 / 15)
+        n_solar = n_assets - n_ev
         asset_types = (
-            ["ev_charging"] * 8 +
-            ["solar_battery"] * 7
+            ["ev_charging"] * n_ev +
+            ["solar_battery"] * n_solar
         )
 
     n_intervals = (days * 24 * 60) // interval_minutes

@@ -32,7 +32,7 @@ class EvaluationMetrics:
     """Standardised evaluation metrics"""
     mae: float
     rmse: float
-    mape: float
+    mape: float  # percent (0-100)
     pi_coverage: float  # % of actuals within prediction interval
     mean_uncertainty_width: float
     
@@ -298,7 +298,8 @@ class ModelEvaluator:
         """Compute all metrics"""
         mae = mean_absolute_error(y_true, forecast.prediction)
         rmse = np.sqrt(mean_squared_error(y_true, forecast.prediction))
-        mape = mean_absolute_percentage_error(y_true, forecast.prediction)
+        # sklearn returns a fraction; scale to percent to match the "%" in reporting
+        mape = mean_absolute_percentage_error(y_true, forecast.prediction) * 100
         
         # PI coverage: % of actual values within [lower, upper]
         coverage = np.mean((y_true >= forecast.lower) & (y_true <= forecast.upper)) * 100
@@ -394,17 +395,22 @@ class ModelComparison:
 
 
 class ModelTuner:
-    """Hyperparameter tuning for a single model"""
-    
-    def __init__(self, model_class, y_train: np.ndarray, y_test: np.ndarray):
+    """Hyperparameter tuning for a single model.
+
+    Trials are fit on y_train and scored on y_val. Keep y_val disjoint from
+    the test set used for final reporting - tuning against the test set makes
+    the reported improvement optimistic by construction.
+    """
+
+    def __init__(self, model_class, y_train: np.ndarray, y_val: np.ndarray):
         self.model_class = model_class
         self.y_train = y_train
-        self.y_test = y_test
+        self.y_val = y_val
         self.trials = []
         
     def grid_search(self, param_grid: Dict[str, List],
                    confidence_level: float = 0.80) -> pl.DataFrame:
-        """Grid search over parameter combinations"""
+        """Grid search over parameter combinations, ranked by RMSE on y_val"""
         import itertools
         
         keys = param_grid.keys()
@@ -416,9 +422,9 @@ class ModelTuner:
             try:
                 model = self.model_class(self.y_train, **params)
                 model.fit()
-                forecast = model.forecast(len(self.y_test), confidence_level)
-                metrics = ModelEvaluator.evaluate(self.y_test, forecast)
-                
+                forecast = model.forecast(len(self.y_val), confidence_level)
+                metrics = ModelEvaluator.evaluate(self.y_val, forecast)
+
                 self.trials.append({
                     'params': params,
                     'metrics': metrics,

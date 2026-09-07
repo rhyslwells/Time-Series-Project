@@ -772,10 +772,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#reported-code-issues" class="md-nav__link">
+  <a href="#known-issues" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Reported code issues
+        Known issues
       
     </span>
   </a>
@@ -1203,18 +1203,11 @@ committed to the repository, since its schema is a cross-layer data contract.</p
 <p><strong>Solar + Battery Storage (7 assets)</strong> — net metering (generation - consumption - discharge):</p>
 </li>
 <li>Solar generation: half-sine over 06:00-18:00, peak 2.5 at local noon</li>
-<li>Consumption: <code>0.8 + 0.3 sin(2π hour / 24)</code>, then scaled by a constant 0.85 (see caveat below)</li>
+<li>Consumption: <code>0.8 + 0.3 sin(2π hour / 24)</code>, then scaled by a weekday factor: 1.0 (Mon-Fri) or 0.85 (Sat-Sun)</li>
 <li>Battery discharge: -0.5 over 18:00-22:00</li>
 <li>Gaussian noise added, std = 8% of (max solar + 0.5); values are <strong>not</strong> clipped, so negatives occur</li>
 <li>Negative values represent net export to grid</li>
 </ol>
-<div class="admonition warning">
-<p class="admonition-title">Known generator issue — solar has no weekday/weekend variation</p>
-<p><code>generate_raw_data.py:44</code> scales consumption by <code>1.0 if (day_of_week &lt; 5).all() else 0.85</code>.
-Because <code>day_of_week</code> spans the whole 14-day array, <code>.all()</code> is always <code>False</code>, so the
-factor collapses to a constant <code>0.85</code>. Solar assets therefore have no weekday/weekend
-effect. Listed in the <a href="#reported-code-issues">code bug report</a>.</p>
-</div>
 <p><strong>Output:</strong> <code>metering_data_raw.csv</code> — a committed intermediate file (the input to Step 2), not a scratch file.</p>
 <hr />
 <h2 id="analysis-and-calculations">Analysis and calculations<a class="headerlink" href="#analysis-and-calculations" title="Permanent link">&para;</a></h2>
@@ -1244,7 +1237,7 @@ Negative ramp = decrease in load/generation</p>
 <p><code>generate_daily_metrics.py:35</code> computes <code>pl.col('ramp_kw').mean()</code> — the signed mean, not
 the mean absolute change. For a series that returns to a similar level each day the signed
 mean sits near zero, so <strong><code>max_abs_ramp_kw</code> is the ramp-magnitude column</strong>, not this one.
-Whether the signed mean is intended or a bug is in the <a href="#reported-code-issues">code bug report</a>.</p>
+See <a href="#known-issues">Known issues</a>.</p>
 </div>
 <h4 id="behavioral-metrics">Behavioral metrics<a class="headerlink" href="#behavioral-metrics" title="Permanent link">&para;</a></h4>
 <p>Daily behavioral metrics characterize asset variability and predictability, enabling adaptive forecasting and model selection.</p>
@@ -1279,7 +1272,7 @@ Whether the signed mean is intended or a bug is in the <a href="#reported-code-i
 <div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>asset_id: string                    # ASSET_001 to ASSET_015
 </span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>timestamp: datetime                 # UTC, 30-minute intervals
 </span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>metering_kwh: float                 # Consumption (+) or generation (-)
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>asset_type: string                  # 'ev_charging' or 'solar_battery'
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>asset_type: string                  # &#39;ev_charging&#39; or &#39;solar_battery&#39;
 </span></code></pre></div></p>
 <p><strong>Size:</strong> 10,080 rows (15 assets × 14 days × 48 periods)</p>
 <p><strong>Usage:</strong>
@@ -1328,9 +1321,9 @@ Whether the signed mean is intended or a bug is in the <a href="#reported-code-i
 table with per-interval and daily-context features side by side. See
 <a href="../feature_engineering/">Feature Engineering</a>.</p>
 <hr />
-<h2 id="reported-code-issues">Reported code issues<a class="headerlink" href="#reported-code-issues" title="Permanent link">&para;</a></h2>
-<p>Suspected bugs in the generation scripts, surfaced during a documentation review. None are
-fixed yet; they are recorded here so the docs above can describe the data as it actually is.</p>
+<h2 id="known-issues">Known issues<a class="headerlink" href="#known-issues" title="Permanent link">&para;</a></h2>
+<p>Open items surfaced during a documentation review. Both are intentional-for-now: the docs
+describe the data as it actually is, and neither blocks use.</p>
 <table>
 <thead>
 <tr>
@@ -1341,29 +1334,14 @@ fixed yet; they are recorded here so the docs above can describe the data as it 
 </thead>
 <tbody>
 <tr>
-<td><code>generate_raw_data.py:44</code></td>
-<td><code>(day_of_week &lt; 5).all()</code> over the whole array is always <code>False</code></td>
-<td>Solar assets get a constant <code>0.85</code> consumption factor — no weekday/weekend variation</td>
-</tr>
-<tr>
 <td><code>generate_daily_metrics.py:35</code></td>
 <td><code>mean_ramp_kw</code> uses <code>.mean()</code> (signed), while its schema gloss and downstream naming imply mean-absolute</td>
-<td>Column is near zero for level-reverting assets; easy to misread as "no ramps"</td>
-</tr>
-<tr>
-<td><code>ts_model_framework.py</code> (MAPE)</td>
-<td>MAPE stored as sklearn's 0-1 fraction but printed with a <code>%</code> suffix</td>
-<td>Threshold comparisons like "MAPE &lt; 15%" are off by 100x</td>
-</tr>
-<tr>
-<td><code>generate_metering_data(n_assets=...)</code></td>
-<td><code>n_assets</code> parameter is accepted but unused; asset count is fixed by <code>asset_types</code></td>
-<td>Passing <code>n_assets=15</code> is a no-op coincidence, not a control</td>
+<td>Column is near zero for level-reverting assets; easy to misread as "no ramps". <code>max_abs_ramp_kw</code> is the magnitude column</td>
 </tr>
 <tr>
 <td><code>daily_metrics.parquet</code> column names</td>
 <td><code>daily_peak_kw</code> / <code>daily_min_kw</code> / <code>daily_avg_kw</code> / <code>daily_std_kw</code> are statistics of a kWh-per-30-min quantity, not kW</td>
-<td><code>_kw</code> suffix implies power; a true kW value is 2× the stored number. Consider renaming to <code>_kwh_hh</code> or similar</td>
+<td><code>_kw</code> suffix implies power; a true kW value is 2× the stored number. Rename to <code>_kwh_hh</code> or similar deferred</td>
 </tr>
 </tbody>
 </table>
@@ -1387,7 +1365,7 @@ fixed yet; they are recorded here so the docs above can describe the data as it 
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 7, 2026 19:20:53 UTC">September 7, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 7, 2026 19:49:21 UTC">September 7, 2026</span>
   </span>
 
     

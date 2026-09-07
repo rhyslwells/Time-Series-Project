@@ -49,7 +49,7 @@ Decision rule:
 | Uncertainty width flat over time (SARIMA only — it is structural for the other two) | Medium | Move to adaptive/quantile intervals |
 | Coverage 85-95 | Low | Acceptable — monitor only |
 
-Model-specific tuning directions are in the per-model sections of [Models](models.md#sarimapdq-x-pdqs); code for grid search is in [Coding](../coding/framework_usage.md#tuning). Note the grid-search tuner currently selects on the test set — see [caveats](../coding/framework_usage.md#tuning).
+Model-specific tuning directions are in the per-model sections of [Models](models.md#sarimapdq-x-pdqs); code for grid search is in [Coding](../coding/framework_usage.md#tuning). The grid-search tuner scores trials on a separate validation set; the final metric is still from a single split — see [caveats](../coding/framework_usage.md#tuning).
 
 ## Production-ready checklist
 

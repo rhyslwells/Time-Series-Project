@@ -66,8 +66,9 @@ Scale-independent, so it is tempting for comparing across differently-sized asse
 over-forecasting more than under-forecasting). For `solar_battery` assets, whose values
 cross zero, it is meaningless. Prefer MASE.
 
-Note: `ts_model_framework.py` currently stores MAPE as a 0-1 fraction but prints it with a
-`%` suffix — see the [code bug report](../data/data_generation.md#reported-code-issues).
+Note: `ModelEvaluator.evaluate` scales sklearn's fraction to a percentage (0-100), so the
+stored value matches the `%` it is printed with and thresholds like "MAPE < 15%" read
+directly.
 
 ## MASE — Mean Absolute Scaled Error
 

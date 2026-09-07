@@ -928,19 +928,6 @@
 
 
 <h1 id="model-comparison-and-interpretation">Model comparison and interpretation<a class="headerlink" href="#model-comparison-and-interpretation" title="Permanent link">&para;</a></h1>
-<p><strong>Question.</strong> For one asset, how do SARIMA, Exponential Smoothing and LightGBM compare on the
-same train/test split, and how should each diagnostic plot be read when deciding between them?</p>
-<p><strong>Setup.</strong> <code>ASSET_001</code> from <code>metering_data.parquet</code>, 14 days at 30-minute resolution, split
-10 days train / 4 days test (192 steps). Three models with default configs:
-<code>SARIMA(1,1,1)×(1,1,1,48)</code>, <code>ExponentialSmoothing(seasonal_periods=48)</code>,
-<code>LightGBM(lags=[1, 2, 48, 96])</code>. Ranked by RMSE via <code>ModelComparison</code>, then the four
-<code>TSPlotter</code> diagnostics and the overlaid <code>ComparisonPlotter</code> view.</p>
-<p><strong>What it demonstrates.</strong> A worked reading of each diagnostic plot against a real forecast,
-and the RMSE-vs-coverage trade-off that <a href="../../theory/models-decisions/">Decisions</a> formalises.
-Caveats that apply to the ranking it produces: it is one fixed split (the model order is
-substantially noise on 14 days), the tuner it feeds selects on the test set, and
-<code>ExponentialSmoothing</code>/<code>LightGBM</code> intervals are constant-width by construction. The concrete
-ranking for this run is in the embedded notebook below.</p>
 <p><a href="../ts_model_explorer_export.html" rel="noopener" target="_blank">Open the full-screen version</a></p>
 <p><iframe
   src="../ts_model_explorer_export.html"
@@ -972,7 +959,7 @@ ranking for this run is in the embedded notebook below.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 7, 2026 19:20:53 UTC">September 7, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 7, 2026 19:49:21 UTC">September 7, 2026</span>
   </span>
 
     
