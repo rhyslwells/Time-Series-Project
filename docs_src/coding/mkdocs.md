@@ -1,193 +1,70 @@
-# MkDocs Documentation Setup 2
+# MkDocs setup
 
-How the documentation site is built and deployed.
+How the documentation site is built and deployed. This covers the project-specific mechanics
+only; for general MkDocs usage see the [Material docs](https://squidfunk.github.io/mkdocs-material/).
 
-## Overview
+## The source / output split
 
-This project uses MkDocs with Material theme to generate a documentation site published on GitHub Pages.
+- Source: `docs_src/` — the markdown you edit.
+- Built output: `docs/` — auto-generated HTML. **Do not edit `docs/` by hand**; the next build overwrites it.
+- Config: `mkdocs.yml` (nav, theme, markdown extensions).
+- Published at <https://rhyslwells.github.io/time-series-project> from the `main` branch `/docs` folder.
 
-- Source: `docs_src/` (markdown files)
-- Built output: `docs/` (HTML, CSS, JS)
-- Published: https://rhyslwells.github.io/time-series-project
-- Deployment: Automatic via GitHub Actions
+## Deploy
 
-## Directory Structure
+`.github/workflows/deploy.yml` runs on push to `main`, **only when `docs_src/**` or
+`mkdocs.yml` changed**. It installs mkdocs + plugins, runs `mkdocs build`, and commits the
+regenerated `docs/` back to `main` with `[skip ci]`. No manual deploy step.
 
-```
-project/
-├── docs_src/                    Source markdown files
-│   ├── index.md
-│   ├── findings/
-│   ├── theory/
-│   ├── data/
-│   ├── notebooks/
-│   └── coding/
-│
-├── docs/                        Built HTML (auto-generated)
-│   ├── index.html
-│   ├── assets/
-│   └── [all built files]
-│
-├── mkdocs.yml                   MkDocs configuration
-└── .github/workflows/deploy.yml Auto-build workflow
-```
+A push that changes only `src/` or notebooks will not rebuild the site — touch `mkdocs.yml`
+or a `docs_src/` file if you need to force it.
 
-## Workflow: Edit -> Build -> Deploy
-
-### 1. You Edit Source Files
-
-Edit markdown files in `docs_src/`:
+## Build locally
 
 ```bash
-# Edit any markdown file
-vim docs_src/findings/my_finding.md
+uv sync --group docs        # matches the pyproject "docs" dependency group
+uv run mkdocs build         # writes docs/
+uv run mkdocs serve         # live-reload preview at http://localhost:8000
 ```
 
-### 2. Commit and Push
+`mkdocs serve` is the command to use while writing — it is the single source for build/serve
+instructions (the notebook page links here rather than repeating them).
 
-```bash
-git add docs_src/
-git commit -m "Document new finding"
-git push origin main
-```
+## Marimo notebooks
 
-### 3. GitHub Actions Builds Automatically
+The notebook pages embed marimo exports. The `mkdocs-marimo` plugin renders `.py` marimo
+files, and the `*_export.html` artifacts under `docs_src/notebooks/` are committed alongside
+them. Regenerate an export with `marimo export html <notebook>.py -o <notebook>_export.html`
+before committing a notebook change. See [Notebooks](../notebooks/notebooks.md).
 
-The workflow (`.github/workflows/deploy.yml`):
-- Triggers on push to `main` branch
-- Installs mkdocs and Material theme
-- Builds from `docs_src/` to `docs/`
-- Commits built files back to repo
-- Pushes to `main`
+## Adding a page
 
-### 4. GitHub Pages Deploys
+1. Create the markdown file under `docs_src/`.
+2. Add it to `nav:` in `mkdocs.yml`.
+3. Commit and push `docs_src/` + `mkdocs.yml` together.
 
-GitHub Pages automatically serves the latest `docs/` folder at:
-```
-https://rhyslwells.github.io/time-series-project
-```
+## Linking between pages
 
-No manual steps needed. Just edit, commit, push.
-
-## Building Locally
-
-To test changes before pushing:
-
-```bash
-# Install dependencies (if not already done)
-uv sync --all-extras
-
-# Build the site
-uv run mkdocs build
-
-# Or serve with live reload
-uv run mkdocs serve
-```
-
-Then visit `http://localhost:8000`
-
-## Configuration
-
-## Do NOT Manually Edit docs/
-
-The `docs/` folder is auto-generated. Any manual changes will be overwritten on the next build.
-
-Edit `docs_src/` instead.
-
-## Adding New Pages
-
-1. Create markdown file in `docs_src/`:
-   ```bash
-   # Example: new finding
-   touch docs_src/findings/new_discovery.md
-   ```
-
-2. Add to navigation in `mkdocs.yml`:
-   ```yaml
-   nav:
-     - Findings:
-         - findings/index.md
-         - New Discovery: findings/new_discovery.md
-   ```
-
-3. Write content, commit, push:
-   ```bash
-   git add docs_src/
-   git commit -m "Add new discovery page"
-   git push
-   ```
-
-4. Workflow auto-builds → site updates in ~1-2 minutes
-
-## Linking Between Pages
-
-Use relative markdown links:
+Use relative markdown links **to the `.md` file**, resolved from the current file's location:
 
 ```markdown
-# From findings/ to theory/
-See [Decisions](../theory/model-decisions.md)
-
-# From docs_src root to notebook
-Explore the [SARIMA Forecasting](notebooks/sarima_forecasting.md)
+See [Decisions](../theory/models-decisions.md)
+Explore the [SARIMA notebook](../notebooks/sarima.md)
 ```
+
+`mkdocs.yml` sets `validation.links.anchors: warn`, so a broken anchor shows up in the build log.
+
+## Version pin
+
+`pyproject.toml` pins `mkdocs>=1.5.0,<2.0.0` and `mkdocs-material<10`. Material prints a
+build-time warning about backward-incompatible changes planned for MkDocs 2.0; the `<2.0.0`
+pin is what keeps the current build stable, and the pin should stay until Material ships a
+2.0-compatible release.
 
 ## Troubleshooting
 
-### Build fails: "unknown field `python-version`"
-
-Your `pyproject.toml` has invalid `[tool.uv]` config. Remove it—`requires-python` in `[project]` is sufficient.
-
-### Links show as broken in built site
-
-Check that:
-- File path is correct
-- Using relative links from the markdown file location
-- File exists in `docs_src/`
-
-### Site doesn't update after push
-
-Check GitHub Actions:
-1. Go to repo → Actions tab
-2. Look for "Deploy Docs" workflow
-3. Check if it passed or failed
-4. Logs show what went wrong
-
-## Dependencies
-
-Installed via `pyproject.toml`:
-
-```
-mkdocs>=1.5.0
-mkdocs-material>=9.0.0
-```
-
-Install with:
-```bash
-uv sync --all-extras
-```
-
-### Important: MkDocs 2.0 Breaking Changes
-
-MkDocs 2.0 (currently in development) will introduce backward-incompatible changes:
-
-- Plugin system will be removed
-- Theme overrides will break
-- No migration path for existing projects
-- Material for MkDocs will not be compatible
-
-**Action needed**: Before MkDocs 2.0 is released, we need to either:
-1. Lock to MkDocs 1.x
-2. Migrate to a different documentation tool
-3. Wait for Material for MkDocs to release a 2.0-compatible version
-
-Currently using MkDocs 1.5.x, so there's time to plan. Monitor:
-- https://squidfunk.github.io/mkdocs-material/blog/2026/02/18/mkdocs-2.0/
-
-## GitHub Pages Settings
-
-Verify in repo Settings → Pages:
-- Source: Deploy from branch
-- Branch: `main`
-- Folder: `/docs`
-
-Everything else is automatic.
+| Symptom | Check |
+|---|---|
+| Site doesn't update after push | repo → Actions → "Deploy Docs" — did it run, did it pass? A `src/`-only push won't trigger it. |
+| Broken-link warnings in the build | relative path from the current file; target `.md` exists in `docs_src/` |
+| GitHub Pages not serving | repo → Settings → Pages: source "Deploy from branch", branch `main`, folder `/docs` |

@@ -1,6 +1,8 @@
 # Diagnostics
 
-How to read each of the four diagnostic plots produced by `ts_plots.TSPlotter`, and what a bad case tells you about the model.
+How to read each of the four diagnostic plots produced by `ts_plots.TSPlotter`, and what a bad case tells you about the model. Each failure mode ends with a *Confirm with:* line naming the metric or test that distinguishes it, so the page is usable without a plot in front of you.
+
+This page would be clearer with example figures for each failure mode — worth adding once there are real forecasts from [the framework](../coding/framework_usage.md) to draw from.
 
 ## Forecast vs Actual (with prediction interval)
 
@@ -8,27 +10,42 @@ How to read each of the four diagnostic plots produced by `ts_plots.TSPlotter`, 
 
 **Overconfident (PI too narrow):** actuals repeatedly spike outside the band even though the point forecast itself looks reasonable — coverage comes out well under the 80% target (e.g. 45%). Cause: residual std underestimated, or residuals aren't actually normal. Fix: widen manually (`upper *= 1.5, lower /= 1.5`), check the residual histogram for heavy tails, or switch to quantile regression.
 
-**Underfit (forecast flat-lines):** the actual line swings but the forecast barely moves — the model settled on predicting close to the mean every time. Coverage can look fine only because the interval is very wide, not because the model is confident. Cause: over-differencing (d too high) removed real signal, or too little AR/MA capacity. Fix: reduce d, increase p, or switch to LightGBM if the pattern is non-linear.
+**Underfit (forecast flat-lines):** the actual line swings but the forecast barely moves — the model settled on predicting close to the mean every time. Coverage can look fine only because the interval is very wide, not because the model is confident. Cause: over-differencing (d too high) removed real signal, or too little AR/MA capacity. Fix: reduce d (this data has no trend, so `d=0` is the right default), increase p, or switch to LightGBM if the pattern is non-linear. *Confirm with:* `forecast.std()` near zero, and residuals that mirror the actual series' shape.
 
-**Systematically biased:** point forecast tracks reasonably but sits consistently above or below actual — check the residual mean, not just MAE/RMSE, since a biased-but-small error can still look acceptable on those alone. Cause: seasonal pattern shifted (e.g. trained on a different season) or a driving variable (temperature, occupancy) is missing. Fix: retrain on recent data, or add the missing feature.
+**Systematically biased:** point forecast tracks reasonably but sits consistently above or below actual — check the residual mean, not just MAE/RMSE, since a biased-but-small error can still look acceptable on those alone. Cause: seasonal pattern shifted (e.g. trained on a different season) or a driving variable (temperature, occupancy) is missing. Fix: retrain on recent data, or add the missing feature. *Confirm with:* mean(residuals) well away from zero relative to their std.
 
 ## Residuals diagnostic (time series + histogram)
 
 **Good case:** residuals bounce randomly around 0 with no trend, mostly within ±2x the model's own uncertainty band, and the histogram is roughly bell-shaped and centered at 0.
 
-**Autocorrelated residuals:** consecutive residuals cluster on the same side (several positive in a row, then several negative) instead of bouncing randomly. This means the model missed structure — errors compound instead of self-correcting. Fix: increase differencing (d/D) or AR terms (p/P).
+**Autocorrelated residuals:** consecutive residuals cluster on the same side (several positive in a row, then several negative) instead of bouncing randomly. This means the model missed structure — errors compound instead of self-correcting. Fix: add AR terms (p/P) or seasonal differencing (D); check the ACF/PACF of the residuals for which. *Confirm with:* Ljung-Box on the residuals, or a visible spike in their ACF.
 
-**Systematic bias:** residuals sit almost entirely on one side of zero and the histogram is visibly skewed. All-positive means the forecast underestimates; all-negative means it overestimates. Fix: check for a missing trend term (ensure d ≥ 1), or retrain on data that better represents current conditions.
+**Systematic bias:** residuals sit almost entirely on one side of zero and the histogram is visibly skewed. All-positive means the forecast underestimates; all-negative means it overestimates. Fix: check the seasonal component is capturing the daily shape, or retrain on data that better represents current conditions. (Adding non-seasonal differencing is not the fix here — the series has no trend.) *Confirm with:* sign test on the residuals, or simply the fraction above zero.
 
-**Heavy tails:** the histogram has a normal-looking center but disproportionately tall bars at the extremes. The normal-residual assumption behind the PI calculation breaks down, so real-world coverage will run below what the model reports. Fix: remove/inspect outliers in training data, use a more robust model, or predict quantiles directly instead of assuming normality.
+**Heavy tails:** the histogram has a normal-looking center but disproportionately tall bars at the extremes. The normal-residual assumption behind the PI calculation breaks down, so real-world coverage will run below what the model reports. Fix: remove/inspect outliers in training data, use a more robust model, or predict quantiles directly instead of assuming normality. *Confirm with:* excess kurtosis, or PI coverage below the reported target despite a centered residual mean.
 
 ## Uncertainty width over time
 
 **Good case:** width tracks actual volatility — narrow during stable stretches (e.g. midday for an office), wider during transitions (morning ramp-up, evening ramp-down). Mean width roughly matches `2 x z x std(residuals)`.
 
-**Flat width:** the interval is the same size at every hour, meaning the model isn't adapting its confidence to conditions — over-wide during predictable periods (wasted conservatism) and under-wide during volatile ones (under-confident when it matters most). Usually means the interval was computed from a single global residual std rather than a conditional one; for LightGBM in particular, consider a residual-std model or explicit quantile models.
+**Flat width:** the interval is the same size at every hour. For **ExponentialSmoothing and
+LightGBM this is structural, not a fitting failure** — both return `np.full_like(...)`, a
+single residual std broadcast across the whole horizon (`ts_model_framework.py:175, :273`).
+Only SARIMA's width is diagnostic here. Where you do want conditional width, the fix is a
+residual-std model or explicit quantile models. This is also the dominant real problem in
+this codebase: load-forecast residual variance scales with level and time of day, and a
+constant width cannot represent that (a variance-stabilising transform for the strictly
+positive EV assets, conditional variance modelling, or direct quantile regression are the
+remedies). *Confirm with:* plot width against horizon — a horizontal line for ExpSmoothing
+or LightGBM is expected; a horizontal line for SARIMA is the finding.
 
-**Exploding width:** the interval balloons far faster than the forecast horizon justifies (e.g. tripling over a few hours). Typically comes from naive error propagation (std growing with $\sqrt{\text{horizon}}$) rather than recalibration against real data. Fix: cap the width, or use a recursive forecasting approach that treats each step's own forecast as the new anchor.
+**Widening width (SARIMA):** the interval grows roughly with $\sqrt{\text{horizon}}$. For an
+integrated process this is **correct behaviour**, not an artefact — h-step forecast variance
+genuinely grows with h, and this is what SARIMA's own `conf_int` produces. Do not cap it:
+capping produces miscalibrated intervals by construction, the very failure this page is
+trying to prevent. Only treat it as a problem if the width outpaces what the residuals
+justify when checked against a held-out window. *Confirm with:* PI coverage at long horizons —
+if coverage stays near target as the band widens, the widening is earned.
 
 ## PI coverage (green/red scatter)
 

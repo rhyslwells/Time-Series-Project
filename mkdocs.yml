@@ -60,29 +60,29 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - Findings:
-      - findings/index.md
-      - Asset Profiling: findings/asset_profiling.md
   - Data:
       - data/index.md
-      - Data Generation: data/data_generation.md
-      - Feature Engineering: data/feature_engineering.md
-      - Synthetic Metering Data: data/synthetic_metering_data.md
-  - Exploration Notebooks:
-      - Notebooks: notebooks/notebooks.md
-      - SARIMA Forecasting: notebooks/sarima.md
-      - Model Comparison: notebooks/ts_model_explorer.md
+      - Data generation: data/data_generation.md
+      - Feature engineering: data/feature_engineering.md
+      - Synthetic metering data: data/synthetic_metering_data.md
   - Theory:
       - theory/index.md
       - Metrics: theory/metrics.md
       - Models: theory/models.md
       - Diagnostics: theory/diagnostics.md
       - Decisions: theory/models-decisions.md
-      - Forecast Products: theory/forecast_products.md
+      - Forecast products: theory/forecast_products.md
   - Coding:
       - coding/index.md
-      - Framework Usage: coding/framework_usage.md
-      - MkDocs Setup: coding/mkdocs.md
+      - Framework usage: coding/framework_usage.md
+      - MkDocs setup: coding/mkdocs.md
+  - Notebooks:
+      - notebooks/notebooks.md
+      - SARIMA forecasting: notebooks/sarima.md
+      - Model comparison: notebooks/ts_model_explorer.md
+  - Findings:
+      - findings/index.md
+      - Asset profiling: findings/asset_profiling.md
 
 plugins:
   - search

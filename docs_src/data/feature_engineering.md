@@ -1,4 +1,4 @@
-# Feature Engineering
+# Feature engineering
 
 This document describes how daily behavioral metrics are joined back onto the 30-minute
 metering series to produce a single model-ready table.
@@ -16,7 +16,7 @@ it typically runs, how often it sits at zero. `daily_metrics.parquet` already co
 these per asset-day, but at 210 rows it cannot be joined directly into a 30-minute model
 matrix — each daily row needs to be repeated across the 48 half-hour intervals it covers.
 
-## Join Logic
+## Join logic
 
 ```mermaid
 graph TD
@@ -36,7 +36,7 @@ Each of the 210 asset-day rows in `daily_metrics.parquet` is broadcast across th
 half-hour rows of `metering_data.parquet` that share its `asset_id` and `date` — every
 row within a given asset-day carries the same daily feature values.
 
-## Column Naming
+## Column naming
 
 All columns joined in from `daily_metrics.parquet` (other than the `asset_id`/`date` join
 keys, which are dropped after the join) are prefixed with `feat_`, e.g. `daily_energy_kwh`
@@ -45,7 +45,7 @@ columns native to the 30-minute series (`metering_kwh`, `asset_type`), so a mode
 analysis reading the schema can immediately tell which features vary within a day and
 which are constant across it.
 
-## Output Data
+## Output data
 
 ### metering_data_with_features.parquet
 
@@ -77,3 +77,8 @@ it could not know until the day is over. This table is intended as a general-pur
 easy-to-inspect join of daily context onto the 30-minute series; a forecasting pipeline
 should shift `date` by one day (or otherwise lag the join) before using these columns as
 model inputs.
+
+A one-day lag is only sufficient for a horizon of h ≤ 48 (one day ahead). For a longer
+forecast — say four days — days 2 to 4 of the horizon have no observed daily metrics
+available at forecast time, so those features would themselves have to be forecast, or held
+fixed at the forecast-origin day's values. Decide which before extending the horizon.

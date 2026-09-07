@@ -2,17 +2,19 @@
 
 Math, model behavior, and interpretation for the forecasting framework. Code usage lives in [Coding](../coding/index.md); this section covers the reasoning behind it.
 
-- [Metrics](metrics.md) — MAE, RMSE, MAPE, PI coverage: formulas and expected ranges by asset type
+- [Metrics](metrics.md) — MAE, RMSE, MAPE, MASE, PI coverage: formulas, expected ranges, and why every number is read against a seasonal-naive baseline at a stated horizon
 - [Models](models.md) — SARIMA, Exponential Smoothing, LightGBM: the math and when to use each
 - [Diagnostics](diagnostics.md) — how to read the four diagnostic plots, good vs bad cases
 - [Decisions](models-decisions.md) — model selection, retrain triggers, tuning guide, deploy checklist
-- [Forecast Products](forecast_products.md) — turning a forecast into derived signals: uncertainty, event probability, anomaly detection, asset classification, portfolio and flexibility forecasting
+- [Forecast products](forecast_products.md) — turning a forecast into derived signals: uncertainty, event probability, anomaly detection, asset classification, portfolio and flexibility forecasting (design, not yet built)
 
 ## Find an answer fast
 
 | Question | Page |
 |---|---|
-| "What's a good MAE/RMSE for my asset type?" | [Metrics](metrics.md) |
+| "What's a good MAE/RMSE for my asset type?" | [Metrics](metrics.md) — but read it against a baseline, not an absolute threshold |
+| "How do I compare across assets of different sizes?" | [Metrics — MASE](metrics.md#mase-mean-absolute-scaled-error) |
+| "Why don't the metrics mean anything without a baseline?" | [Metrics](metrics.md#read-metrics-against-a-baseline) |
 | "Why does SARIMA use these parameters?" | [Models](models.md) |
 | "How do I read this diagnostic plot?" | [Diagnostics](diagnostics.md) |
 | "Which model should I pick?" | [Decisions](models-decisions.md) |

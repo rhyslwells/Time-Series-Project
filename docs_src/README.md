@@ -1,40 +1,10 @@
-# Documentation & Solid Notes
+# docs_src/
 
-This directory contains tracked, stable documentation and findings. All files here are committed to git and serve as your project's knowledge base.
+Source markdown for the documentation site. Edit files here; `mkdocs.yml` controls the nav.
+The built HTML in `docs/` is generated — do not edit it by hand.
 
-## Subdirectories
+Sections: `data/`, `theory/`, `coding/`, `notebooks/`, `findings/`.
 
-### `findings/`
-Validated analysis and discoveries. Findings that are worth keeping and referring back to.
-
-Examples:
-- Asset behavior patterns discovered through exploration
-- Model performance comparisons
-- Data quality issues and how they were resolved
-
-### `data/`
-Data-related documentation and data contracts.
-
-### `theory/`
-Methodological foundations and design rationale. How we decided to approach something and why.
-
-Examples:
-- Forecasting layer architecture
-- Model selection approaches
-- Feature engineering strategies
-
-### `notebooks/`
-Consolidation notebooks and exploration guides.
-
-### `coding/`
-Code patterns, style guides, and implementation reference material.
-
----
-
-## How Files Get Here
-
-Files in `docs_src/` should be:
-- Clear and self-contained
-- Written for future reference (not just for you right now)
-- Organized by topic
-- Easy to find when you need them later
+This file is excluded from the build (`exclude_docs` in `mkdocs.yml`). The documentation
+policy — what belongs here versus in `working_notes/` — lives in `.claude/DOCUMENTATION.md`.
+Build and deploy mechanics are in [coding/mkdocs.md](coding/mkdocs.md).

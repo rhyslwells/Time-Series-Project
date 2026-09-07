@@ -2,6 +2,18 @@
 
 The model outputs in [Models](models.md) are inputs to a larger system. This page covers the theory for turning a per-timestep forecast into the derived signals that system needs.
 
+!!! warning "Proposed — not implemented"
+    Everything on this page is design, not built code. The forecasting framework produces the
+    per-timestep forecast and interval; none of the derived signals below (schedules, event
+    probabilities, flexibility ranges, portfolio aggregation, scenarios) exist in the repo yet.
+    Read this as a map of where the system is heading.
+
+The signals group into three bands, roughly by distance from the raw forecast:
+
+1. **Asset-level signals** — derived directly from one asset's forecast distribution: daily energy/peak/ramp, uncertainty width, event probability, expected schedule, DR baseline, residual-based anomaly detection.
+2. **Portfolio and flexibility** — combining assets or reframing as feasible actions: flexibility ranges, portfolio aggregation and its error-correlation problem, scenario generation.
+3. **Model health and monitoring** — reading errors over time: segmented error tracking, concept-drift detection, cross-asset comparison and asset classification.
+
 ## The forecast as a distribution
 
 Treat each forecast as a distribution, not a single number: $E[Y_t]$, $P_{10}(Y_t)$, $P_{50}(Y_t)$, $P_{90}(Y_t)$ (or whatever interval the model supports). A point forecast alone answers "what will happen"; the distribution also answers "how sure are we", which is what every signal below is built from.
@@ -44,15 +56,21 @@ The residual $e_t = y_t - \hat{y}_t$ (see [Diagnostics](diagnostics.md) for what
 
 ## Model health and concept drift
 
-Beyond the aggregate MAE/RMSE in [Metrics](metrics.md), error is worth tracking segmented — by day of week, season, weather, or asset operating regime. A model that's accurate Monday-Friday but poor on weekends is telling you something about the model *and* the asset (a regime that regime it doesn't understand), not just producing a lower average score. This segmented view is what should trigger the retrain/switch decisions in [Decisions](models-decisions.md), rather than a single rolling aggregate.
+Beyond the aggregate MAE/RMSE in [Metrics](metrics.md), error is worth tracking segmented — by day of week, season, weather, or asset operating regime. A model that's accurate Monday-Friday but poor on weekends is telling you something about the model *and* the asset (a regime it doesn't understand), not just producing a lower average score. This segmented view is what should trigger the retrain/switch decisions in [Decisions](models-decisions.md), rather than a single rolling aggregate.
 
 ## Cross-asset comparison and asset classification
 
-With many asset/model pairs, error metrics become a table (asset x model x MAE/RMSE/bias/coverage) that raises a meta-question: what characteristics of an asset predict which model will work best for it? That points toward a behavioural fingerprint per asset — mean load, variance, coefficient of variation, autocorrelation, seasonality strength, intermittency, ramp frequency, peak-to-average ratio, plus the asset's own forecast error/uncertainty history — used to cluster assets and route each cluster to the model class suited to it, rather than grid-searching every asset individually. This is the theory behind `behavioral_fingerprints.parquet` in the data pipeline.
+With many asset/model pairs, error metrics become a table (asset x model x MAE/RMSE/bias/coverage) that raises a meta-question: what characteristics of an asset predict which model will work best for it? That points toward a behavioural fingerprint per asset — mean load, variance, coefficient of variation, autocorrelation, seasonality strength, intermittency, ramp frequency, peak-to-average ratio, plus the asset's own forecast error/uncertainty history — used to cluster assets and route each cluster to the model class suited to it, rather than grid-searching every asset individually. The per-asset behavioural metrics this would build on already exist in
+[`daily_metrics.parquet`](../data/data_generation.md) (coefficient of variation,
+peak-to-average ratio, ramp statistics, intermittency); the clustering and model-routing
+described here is not yet built. A "seasonality strength" discriminator would need defining —
+the standard is $F_S = \max(0,\, 1 - \operatorname{Var}(R)/\operatorname{Var}(S+R))$ from an
+STL decomposition. There is no `behavioral_fingerprints.parquet`; an earlier design used
+that name and it was consolidated into `daily_metrics.parquet`.
 
 ## Portfolio forecasting
 
-Aggregating per-asset forecasts gives a portfolio forecast, $\hat{Y}_t = \sum_i \hat{Y}_{i,t}$, and the aggregate's expectation is just the sum of expectations. Its *uncertainty* is not: it depends on the correlation between assets' errors, not the sum of their individual uncertainties. Where asset errors aren't perfectly correlated, the portfolio forecast is more reliable than any individual asset forecast — which is the main reason aggregation is valuable for a multi-asset system, beyond convenience.
+Aggregating per-asset forecasts gives a portfolio forecast, $\hat{Y}_t = \sum_i \hat{Y}_{i,t}$, and the aggregate's expectation is just the sum of expectations. Its *uncertainty* is not: it depends on the correlation between assets' errors, not the sum of their individual uncertainties. Where asset errors aren't perfectly correlated, the portfolio forecast is more reliable than any individual asset forecast — which is the main reason aggregation is valuable for a multi-asset system, beyond convenience. Reconciling the per-asset and portfolio forecasts so they agree (bottom-up vs top-down vs optimal/MinT reconciliation) is the standard framework once both levels are forecast directly.
 
 ## Flexibility forecasting
 

@@ -1,35 +1,34 @@
-# Time Series Forecasting
+# Time series forecasting
 
-A multi-layer forecasting system for energy assets.
+A layered forecasting system for energy assets: raw metering → forecasts → derived features
+→ flexibility → optimization. Layers 1-2 (data and per-asset forecasting) are built; the
+upper layers are design, described in [Forecast products](theory/forecast_products.md).
 
-**Goal: build a reusable library of code snippets for time series forecasting on energy assets, organized by forecasting task and designed for low-friction implementation.**
+## What exists today
 
-This is a curated collection of production-ready code patterns from the time series forecasting framework—SARIMA, Exponential Smoothing, LightGBM, and diagnostic tools—presented as self-contained snippets with hand-written narrative guidance.
+- A synthetic dataset: 15 assets (EV charging and solar+battery), 14 days, 30-minute intervals, in three parquet files. See [Data](data/index.md).
+- A forecasting framework in `src/ts_model_framework.py`: `SARIMAModel`, `ExponentialSmoothingModel`, `LightGBMModel`, plus comparison, tuning and evaluation. See [Coding](coding/index.md).
+- Diagnostic plots in `src/ts_plots.py` and a reading guide in [Diagnostics](theory/diagnostics.md).
+- Two exploration notebooks running one asset through the framework. See [Notebooks](notebooks/notebooks.md).
 
-Users land here, find their task (trend removal, seasonality detection, walk-forward validation, anomaly detection, model tuning, or evaluation), copy the pattern, and adapt it to their own use case.
+Not yet built: rolling-origin evaluation, a seasonal-naive baseline, asset clustering, and
+everything above the per-asset forecast. [Findings](findings/index.md) tracks the honest status.
 
-## Concepts explored
+## Reading path
 
-1. Forecasting with plots
-2. Comparing different models for a given asset and time period
-3. Core forecasting tasks:
-    - Trend removal and deseasonalization
-    - Seasonality detection
-    - Walk-forward validation
-    - Anomaly detection
-    - Model selection and tuning
-    - Forecast evaluation
+1. **[Data](data/index.md)** — what the dataset is, how it is generated, what each column means.
+2. **[Theory](theory/index.md)** — metrics, models, diagnostics, and the model-selection logic.
+3. **[Coding](coding/index.md)** — how to call the framework, starting from loading the parquet data.
+4. **[Notebooks](notebooks/notebooks.md)** — the same workflow, interactive.
+5. **[Findings](findings/index.md)** — what has actually been established so far.
 
-## Concepts to explore in future
+## Find your task
 
-1. **Asset profiling**: classify assets by behavioral fingerprint
-2. **Daily metrics**: make use of the daily aggregate metrics
-3. **Uncertainty quantification**: understand prediction intervals and confidence levels for forecasts
-
-## Documentation
-
-- **[Data](data/index.md)** — Data descriptions and generation documentation
-- **[Theory](theory/index.md)** — Design rationale and methodological foundations
-- **[Findings](findings/index.md)** — Notes on forecasting tasks and the resources that support them
-- **[Notebooks](notebooks/notebooks.md)** — Exploration notebooks covering forecasting tasks
-
+| Task | Page |
+|---|---|
+| Load the data and run a forecast | [Framework usage](coding/framework_usage.md#from-parquet-to-numpy) |
+| Call the framework classes | [Framework usage](coding/framework_usage.md) |
+| Pick a metric / read it against a baseline | [Metrics](theory/metrics.md) |
+| Choose between SARIMA / ExpSmoothing / LightGBM | [Models](theory/models.md), [Decisions](theory/models-decisions.md) |
+| Read a diagnostic plot | [Diagnostics](theory/diagnostics.md) |
+| Understand the column units (kW vs kWh) | [Data](data/index.md#units) |

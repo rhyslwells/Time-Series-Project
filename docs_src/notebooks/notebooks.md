@@ -1,74 +1,76 @@
-# Exploration Notebooks
+# Exploration notebooks
 
-Interactive marimo notebooks documenting ongoing investigations. These are living documents that evolve as we explore.
+Interactive marimo notebooks documenting ongoing investigations. They are living documents
+that evolve as the analysis develops, and are stored in `src/notebooks/`.
 
-Notebooks are stored in `src/notebooks/`.
+## Available notebooks
 
-## How to Use Notebooks
+| Notebook | What it covers |
+|---|---|
+| [SARIMA forecasting pipeline](sarima.md) | End-to-end SARIMA forecast for one asset, with prediction intervals and event probabilities |
+| [Model comparison and interpretation](ts_model_explorer.md) | SARIMA vs Exponential Smoothing vs LightGBM on one split, with a diagnostic-plot reading guide |
 
-### Editing Locally
-
-Open any marimo notebook for interactive editing:
-
-```bash
-uv run marimo edit src/notebooks/notebook_name.py
-```
-
-### Exporting to Documentation
-
-Once a notebook is complete, export it as a static HTML artifact for embedding in documentation:
+## Running a notebook
 
 ```bash
-cd src/notebooks
-uv run marimo export html notebook.py -o "../../docs_src/notebooks/notebook_export.html" --include-code -f
+uv run marimo edit src/notebooks/<notebook>.py
 ```
 
-Then create a markdown file in `docs_src/notebooks/` that embeds it:
+For the docs build and preview commands, see [MkDocs setup](../coding/mkdocs.md#build-locally).
 
-```markdown
-# Notebook Title
+---
 
-[Open the full-screen version](notebook_export.html){ target="_blank" rel="noopener" }
+## Authoring a notebook page
+
+### Export the notebook
+
+Once a notebook is ready to embed, export it as a static HTML artifact:
+
+```bash
+uv run marimo export html src/notebooks/<notebook>.py \
+  -o docs_src/notebooks/<notebook>_export.html --include-code -f
+```
+
+The `*_export.html` files are committed. Regenerate the export after any notebook edit.
+
+### Add the page
+
+Create `docs_src/notebooks/<notebook>.md`. The built page lives at
+`notebooks/<notebook>/index.html` and the export sits one level up at
+`notebooks/<notebook>_export.html`, so **both the link and the iframe use `../`**:
+
+~~~markdown
+# Notebook title
+
+A short preamble: the question, the setup, and what the notebook shows.
+
+[Open the full-screen version](../<notebook>_export.html){ target="_blank" rel="noopener" }
 
 <iframe
-  src="notebook_export.html"
+  src="../<notebook>_export.html"
   title="Notebook title"
   loading="lazy"
-  style="width: 100%; height: 85vh; border: 1px solid var(--md-default-fg-color--lightest); border-radius: 4px;">
+  style="width: 100%; height: 85vh; border: none;">
 </iframe>
 
-To run this notebook locally, use the following command:
+Run locally:
 ```bash
-cd src/notebooks
-uv run marimo edit notebook.py
+uv run marimo edit src/notebooks/<notebook>.py
 ```
-```
+~~~
 
-### Workflow After Export
+Then add the page to `nav:` in `mkdocs.yml`.
 
-After exporting, the HTML file becomes a build artifact — regenerate it after any notebook edits using the export command above.
+### Notebook structure
 
-## Notebook Structure
-
-When creating a new notebook, follow this structure:
-
-1. **Overview** section explaining the investigation
-2. **Questions** or hypotheses being explored
-3. **Analysis** with visualizations
-4. **Findings** section summarizing conclusions
-5. **Next steps** for follow-up work
+1. Overview — the investigation
+2. Questions or hypotheses
+3. Analysis with visualisations
+4. Findings — conclusions
+5. Next steps
 
 ## Resources
 
-- [marimo Examples](https://github.com/marimo-team/marimo/tree/main/examples) — Starting point for building your own marimo scripts
-- [mkdocs-marimo Getting Started](https://github.com/marimo-team/mkdocs-marimo/tree/main/docs/getting-started) — Integration with documentation sites
-- [marimo Blocks Documentation](https://marimo-team.github.io/mkdocs-marimo/getting-started/blocks/) — Reference for marimo cell and block features
-
-## Build & Serve Locally
-
-Ensure docs dependencies are installed:
-
-```bash
-uv sync --group docs
-uv run mkdocs serve
-```
+- [marimo examples](https://github.com/marimo-team/marimo/tree/main/examples)
+- [mkdocs-marimo getting started](https://github.com/marimo-team/mkdocs-marimo/tree/main/docs/getting-started)
+- [marimo blocks reference](https://marimo-team.github.io/mkdocs-marimo/getting-started/blocks/)

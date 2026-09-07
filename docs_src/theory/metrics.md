@@ -1,38 +1,54 @@
 # Metrics
 
+This page is reference-first: the range tables and sanity checks come first so they are
+quick to look up, then each metric is defined below. Read a metric's value against a
+**baseline**, not against an absolute threshold — see the last section.
+
 ## Expected ranges by asset type
 
-| Metric | Residential | Commercial | EV Charging |
-|---|---|---|---|
-| MAE | < 0.5 kWh good, 0.5-1.0 acceptable, > 1.5 poor | < 1.0 / 1.0-1.5 / > 2.0 kWh | < 2.0 / 2.0-4.0 / > 5.0 kWh |
-| RMSE | < 0.7 / 0.7-1.0 / > 1.5 kWh | < 1.3 / 1.3-1.8 / > 2.5 kWh | < 2.5 / 2.5-5.0 / > 7.0 kWh |
-| MAPE | < 10% / 10-15% / > 20% | < 15% / 15-20% / > 25% | < 30% / 30-40% / > 50% |
-| PI Coverage (80% target) | 78-82% good, 75-85% acceptable | 76-84% | 70-80% |
-| Uncertainty width | 0.8-1.5 kWh | 1.5-2.5 kWh | 3.0-6.0 kWh |
+This project has two asset types: `ev_charging` and `solar_battery`. Values are in the units
+the data uses (kWh per 30-minute interval; see [units](../data/index.md)). Ranges are
+rough orientation, not acceptance criteria, and they are **horizon-dependent** — a day-ahead
+(h=48) forecast has much more error than an intraday (h=1) one, so qualify any number you
+quote with the horizon it was measured at.
 
-Why the spread: residential demand follows a stable daily routine, commercial adds occupancy and HVAC non-linearity, and EV charging arrival/duration is close to a Poisson process — each step up trades predictability for MAE/MAPE headroom.
+| Metric | ev_charging | solar_battery |
+|---|---|---|
+| MAE | < 0.3 good, 0.3-0.6 acceptable, > 1.0 poor | < 0.3 / 0.3-0.6 / > 1.0 |
+| RMSE | < 0.5 / 0.5-0.9 / > 1.4 | < 0.5 / 0.5-0.9 / > 1.4 |
+| MAPE | usable, < 20% / 20-35% / > 50% | **not usable** — series crosses zero |
+| PI Coverage (80% target) | 75-85% good, 70-90% acceptable | 75-85% / 70-90% |
+| MASE (vs seasonal naive, s=48) | < 1 = beats the baseline; aim well below 1 | < 1 = beats the baseline |
+
+`solar_battery` values pass through zero, so MAPE's denominator is not merely small, it is
+sometimes exactly zero and often changes sign. `max(|y_t|, ε)` does not fix this — it
+silently redefines the metric, so cross-asset comparison (the only reason to use MAPE) no
+longer holds. Use MASE for these assets, and for cross-asset comparison generally.
 
 ## Sanity checks before trusting a forecast
+
+The framework returns `pi_coverage` as a **percentage (0-100)**, not a fraction.
 
 ```python
 assert (forecast.lower < forecast.prediction).all()
 assert (forecast.upper > forecast.prediction).all()
-assert 0.7 < coverage < 0.95
+assert 70 < metrics.pi_coverage < 95        # percentage scale
 assert not np.isnan(forecast.prediction).any()
 ```
-
 
 ## MAE — Mean Absolute Error
 
 $$\text{MAE} = \frac{1}{n} \sum_{t=1}^{n} |y_t - \hat{y}_t|$$
 
-Average absolute difference between actual and forecast, in the same units as the data (kWh). Scale-dependent: 0.1 kWh is excellent for a 0.1 kWh asset and poor for a 5 kWh asset — always read it against the asset-type ranges below.
+Average absolute difference between actual and forecast, in the same units as the data.
+Scale-dependent: read it against the asset-type ranges above, or better, against MASE.
 
 ## RMSE — Root Mean Squared Error
 
 $$\text{RMSE} = \sqrt{\frac{1}{n} \sum_{t=1}^{n} (y_t - \hat{y}_t)^2}$$
 
-Squaring means large errors dominate the sum, so RMSE is always ≥ MAE and the *gap* between them is diagnostic:
+Squaring means large errors dominate the sum, so RMSE is always ≥ MAE and the *gap* between
+them is diagnostic:
 
 ```python
 ratio = rmse / mae
@@ -45,16 +61,36 @@ ratio = rmse / mae
 
 $$\text{MAPE} = \frac{100}{n} \sum_{t=1}^{n} \left|\frac{y_t - \hat{y}_t}{y_t}\right|$$
 
-Scale-independent, so it's the right metric for comparing forecast quality across differently-sized assets. **Pitfall:** blows up when $y_t \approx 0$ (common in energy off-peak periods) — use $\max(|y_t|, \epsilon)$ in the denominator, or exclude near-zero values.
+Scale-independent, so it is tempting for comparing across differently-sized assets.
+**Pitfalls:** undefined at $y_t = 0$, unstable near it, and asymmetric (it penalises
+over-forecasting more than under-forecasting). For `solar_battery` assets, whose values
+cross zero, it is meaningless. Prefer MASE.
+
+Note: `ts_model_framework.py` currently stores MAPE as a 0-1 fraction but prints it with a
+`%` suffix — see the [code bug report](../data/data_generation.md#reported-code-issues).
+
+## MASE — Mean Absolute Scaled Error
+
+$$\text{MASE} = \frac{\text{MAE of the model}}{\text{MAE of seasonal naive } (\hat{y}_t = y_{t-48})}$$
+
+Scale-free, defined at zero, symmetric, and by construction a skill ratio against the
+seasonal-naive baseline. MASE < 1 means the model beats "copy the same time yesterday";
+MASE ≥ 1 means it does not. On clean synthetic data with a hard-coded daily profile,
+seasonal naive is a strong baseline and beating it is not guaranteed.
 
 ## PI Coverage
 
-$$\text{Coverage} = \frac{1}{n} \sum_{t=1}^{n} \mathbb{1}[y_t \in [\hat{L}_t, \hat{U}_t]]$$
+$$\text{Coverage} = \frac{100}{n} \sum_{t=1}^{n} \mathbb{1}[y_t \in [\hat{L}_t, \hat{U}_t]]$$
 
-The share of actuals that fall inside the prediction interval. For an 80% PI, coverage should land near 80%.
+The percentage of actuals that fall inside the prediction interval. For an 80% PI, coverage
+should land near 80.
 
-- **Undercoverage** (e.g. 45%): intervals too narrow, model over-confident — flexibility commitments will breach.
-- **Overcoverage** (e.g. 95%): intervals too wide, model under-confident — wasted conservatism, missed revenue.
+- **Undercoverage** (e.g. 45): intervals too narrow, model over-confident — flexibility commitments will breach.
+- **Overcoverage** (e.g. 95): intervals too wide, model under-confident — wasted conservatism, missed revenue.
+
+Coverage alone is gameable — you can hit 80% with enormous intervals. Pair it with a proper
+scoring rule (interval/Winkler score or pinball loss) that combines width and breach into a
+single number.
 
 ```python
 from scipy.stats import norm
@@ -64,5 +100,16 @@ upper = forecast + z_80 * std(residuals)
 lower = forecast - z_80 * std(residuals)
 ```
 
-Sanity check: `mean_width ≈ 2 * z * std(residuals)`; a gap larger than ~0.2 kWh means the interval calculation doesn't match the residual distribution.
+Sanity check: `mean_width ≈ 2 * z * std(residuals)` for a single-std interval. Note that only
+SARIMA produces a horizon-varying width in this framework; ExponentialSmoothing and LightGBM
+return a constant width (see [Diagnostics](diagnostics.md)).
 
+## Read metrics against a baseline
+
+An MAE of 0.4 means nothing on its own. The reference point is **seasonal naive**
+($\hat{y}_t = y_{t-48}$ for a 30-minute series with a daily cycle). Compute the baseline's
+MAE/RMSE on the same test window first, then report the model as a ratio (that ratio is
+MASE). `archive/TimeSeries/Forecasting/Forecasting_Baseline.py` has a starting point.
+
+With 14 days of data there are only two weekly cycles, so a weekly seasonal-naive baseline
+($\hat{y}_t = y_{t-336}$) is barely estimable — daily seasonal naive is the honest reference here.

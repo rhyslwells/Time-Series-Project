@@ -1,8 +1,8 @@
-# Synthetic Metering Data Description
+# Synthetic metering data
 
-This document describes the characteristics, patterns, and behavior of the synthetic metering dataset (src\data\metering_data.parquet) used for model development and testing.
+This document describes the characteristics, patterns, and behavior of the synthetic metering dataset (`src/data/metering_data.parquet`) used for model development and testing. For the generation process and formulas, see [Data Generation and Calculations](data_generation.md).
 
-## Dataset Overview
+## Dataset overview
 
 **Purpose:** Provide realistic, reproducible metering data for developing and validating energy forecasting systems.
 
@@ -13,32 +13,38 @@ effects appear twice — at 1,344 complete records per asset.
 
 ---
 
-## Asset Types and Behavioral Patterns
+## Asset types and behavioral patterns
 
-### EV Charging Stations (8 assets)
+### EV charging stations (8 assets)
 
 **Characteristics:**
 - Deterministic, predictable daily patterns
 - Strong weekday/weekend separation
 - Two main charging windows: morning and evening
 
-**Hourly Pattern (Weekday Base):**
-```
-06:00 - 09:00: Morning charging peak    (2.5 kW avg, 1.2x multiplier)
-09:00 - 16:00: Daytime taper            (0.5 kW avg)
-16:00 - 21:00: Evening peak             (3.0 kW avg, 1.2x multiplier)
-21:00 - 02:00: Night charging           (1.5 kW avg)
-02:00 - 06:00: Overnight minimal        (0.1 kW avg)
-```
+**Resulting half-hourly values** (component sum × weekday factor, before noise):
+
+| Window | Components | Weekday (×1.2) | Weekend (×0.8) |
+|--------|-----------|----------------|----------------|
+| 00:00 - 02:00 | base 0.5 + night 1.5 | 2.4 | 1.6 |
+| 02:00 - 06:00 | base 0.5 | 0.6 | 0.4 |
+| 06:00 - 09:00 | base 0.5 + morning 2.5 | 3.6 | 2.4 |
+| 09:00 - 16:00 | base 0.5 | 0.6 | 0.4 |
+| 16:00 - 21:00 | base 0.5 + evening 3.0 | 4.2 | 2.8 |
+| 21:00 - 22:00 | base 0.5 | 0.6 | 0.4 |
+| 22:00 - 00:00 | base 0.5 + night 1.5 | 2.4 | 1.6 |
+
+There is no separate "overnight minimal" band — outside the three charging windows the value
+is just the base load. Night charging runs 22:00-02:00, not 21:00-02:00.
 
 **Weekday/Weekend Variation:**
 - Weekday (Mon-Fri): 1.2× intensity (higher charging demand)
 - Weekend (Sat-Sun): 0.8× intensity (lower, more distributed charging)
 
-**Behavioral Metrics (Typical):**
-- Mean load: 1.83 kW
-- Coefficient of variation: 0.79 (moderate predictability)
-- Peak-to-average ratio: 2.23 (pronounced peaks)
+**Behavioral Metrics (indicative — computed from a prior run, not re-verified here):**
+- Mean load: ~1.8 kW
+- Coefficient of variation: ~0.8 (moderate predictability)
+- Peak-to-average ratio: ~2.2 (pronounced peaks)
 - Intermittency: minimal (rarely zero)
 - Daily variability: Low (similar patterns day-to-day)
 
@@ -49,7 +55,7 @@ effects appear twice — at 1,344 complete records per asset.
 
 ---
 
-### Solar + Battery Storage (7 assets)
+### Solar + battery storage (7 assets)
 
 **Characteristics:**
 - Generation-led, net metering (exports to grid)
@@ -57,27 +63,29 @@ effects appear twice — at 1,344 complete records per asset.
 - Highly variable, weather-dependent
 - Evening battery discharge supports grid
 
-**Daily Pattern (Clear Sky Base):**
+**Daily Pattern (net = solar generation − consumption − battery discharge):**
 ```
-00:00 - 06:00: Minimal generation        (-0.2 kW avg, base load only)
-06:00 - 09:00: Solar ramp-up             (0 to 2.0 kW)
-09:00 - 12:00: Increasing generation    (2.0 to 2.5 kW)
-12:00 - 15:00: Peak generation          (2.5 kW, export active)
-15:00 - 18:00: Afternoon decline         (2.5 to 1.0 kW)
-18:00 - 22:00: Battery discharge        (-0.5 kW avg, grid support)
-22:00 - 00:00: Evening wind-down         (-0.2 to 0.0 kW)
+Solar generation: half-sine over 06:00-18:00, peak 2.5 at ~12:00, zero otherwise
+Consumption:      0.8 + 0.3 sin(2π hour / 24), scaled by a constant 0.85
+Battery discharge: 0.5 subtracted over 18:00-22:00
 ```
+Overnight the net is roughly −consumption (a small import); midday the solar term dominates
+and the net goes strongly negative (export); the evening discharge deepens the 18:00-22:00 dip.
 
 **Value Interpretation:**
 - Positive values: Net consumption (importing from grid)
 - Negative values: Net export (generation exceeds consumption)
 
-**Behavioral Metrics (Typical):**
-- Mean load: 0.026 kW (net exporter)
-- Coefficient of variation: 45.5 (highly variable)
-- Peak-to-average ratio: 88.8 (extreme variation due to zero-crossing)
+!!! warning "No weekday/weekend variation"
+    Unlike EV assets, solar assets are identical on weekdays and weekends — the intended
+    0.85 weekend factor is applied on every day (see [generator issue](data_generation.md#reported-code-issues)).
+
+**Behavioral Metrics (indicative — computed from a prior run, not re-verified here):**
+- Mean load: near zero (net exporter)
+- Coefficient of variation: very large (mean near zero makes CV unstable)
+- Peak-to-average ratio: very large (same cause — denominator near zero)
 - Intermittency: none (always operating)
-- Daily variability: High (weather-dependent)
+- Daily variability: High
 
 **Forecasting Suitability:**
 - Weather-dependent (requires external variables)
@@ -87,67 +95,68 @@ effects appear twice — at 1,344 complete records per asset.
 
 ---
 
-## Data Quality and Characteristics
+## Data quality and characteristics
 
-### Value Distribution
+### Value distribution
 
-**Range:**
-- Minimum: -1.8 kW (solar export)
-- Maximum: +3.4 kW (EV charging peak)
-- Mean across all records: 0.89 kW
+**Range (indicative, from a prior run):**
+- Minimum: about -1.8 kW (solar export)
+- Maximum: about +4.2 kW (EV weekday evening peak, plus noise)
+- Mean across all records: order of 1 kW (EV assets dominate the count)
 
 **Negative Values:**
-- Count: 2,767 records (18.2%)
-- Source: Solar+battery assets during generation periods
+- Count: 2,767 records — 27.5% of the 10,080 rows (2,767 / 10,080)
+- Source: Solar+battery assets during generation periods (2,767 / 4,704 solar rows ≈ 59%)
 - Status: Expected (net export to grid)
 
-**Distribution by Asset Type:**
+**Distribution by Asset Type (indicative):**
 | Type | Positive (%) | Negative (%) | Mean (kW) |
 |------|-------------|-------------|-----------|
-| EV Charging | 99%+ | <1% | 1.83 |
-| Solar+Battery | 40% | 60% | 0.026 |
+| EV Charging | ~100% | ~0% | ~1.8 |
+| Solar+Battery | ~41% | ~59% | near zero |
 
-### Temporal Patterns
+### Temporal patterns
 
-**Weekday/Weekend Patterns (EV assets):**
-- Weekday peak load: 20-30% higher than weekend
-- Weekend patterns show distributed charging
+**Weekday/Weekend Patterns:**
+- EV assets: weekday values are exactly 1.2/0.8 = 1.5× the weekend values (50% higher), before noise
+- Solar assets: none — the weekend factor is inert (see warning above)
 
-**Daily Seasonality (All assets):**
+**Daily Seasonality (all assets):**
 - EV: Strong 24-hour cycle
 - Solar: Strong 24-hour cycle (inverted vs EV)
 
 **Weekly Patterns:**
-- Visible Mon-Sun variation (weekday/weekend effect)
-- Two complete weeks provide statistical representation
+- EV assets only: a weekday/weekend step, repeated across the two weeks
+- Two weeks give exactly two realisations of the weekly cycle — barely enough to estimate a weekly component (see [Models](../theory/models.md))
 
 ---
 
-## Realistic Noise
+## Realistic noise
 
 The data includes realistic noise to make patterns non-trivial for forecasting:
-- Random variation within ±5% of expected values
+- Additive Gaussian noise (unbounded), std = 10% of the mean positive pattern value for EV assets, 8% of (max solar + 0.5) for solar assets
+- EV values are clipped at zero after noise; solar values are not, which is why solar can go negative
 - No missing data (unrealistic but enables testing)
 - No extreme outliers (exceptional weather, equipment failures)
 - No trend or drift (assumes stable asset behavior)
 
 ---
 
-## Use Cases and Limitations
+## Use cases and limitations
 
-### Appropriate For
+### Appropriate for
 
-✓ **Developing and validating forecasting models**
+**Developing and validating forecasting models**
 - Deterministic, repeatable patterns
 - Known asset types and behaviors
 - Clean data for algorithm development
 
-✓ **Testing feature engineering pipelines**
+**Testing feature engineering pipelines**
 - Sufficient temporal coverage (2 weeks)
 - Clear asset differentiation (EV vs solar)
 - Interpretable behavioral metrics
 
-✓ **Prototyping forecasting workflows**
+**Prototyping forecasting workflows**
 - Fast iteration (small dataset)
 - Reproducible (seed=42)
 - All assumptions documented
@@ -171,9 +180,11 @@ The data includes realistic noise to make patterns non-trivial for forecasting:
 
 ---
 
-## Asset Reference
+## Asset reference
+
+Indicative figures from a prior run; not re-verified in this review.
 
 | Asset ID | Type | Mean Load (kW) | CV | Peak Ratio | Notes |
 |----------|------|---|---|---|---|
-| ASSET_001-008 | EV Charging | ~1.8 | ~0.79 | ~2.2 | Predictable peaks |
-| ASSET_009-015 | Solar+Battery | ~0.03 | ~45 | ~90 | Net exporter |
+| ASSET_001-008 | EV Charging | ~1.8 | ~0.8 | ~2.2 | Predictable peaks |
+| ASSET_009-015 | Solar+Battery | near 0 | very large | very large | Net exporter; CV/ratio unstable because mean ≈ 0 |

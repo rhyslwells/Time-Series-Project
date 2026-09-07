@@ -1,5 +1,46 @@
 
-# docs review notes
+
+## Progress log
+
+**Phase 1 — Unbreak rendering — DONE (2026-09-07, not yet committed)**
+Changes to `mkdocs.yml` plus one new file `docs_src/javascripts/mathjax.js`:
+
+- LaTeX now renders: added `pymdownx.arithmatex: generic: true` and `extra_javascript` for MathJax v3 (jsdelivr CDN) + the new `mathjax.js` config shim. Verified `docs/theory/metrics/index.html` wraps formulas in `arithmatex` spans and loads the MathJax bundle.
+- Mermaid now renders: added `format: !!python/name:pymdownx.superfences.fence_code_format` to the mermaid custom fence. Verified `docs/data/feature_engineering/index.html` emits `<pre class="mermaid">`.
+- Removed `theme.favicon` (pointed at nonexistent `_static/`) — Material falls back to its default.
+- Dropped the duplicate `pymdownx.tasklist`.
+- Orphan README: added `exclude_docs: README.md` (no committed `docs/README*` existed anyway).
+- Verified with `uv run mkdocs build` — clean build, ~6s.
+
+Notes carried forward:
+- The "MkDocs 2.0 Breaking Changes" text in `mkdocs.md` that content-notes flagged as speculation is actually echoed verbatim by the Material team's own build-time warning. Reconsider the Phase 4 plan to delete it — it's upstream, not invented.
+- The deploy workflow uses an explicit `pip install` list, not the pyproject `docs` group; arithmatex/superfences ship with `mkdocs-material` so CI needs no change.
+
+Still open: Phases 2-6, then C1-C6. C4 architecture page = decide later. Code fixes = allowed where necessary.
+
+---
+
+**Phases 2-6 + C1-C3, C5-C6 — DONE (2026-09-07, not yet committed)**
+
+- **Phase 2 (data):** `data_generation.md` + `synthetic_metering_data.md` corrected against the generators — EV pattern table rebuilt as additive components + resulting values, noise (Gaussian 10%/8% std, not ±5%), negatives 27.5% not 18.2%, solar has no weekday/weekend (documented as a bug), `mean_ramp_kw` is signed, raw CSV is a committed intermediate, ✓ glyphs + Windows path removed, non-derivable stats marked indicative. Added pipeline mermaid and a **Reported code issues** table (this is the Phase 6 report — folded in here, covers `day_of_week` collapse, signed `mean_ramp_kw`, MAPE %/fraction, unused `n_assets`, mislabelled `daily_*_kw`).
+- **Phase 3 (theory):** `metrics.md` rewritten (reference-first, `ev_charging`/`solar_battery`, MASE + seasonal-naive baseline section, MAPE unusable for solar, coverage 0-100, horizon-qualified). `models.md` rewritten (`d=0` default reconciled with "no trend", `seasonal="mul"` banned for solar, "weekly cycle invisible to all defaults" section, LightGBM recursive-interval explanation, AICc/ADF/KPSS). `diagnostics.md` (flat width is structural for ExpSmoothing/LightGBM, "widening width is correct — don't cap", *confirm with* line on every failure mode, removed the `d≥1` advice). `models-decisions.md` (one-failure gap in the decision rule closed, coverage 0-100, MASE in checklist, tuner caveat link). `forecast_products.md` ("Proposed — not implemented" admonition, three bands, `behavioral_fingerprints.parquet` repointed to `daily_metrics.parquet`, reconciliation + STL F_S).
+- **Phase 4 (coding):** `framework_usage.md` — polars not pandas, coverage 0-100, MAPE bug noted, **test-set tuning warning**, `ModelEvaluator` import, per-model interval semantics, deps corrected; added a "From parquet to numpy" section (the load/split bridge — folded in from the dropped `end_to_end.md` idea). `mkdocs.md` rewritten and roughly halved — project-specific mechanics only, broken link examples fixed, empty heading + stray "2" gone, MkDocs-2.0 section cut to one neutral line (Material prints that warning itself now).
+- **Phase 5:** `findings/index.md` → status table; `asset_profiling.md` → "Proposed — not implemented", dangling refs repaired; `notebooks.md` split reader/authoring, nested-fence fixed, paths fixed; `sarima.md` + `ts_model_explorer.md` got question/setup/what-it-shows preambles (setup only — no invented numeric findings) and `../` path; `index.md` rewritten as a real front door with reading path + task table.
+- **C1:** status admonitions applied; units decided (`metering_kwh` = kWh per 30-min) with a note in `data/index.md`; `data/` headings → sentence case.
+- **C2:** nav reordered Home → Data → Theory → Coding → Notebooks → Findings; `data/index.md`, `coding/index.md`, `theory/index.md` given question→page tables.
+- **C3:** no standalone `end_to_end.md` (user's call) — its load/split content lives at the top of `framework_usage.md`; the runnable script is cross-linked.
+- **C6:** `data_generation.md` / `synthetic_metering_data.md` split into process-vs-characteristics with a cross-link; `mkdocs.md` trimmed; build/serve owned by `mkdocs.md`, `notebooks.md` links to it; `docs_src/README.md` cut to orientation.
+
+**Not done / deferred:**
+- **C4** — `theory/architecture.md` (the layer-model page). Deferred pending your call on whether it should be public.
+- Notebook preambles are **setup only**. If you want real "what it concluded" text, that needs a fresh notebook run or your draft.
+- Build is clean except two pre-existing link-validator warnings on `notebooks/sarima.md` / `ts_model_explorer.md` (`../*_export.html`). The `../` is correct for the browser under `use_directory_urls`; MkDocs' source-path validator disagrees. Cosmetic; the pages render and the iframes/links work.
+- Nothing committed yet.
+
+---
+
+## docs review notes
+
 
 Two greps confirm a pattern worth naming up front: zero admonitions, zero images, zero tabbed blocks across all 23 files — despite admonition, pymdownx.details, attr_list and tasklist all being enabled in mkdocs.yml. And units split cleanly by section: synthetic_metering_data.md says kW 19 times and kWh never; metrics.md says kWh 14 times and kW never. Same quantity, two sections, never reconciled.
 

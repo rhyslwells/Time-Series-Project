@@ -1,12 +1,26 @@
-# Data Generation and Calculations
+# Data generation and calculations
 
-This document describes how synthetic metering data is generated and the calculations performed to produce analysis-ready datasets.
+This page covers the generation process and the formulas. For what the resulting data looks
+like and its fitness for use, see [Synthetic metering data](synthetic_metering_data.md).
 
 **Source:** `src/data/` scripts (generate_raw_data.py, generate_daily_metrics.py). For the third pipeline stage, which joins these daily metrics back onto the 30-minute series, see [Feature Engineering](feature_engineering.md).
 
-## Generation Process
+## Pipeline at a glance
 
-### Step 1: Synthetic Metering Generation (generate_raw_data.py)
+```mermaid
+flowchart LR
+    A[generate_raw_data.py] -->|metering_data_raw.csv| B[generate_daily_metrics.py]
+    B -->|metering_data.parquet| C[generate_metering_features.py]
+    B -->|daily_metrics.parquet| C
+    C -->|metering_data_with_features.parquet| D[Forecasting]
+```
+
+All three scripts and their outputs live in `src/data/`. Every intermediate file is
+committed to the repository, since its schema is a cross-layer data contract.
+
+## Generation process
+
+### Step 1: synthetic metering generation (generate_raw_data.py)
 
 Synthetic metering data is created with realistic behavioral patterns for 15 assets over 14 days (2025-01-01 to 2025-01-14) at 30-minute intervals.
 
@@ -19,29 +33,37 @@ Synthetic metering data is created with realistic behavioral patterns for 15 ass
 
 **Asset Types:**
 
-1. **EV Charging (8 assets)**
-   - Distinct daily peaks during charging hours
-   - Weekday (Mon-Fri): 1.2x intensity multiplier
-   - Weekend (Sat-Sun): 0.8x intensity multiplier
-   - Peak times: Morning (06:00-09:00), Evening (16:00-21:00)
+1. **EV Charging (8 assets)** — additive components on a 0.5 base load:
+   - Morning peak (06:00-09:00): +2.5
+   - Evening peak (16:00-21:00): +3.0
+   - Night charging (22:00-02:00): +1.5
+   - Whole pattern then multiplied by a weekday factor: 1.2 (Mon-Fri) or 0.8 (Sat-Sun)
+   - Gaussian noise added, std = 10% of the mean positive pattern value; result clipped at 0
 
-2. **Solar + Battery Storage (7 assets)**
-   - Solar generation peak at midday
-   - Evening discharge period
-   - Net metering (generation - consumption - discharge)
-   - Negative values represent export to grid
+2. **Solar + Battery Storage (7 assets)** — net metering (generation - consumption - discharge):
+   - Solar generation: half-sine over 06:00-18:00, peak 2.5 at local noon
+   - Consumption: `0.8 + 0.3 sin(2π hour / 24)`, then scaled by a constant 0.85 (see caveat below)
+   - Battery discharge: -0.5 over 18:00-22:00
+   - Gaussian noise added, std = 8% of (max solar + 0.5); values are **not** clipped, so negatives occur
+   - Negative values represent net export to grid
 
-**Output:** `metering_data_raw.csv` (temporary working file)
+!!! warning "Known generator issue — solar has no weekday/weekend variation"
+    `generate_raw_data.py:44` scales consumption by `1.0 if (day_of_week < 5).all() else 0.85`.
+    Because `day_of_week` spans the whole 14-day array, `.all()` is always `False`, so the
+    factor collapses to a constant `0.85`. Solar assets therefore have no weekday/weekend
+    effect. Listed in the [code bug report](#reported-code-issues).
+
+**Output:** `metering_data_raw.csv` — a committed intermediate file (the input to Step 2), not a scratch file.
 
 ---
 
-## Analysis and Calculations
+## Analysis and calculations
 
-### Step 2: Daily Metrics Computation (generate_daily_metrics.py)
+### Step 2: daily metrics computation (generate_daily_metrics.py)
 
 Raw metering data is aggregated and analyzed to produce daily-level metrics for each asset.
 
-#### Energy Metrics
+#### Energy metrics
 
 ```
 daily_energy_kwh = SUM(metering_kwh) over all 30-minute intervals in day
@@ -52,7 +74,7 @@ daily_std_kw = STDEV(metering_kwh) over all 30-minute intervals in day
 n_samples = COUNT of 30-minute intervals (48 per day)
 ```
 
-#### Ramp Rate Analysis
+#### Ramp rate analysis
 
 Ramp rates measure how quickly power changes between consecutive 30-minute intervals, important for understanding asset flexibility constraints.
 
@@ -60,7 +82,7 @@ Ramp rates measure how quickly power changes between consecutive 30-minute inter
 ramp_kw = metering_kwh[t] - metering_kwh[t-1]
 
 Per day aggregation:
-mean_ramp_kw = MEAN(|ramp_kw|) over all intervals in day
+mean_ramp_kw = MEAN(ramp_kw) over all intervals in day        # signed, not absolute
 std_ramp_kw = STDEV(ramp_kw) over all intervals in day
 max_abs_ramp_kw = MAX(|ramp_kw|) over all intervals in day
 ```
@@ -68,7 +90,13 @@ max_abs_ramp_kw = MAX(|ramp_kw|) over all intervals in day
 Positive ramp = increase in load/generation
 Negative ramp = decrease in load/generation
 
-#### Behavioral Metrics
+!!! note "mean_ramp_kw is the signed mean"
+    `generate_daily_metrics.py:35` computes `pl.col('ramp_kw').mean()` — the signed mean, not
+    the mean absolute change. For a series that returns to a similar level each day the signed
+    mean sits near zero, so **`max_abs_ramp_kw` is the ramp-magnitude column**, not this one.
+    Whether the signed mean is intended or a bug is in the [code bug report](#reported-code-issues).
+
+#### Behavioral metrics
 
 Daily behavioral metrics characterize asset variability and predictability, enabling adaptive forecasting and model selection.
 
@@ -104,9 +132,9 @@ Interpretation:
 
 ---
 
-## Output Data
+## Output data
 
-### metering_data.parquet (Raw Time Series)
+### metering_data.parquet (raw time series)
 
 **Schema:**
 ```
@@ -125,7 +153,7 @@ asset_type: string                  # 'ev_charging' or 'solar_battery'
 
 ---
 
-### daily_metrics.parquet - Daily Aggregates and Behavioral Features
+### daily_metrics.parquet - daily aggregates and behavioral features
 
 **Schema:**
 ```
@@ -137,7 +165,7 @@ daily_min_kw: float                 # Minimum 30-min value in day
 daily_avg_kw: float                 # Mean 30-min value in day
 daily_std_kw: float                 # Std dev of 30-min values
 n_samples: int                      # Count (48 for complete days)
-mean_ramp_kw: float                 # Average absolute change between intervals
+mean_ramp_kw: float                 # Signed mean change between intervals (near zero for level-reverting series)
 std_ramp_kw: float                  # Std dev of ramp changes
 max_abs_ramp_kw: float              # Largest change between any two intervals
 coefficient_of_variation: float     # Daily variability metric (std/mean)
@@ -158,9 +186,9 @@ peak_to_avg_ratio: float            # Peak load vs average load
 
 ---
 
-## Key Design Decisions
+## Key design decisions
 
-### Why Consolidate into daily_metrics?
+### Why consolidate into daily_metrics?
 
 Previously, behavioral metrics and ramp rates were stored separately (15 rows each, asset-level aggregates). Consolidating into daily_metrics enables:
 
@@ -171,9 +199,24 @@ Previously, behavioral metrics and ramp rates were stored separately (15 rows ea
 
 ---
 
-## Next Step
+## Next step
 
 `daily_metrics.parquet` is joined back onto the 30-minute series to produce a model-ready
 table with per-interval and daily-context features side by side. See
 [Feature Engineering](feature_engineering.md).
+
+---
+
+## Reported code issues
+
+Suspected bugs in the generation scripts, surfaced during a documentation review. None are
+fixed yet; they are recorded here so the docs above can describe the data as it actually is.
+
+| Location | Issue | Effect |
+|----------|-------|--------|
+| `generate_raw_data.py:44` | `(day_of_week < 5).all()` over the whole array is always `False` | Solar assets get a constant `0.85` consumption factor — no weekday/weekend variation |
+| `generate_daily_metrics.py:35` | `mean_ramp_kw` uses `.mean()` (signed), while its schema gloss and downstream naming imply mean-absolute | Column is near zero for level-reverting assets; easy to misread as "no ramps" |
+| `ts_model_framework.py` (MAPE) | MAPE stored as sklearn's 0-1 fraction but printed with a `%` suffix | Threshold comparisons like "MAPE < 15%" are off by 100x |
+| `generate_metering_data(n_assets=...)` | `n_assets` parameter is accepted but unused; asset count is fixed by `asset_types` | Passing `n_assets=15` is a no-op coincidence, not a control |
+| `daily_metrics.parquet` column names | `daily_peak_kw` / `daily_min_kw` / `daily_avg_kw` / `daily_std_kw` are statistics of a kWh-per-30-min quantity, not kW | `_kw` suffix implies power; a true kW value is 2× the stored number. Consider renaming to `_kwh_hh` or similar |
 
