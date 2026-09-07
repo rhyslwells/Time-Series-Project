@@ -1,3 +1,6 @@
+
+# docs review notes
+
 Two greps confirm a pattern worth naming up front: zero admonitions, zero images, zero tabbed blocks across all 23 files — despite admonition, pymdownx.details, attr_list and tasklist all being enabled in mkdocs.yml. And units split cleanly by section: synthetic_metering_data.md says kW 19 times and kWh never; metrics.md says kWh 14 times and kW never. Same quantity, two sections, never reconciled.
 
 Diagnosis: what's actually wrong with the content

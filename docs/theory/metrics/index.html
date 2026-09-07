@@ -22,7 +22,7 @@
         
       
       
-      <link rel="icon" href="../../_static/favicon-32x32.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
@@ -1147,10 +1147,10 @@
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="k">assert</span> <span class="ow">not</span> <span class="n">np</span><span class="o">.</span><span class="n">isnan</span><span class="p">(</span><span class="n">forecast</span><span class="o">.</span><span class="n">prediction</span><span class="p">)</span><span class="o">.</span><span class="n">any</span><span class="p">()</span>
 </span></code></pre></div>
 <h2 id="mae-mean-absolute-error">MAE — Mean Absolute Error<a class="headerlink" href="#mae-mean-absolute-error" title="Permanent link">&para;</a></h2>
-<p>$$\text{MAE} = \frac{1}{n} \sum_{t=1}^{n} |y_t - \hat{y}_t|$$</p>
+<div class="arithmatex">\[\text{MAE} = \frac{1}{n} \sum_{t=1}^{n} |y_t - \hat{y}_t|\]</div>
 <p>Average absolute difference between actual and forecast, in the same units as the data (kWh). Scale-dependent: 0.1 kWh is excellent for a 0.1 kWh asset and poor for a 5 kWh asset — always read it against the asset-type ranges below.</p>
 <h2 id="rmse-root-mean-squared-error">RMSE — Root Mean Squared Error<a class="headerlink" href="#rmse-root-mean-squared-error" title="Permanent link">&para;</a></h2>
-<p>$$\text{RMSE} = \sqrt{\frac{1}{n} \sum_{t=1}^{n} (y_t - \hat{y}_t)^2}$$</p>
+<div class="arithmatex">\[\text{RMSE} = \sqrt{\frac{1}{n} \sum_{t=1}^{n} (y_t - \hat{y}_t)^2}\]</div>
 <p>Squaring means large errors dominate the sum, so RMSE is always ≥ MAE and the <em>gap</em> between them is diagnostic:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">ratio</span> <span class="o">=</span> <span class="n">rmse</span> <span class="o">/</span> <span class="n">mae</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="c1"># &lt; 1.2   consistent errors, no outliers</span>
@@ -1158,10 +1158,10 @@
 </span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># &gt; 1.5   frequent large errors — check data quality / model fit</span>
 </span></code></pre></div>
 <h2 id="mape-mean-absolute-percentage-error">MAPE — Mean Absolute Percentage Error<a class="headerlink" href="#mape-mean-absolute-percentage-error" title="Permanent link">&para;</a></h2>
-<p>$$\text{MAPE} = \frac{100}{n} \sum_{t=1}^{n} \left|\frac{y_t - \hat{y}_t}{y_t}\right|$$</p>
-<p>Scale-independent, so it's the right metric for comparing forecast quality across differently-sized assets. <strong>Pitfall:</strong> blows up when $y_t \approx 0$ (common in energy off-peak periods) — use $\max(|y_t|, \epsilon)$ in the denominator, or exclude near-zero values.</p>
+<div class="arithmatex">\[\text{MAPE} = \frac{100}{n} \sum_{t=1}^{n} \left|\frac{y_t - \hat{y}_t}{y_t}\right|\]</div>
+<p>Scale-independent, so it's the right metric for comparing forecast quality across differently-sized assets. <strong>Pitfall:</strong> blows up when <span class="arithmatex">\(y_t \approx 0\)</span> (common in energy off-peak periods) — use <span class="arithmatex">\(\max(|y_t|, \epsilon)\)</span> in the denominator, or exclude near-zero values.</p>
 <h2 id="pi-coverage">PI Coverage<a class="headerlink" href="#pi-coverage" title="Permanent link">&para;</a></h2>
-<p>$$\text{Coverage} = \frac{1}{n} \sum_{t=1}^{n} \mathbb{1}[y_t \in [\hat{L}_t, \hat{U}_t]]$$</p>
+<div class="arithmatex">\[\text{Coverage} = \frac{1}{n} \sum_{t=1}^{n} \mathbb{1}[y_t \in [\hat{L}_t, \hat{U}_t]]\]</div>
 <p>The share of actuals that fall inside the prediction interval. For an 80% PI, coverage should land near 80%.</p>
 <ul>
 <li><strong>Undercoverage</strong> (e.g. 45%): intervals too narrow, model over-confident — flexibility commitments will breach.</li>
@@ -1194,7 +1194,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 6, 2026 18:11:54 UTC">September 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 5, 2026 16:35:49 UTC">September 5, 2026</span>
   </span>
 
     
@@ -1309,6 +1309,10 @@
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       
     
   </body>

@@ -22,7 +22,7 @@
         
       
       
-      <link rel="icon" href="../../_static/favicon-32x32.png">
+      <link rel="icon" href="../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
@@ -1099,7 +1099,7 @@
 <h2 id="uncertainty-width-over-time">Uncertainty width over time<a class="headerlink" href="#uncertainty-width-over-time" title="Permanent link">&para;</a></h2>
 <p><strong>Good case:</strong> width tracks actual volatility — narrow during stable stretches (e.g. midday for an office), wider during transitions (morning ramp-up, evening ramp-down). Mean width roughly matches <code>2 x z x std(residuals)</code>.</p>
 <p><strong>Flat width:</strong> the interval is the same size at every hour, meaning the model isn't adapting its confidence to conditions — over-wide during predictable periods (wasted conservatism) and under-wide during volatile ones (under-confident when it matters most). Usually means the interval was computed from a single global residual std rather than a conditional one; for LightGBM in particular, consider a residual-std model or explicit quantile models.</p>
-<p><strong>Exploding width:</strong> the interval balloons far faster than the forecast horizon justifies (e.g. tripling over a few hours). Typically comes from naive error propagation (std growing with $\sqrt{\text{horizon}}$) rather than recalibration against real data. Fix: cap the width, or use a recursive forecasting approach that treats each step's own forecast as the new anchor.</p>
+<p><strong>Exploding width:</strong> the interval balloons far faster than the forecast horizon justifies (e.g. tripling over a few hours). Typically comes from naive error propagation (std growing with <span class="arithmatex">\(\sqrt{\text{horizon}}\)</span>) rather than recalibration against real data. Fix: cap the width, or use a recursive forecasting approach that treats each step's own forecast as the new anchor.</p>
 <h2 id="pi-coverage-greenred-scatter">PI coverage (green/red scatter)<a class="headerlink" href="#pi-coverage-greenred-scatter" title="Permanent link">&para;</a></h2>
 <p>Each point is colored by whether the actual fell inside (green) or outside (red) the interval.</p>
 <p><strong>Good case:</strong> roughly 80% green for an 80% PI, with reds scattered randomly across time rather than clustered.</p>
@@ -1128,7 +1128,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 6, 2026 18:11:54 UTC">September 6, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 6, 2026 17:35:05 UTC">September 6, 2026</span>
   </span>
 
     
@@ -1243,6 +1243,10 @@
     
     
       <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       
     
   </body>

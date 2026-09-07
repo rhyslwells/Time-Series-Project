@@ -20,8 +20,17 @@ extra:
 extra_css:
   - stylesheets/extra.css
 
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+exclude_docs: |
+  README.md
+
 markdown_extensions:
   - admonition
+  - pymdownx.arithmatex:
+      generic: true
   - attr_list
   - def_list
   - tables
@@ -35,6 +44,7 @@ markdown_extensions:
       custom_fences:
         - class: mermaid
           name: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.tasklist:
       custom_checkbox: true
   - pymdownx.emoji
@@ -46,7 +56,6 @@ markdown_extensions:
   - pymdownx.magiclink
   - pymdownx.mark
   - pymdownx.smartsymbols
-  - pymdownx.tasklist
   - pymdownx.tilde
 
 nav:
@@ -88,7 +97,6 @@ validation:
 
 theme:
   name: material
-  favicon: _static/favicon-32x32.png
   palette:
     # Palette toggle for system preference
     - media: "(prefers-color-scheme)"
