@@ -1054,6 +1054,7 @@ or a <code>docs_src/</code> file if you need to force it.</p>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>uv<span class="w"> </span>run<span class="w"> </span>mkdocs<span class="w"> </span>build<span class="w">         </span><span class="c1"># writes docs/</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>uv<span class="w"> </span>run<span class="w"> </span>mkdocs<span class="w"> </span>serve<span class="w">         </span><span class="c1"># live-reload preview at http://localhost:8000</span>
 </span></code></pre></div>
+<<<<<<< HEAD
 <p><code>mkdocs serve</code> is the command to use while writing — it is the single source for build/serve
 instructions (the notebook page links here rather than repeating them).</p>
 <h2 id="marimo-notebooks">Marimo notebooks<a class="headerlink" href="#marimo-notebooks" title="Permanent link">&para;</a></h2>
@@ -1066,6 +1067,67 @@ before committing a notebook change. See <a href="../../notebooks/notebooks/">No
 <li>Create the markdown file under <code>docs_src/</code>.</li>
 <li>Add it to <code>nav:</code> in <code>mkdocs.yml</code>.</li>
 <li>Commit and push <code>docs_src/</code> + <code>mkdocs.yml</code> together.</li>
+=======
+<h3 id="2-commit-and-push">2. Commit and Push<a class="headerlink" href="#2-commit-and-push" title="Permanent link">&para;</a></h3>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>git<span class="w"> </span>add<span class="w"> </span>docs_src/
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Document new finding"</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>main
+</span></code></pre></div>
+<h3 id="3-github-actions-builds-automatically">3. GitHub Actions Builds Automatically<a class="headerlink" href="#3-github-actions-builds-automatically" title="Permanent link">&para;</a></h3>
+<p>The workflow (<code>.github/workflows/deploy.yml</code>):
+- Triggers on push to <code>main</code> branch
+- Installs mkdocs and Material theme
+- Builds from <code>docs_src/</code> to <code>docs/</code>
+- Commits built files back to repo
+- Pushes to <code>main</code></p>
+<h3 id="4-github-pages-deploys">4. GitHub Pages Deploys<a class="headerlink" href="#4-github-pages-deploys" title="Permanent link">&para;</a></h3>
+<p>GitHub Pages automatically serves the latest <code>docs/</code> folder at:
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>https://rhyslwells.github.io/time-series-project
+</span></code></pre></div></p>
+<p>No manual steps needed. Just edit, commit, push.</p>
+<h2 id="building-locally">Building Locally<a class="headerlink" href="#building-locally" title="Permanent link">&para;</a></h2>
+<p>To test changes before pushing:</p>
+<div class="language-bash highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Install dependencies (if not already done)</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>uv<span class="w"> </span>sync<span class="w"> </span>--all-extras
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Build the site</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>uv<span class="w"> </span>run<span class="w"> </span>mkdocs<span class="w"> </span>build
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Or serve with live reload</span>
+</span><span id="__span-4-8"><a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>uv<span class="w"> </span>run<span class="w"> </span>mkdocs<span class="w"> </span>serve
+</span></code></pre></div>
+<p>Then visit <code>http://localhost:8000</code></p>
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<h2 id="do-not-manually-edit-docs">Do NOT Manually Edit docs/<a class="headerlink" href="#do-not-manually-edit-docs" title="Permanent link">&para;</a></h2>
+<p>The <code>docs/</code> folder is auto-generated. Any manual changes will be overwritten on the next build.</p>
+<p>Edit <code>docs_src/</code> instead.</p>
+<h2 id="adding-new-pages">Adding New Pages<a class="headerlink" href="#adding-new-pages" title="Permanent link">&para;</a></h2>
+<ol>
+<li>
+<p>Create markdown file in <code>docs_src/</code>:
+   <div class="language-bash highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Example: new finding</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>touch<span class="w"> </span>docs_src/findings/new_discovery.md
+</span></code></pre></div></p>
+</li>
+<li>
+<p>Add to navigation in <code>mkdocs.yml</code>:
+   <div class="language-yaml highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="nt">nav</span><span class="p">:</span>
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">Findings</span><span class="p">:</span>
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">findings/index.md</span>
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">New Discovery</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">findings/new_discovery.md</span>
+</span></code></pre></div></p>
+</li>
+<li>
+<p>Write content, commit, push:
+   <div class="language-bash highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>git<span class="w"> </span>add<span class="w"> </span>docs_src/
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>git<span class="w"> </span>commit<span class="w"> </span>-m<span class="w"> </span><span class="s2">"Add new discovery page"</span>
+</span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>git<span class="w"> </span>push
+</span></code></pre></div></p>
+</li>
+<li>
+<p>Workflow auto-builds → site updates in ~1-2 minutes</p>
+</li>
+>>>>>>> 413be0cbf1ef12138574cfa1d0e2a6892f0561a5
 </ol>
 <h2 id="linking-between-pages">Linking between pages<a class="headerlink" href="#linking-between-pages" title="Permanent link">&para;</a></h2>
 <p>Use relative markdown links <strong>to the <code>.md</code> file</strong>, resolved from the current file's location:</p>
@@ -1121,7 +1183,7 @@ pin is what keeps the current build stable, and the pin should stay until Materi
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 5, 2026 16:35:49 UTC">September 5, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 7, 2026 19:20:53 UTC">September 7, 2026</span>
   </span>
 
     
