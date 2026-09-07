@@ -1072,7 +1072,6 @@ that evolve as the analysis develops, and are stored in <code>src/notebooks/</co
 <h2 id="running-a-notebook">Running a notebook<a class="headerlink" href="#running-a-notebook" title="Permanent link">&para;</a></h2>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>uv<span class="w"> </span>run<span class="w"> </span>marimo<span class="w"> </span>edit<span class="w"> </span>src/notebooks/&lt;notebook&gt;.py
 </span></code></pre></div>
-<<<<<<< HEAD
 <p>For the docs build and preview commands, see <a href="../../coding/mkdocs/#build-locally">MkDocs setup</a>.</p>
 <hr />
 <h2 id="authoring-a-notebook-page">Authoring a notebook page<a class="headerlink" href="#authoring-a-notebook-page" title="Permanent link">&para;</a></h2>
@@ -1080,12 +1079,6 @@ that evolve as the analysis develops, and are stored in <code>src/notebooks/</co
 <p>Once a notebook is ready to embed, export it as a static HTML artifact:</p>
 <div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>run<span class="w"> </span>marimo<span class="w"> </span><span class="nb">export</span><span class="w"> </span>html<span class="w"> </span>src/notebooks/&lt;notebook&gt;.py<span class="w"> </span><span class="se">\</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span>-o<span class="w"> </span>docs_src/notebooks/&lt;notebook&gt;_export.html<span class="w"> </span>--include-code<span class="w"> </span>-f
-=======
-<h3 id="exporting-to-documentation">Exporting to Documentation<a class="headerlink" href="#exporting-to-documentation" title="Permanent link">&para;</a></h3>
-<p>Once a notebook is complete, export it as a static HTML artifact for embedding in documentation:</p>
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nb">cd</span><span class="w"> </span>src/notebooks
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>uv<span class="w"> </span>run<span class="w"> </span>marimo<span class="w"> </span><span class="nb">export</span><span class="w"> </span>html<span class="w"> </span>notebook.py<span class="w"> </span>-o<span class="w"> </span><span class="s2">"../../docs_src/notebooks/notebook_export.html"</span><span class="w"> </span>--include-code<span class="w"> </span>-f
->>>>>>> 413be0cbf1ef12138574cfa1d0e2a6892f0561a5
 </span></code></pre></div>
 <p>The <code>*_export.html</code> files are committed. Regenerate the export after any notebook edit.</p>
 <h3 id="add-the-page">Add the page<a class="headerlink" href="#add-the-page" title="Permanent link">&para;</a></h3>
@@ -1094,37 +1087,21 @@ that evolve as the analysis develops, and are stored in <code>src/notebooks/</co
 <code>notebooks/&lt;notebook&gt;_export.html</code>, so <strong>both the link and the iframe use <code>../</code></strong>:</p>
 <div class="language-markdown highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="gh"># Notebook title</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>
-<<<<<<< HEAD
 </span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>A short preamble: the question, the setup, and what the notebook shows.
 </span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>[<span class="nt">Open the full-screen version</span>](<span class="na">../&lt;notebook&gt;_export.html</span>){ target=&quot;_blank&quot; rel=&quot;noopener&quot; }
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>[<span class="nt">Open the full-screen version</span>](<span class="na">../&lt;notebook&gt;_export.html</span>){ target="_blank" rel="noopener" }
 </span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
 </span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>&lt;iframe
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>  src=&quot;../&lt;notebook&gt;_export.html&quot;
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>  title=&quot;Notebook title&quot;
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>  loading=&quot;lazy&quot;
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>  style=&quot;width: 100%; height: 85vh; border: none;&quot;&gt;
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>  src="../&lt;notebook&gt;_export.html"
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>  title="Notebook title"
+</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>  loading="lazy"
+</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>  style="width: 100%; height: 85vh; border: none;"&gt;
 </span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>&lt;/iframe&gt;
 </span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>
 </span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>Run locally:
 </span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a><span class="sb">```bash</span>
 </span><span id="__span-2-16"><a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>uv<span class="w"> </span>run<span class="w"> </span>marimo<span class="w"> </span>edit<span class="w"> </span>src/notebooks/&lt;notebook&gt;.py
 </span><span id="__span-2-17"><a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a><span class="sb">```</span>
-=======
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>[<span class="nt">Open the full-screen version</span>](<span class="na">notebook_export.html</span>){ target="_blank" rel="noopener" }
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
-</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>&lt;iframe
-</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  src="notebook_export.html"
-</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>  title="Notebook title"
-</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>  loading="lazy"
-</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>  style="width: 100%; height: 85vh; border: 1px solid var(--md-default-fg-color--lightest); border-radius: 4px;"&gt;
-</span><span id="__span-2-10"><a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>&lt;/iframe&gt;
-</span><span id="__span-2-11"><a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>
-</span><span id="__span-2-12"><a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>To run this notebook locally, use the following command:
-</span><span id="__span-2-13"><a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>```bash
-</span><span id="__span-2-14"><a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>cd src/notebooks
-</span><span id="__span-2-15"><a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>uv run marimo edit notebook.py
->>>>>>> 413be0cbf1ef12138574cfa1d0e2a6892f0561a5
 </span></code></pre></div>
 <p>Then add the page to <code>nav:</code> in <code>mkdocs.yml</code>.</p>
 <h3 id="notebook-structure">Notebook structure<a class="headerlink" href="#notebook-structure" title="Permanent link">&para;</a></h3>
@@ -1161,7 +1138,7 @@ that evolve as the analysis develops, and are stored in <code>src/notebooks/</co
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 7, 2026 19:20:53 UTC">September 7, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 7, 2026 19:49:43 UTC">September 7, 2026</span>
   </span>
 
     

@@ -928,20 +928,6 @@
 
 
 <h1 id="sarima-forecasting-pipeline">SARIMA forecasting pipeline<a class="headerlink" href="#sarima-forecasting-pipeline" title="Permanent link">&para;</a></h1>
-<p><strong>Question.</strong> Can a single SARIMA model produce a usable day-ahead forecast <em>with calibrated
-uncertainty</em> for one energy-metering asset, and what does the full forecast-as-a-data-product
-output look like end to end?</p>
-<p><strong>Setup.</strong> One asset from <code>metering_data.parquet</code>, 14 days at 30-minute resolution. Split
-10 days train / 4 days test (192 steps). Model: <code>SARIMA(1,1,1)×(1,1,1,48)</code>, <code>s=48</code> for the
-daily cycle, 80% prediction intervals from the state-space confidence interval. Evaluated on
-MAE, RMSE, MAPE and PI coverage; then uncertainty width over time and threshold-exceedance
-probabilities <span class="arithmatex">\(P(\hat{Y}_t &gt; c)\)</span>.</p>
-<p><strong>What it demonstrates.</strong> The mechanics of the standard output contract (<code>prediction</code>,
-<code>lower</code>, <code>upper</code>, <code>uncertainty_width</code>), how the interval widens through the horizon, and how
-a point-plus-interval forecast turns into event probabilities. It is a single-split
-demonstration, not a validated result — see the <a href="../../theory/models/">caveats on single-split evaluation and the
-<code>d=1</code> default</a>. The concrete metrics for this run are in the embedded
-notebook below.</p>
 <p><a href="../sarima_export.html" rel="noopener" target="_blank">Open the full-screen version</a></p>
 <p><iframe
   src="../sarima_export.html"
@@ -973,7 +959,7 @@ notebook below.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 7, 2026 19:20:53 UTC">September 7, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 7, 2026 19:49:43 UTC">September 7, 2026</span>
   </span>
 
     
