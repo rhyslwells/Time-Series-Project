@@ -24,11 +24,7 @@ Time-Series-Project/
 │
 ├── working_notes/                 # Exploration & notes (staged, not a package)
 │   ├── todos.md                   # Task tracking
-│   ├── 0_archive/                 # Superseded exploration
-│   ├── 2_basic_forecasting/       # Early single-model forecasting
-│   ├── 3_framework/               # Notes behind ts_model_framework.py + example_model_comparison.py (runnable walkthrough)
-│   ├── 5_forecast_products/       # Forecast-as-product exploration
-│   └── 6_extra_notebooks/         # Misc notebook ideas
+│   └── <numbered topic dirs>/     # Churns freely - list here deliberately omitted
 │
 ├── archive/                       # Experimental work (old code)
 ├── docs_src/                      # Documentation source (tracked): coding/, data/, theory/, findings/, notebooks/
@@ -42,7 +38,7 @@ Time-Series-Project/
 │   ├── ARCHITECTURE.md
 │   ├── DATA_STACK.md
 │   ├── RESPONSE_STYLE.md
-│   └── projects/                  # Session memory
+│   └── skills/                    # scope / implement / review / test / docs-capture
 │
 └── pyproject.toml, mkdocs.yml, README.md
 ```
