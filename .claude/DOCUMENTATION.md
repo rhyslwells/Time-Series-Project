@@ -32,8 +32,18 @@ Documentation should:
 | `docs_src/coding/` | Framework usage, mkdocs setup |
 | `docs_src/data/` | Data generation, synthetic metering, feature engineering |
 | `docs_src/theory/` | Models, model decisions, metrics, diagnostics, forecast products |
-| `docs_src/findings/` | Task-oriented notes (e.g. asset profiling) |
-| `docs_src/notebooks/` | Notebook write-ups (e.g. SARIMA forecasting) |
+| `docs_src/findings/` | Only what has actually been established; proposals go in theory/ or notebooks/, status-marked |
+| `docs_src/notebooks/` | Notebook write-ups: question, setup, and conclusion above the embedded export |
+
+## Conventions
+
+- **Headings** in sentence case, not Title Case.
+- **Mark built vs planned.** Where a page mixes implemented and aspirational material, tag
+  sections with the admonition extension: `!!! success "Implemented"`,
+  `!!! note "Partially implemented"`, `!!! warning "Proposed — not implemented"`. Keep
+  aspirational content, but never let it read as done.
+- **Read numbers against a baseline.** Forecast metrics are quoted against seasonal naive
+  (MASE) at a stated horizon, not as absolute thresholds.
 
 ## Diagrams and Visualizations
 

@@ -31,14 +31,14 @@ Embedded assistant for energy systems forecasting. Help with: model setup, time 
 - Data: 14 days × 15 assets (EV + solar) × 30-min intervals → 3 parquet files in `src/data/`
 - Forecasting framework in `src/ts_model_framework.py`: `TSModel` subclasses (SARIMA, ExponentialSmoothing, LightGBM) plus `ModelEvaluator` / `ModelComparison` / `ModelTuner`; diagnostics in `src/ts_plots.py`
 - Forecast contracts:
-  - In-memory: `ForecastOutput` (`prediction`, `lower`, `upper`, `uncertainty_width`) + `EvaluationMetrics`
+  - In-memory: `ForecastOutput` (`prediction`, `lower`, `upper`, `uncertainty_width`) + `EvaluationMetrics` (`mape` and `pi_coverage` are percentages, 0-100)
   - Persisted/cross-layer (target): `asset_id`, `timestamp`, `prediction`, `uncertainty`, `model_version`
 - Data ops are polars-only; models exchange numpy arrays (statsmodels/sklearn/lightgbm internals)
 
 **Repository structure:**
 - `src/` — production-ready code (includes the data generation scripts in `src/data/`, since their output is a production data contract)
 - `archive/` — experimental work freely added
-- `working_notes/` — exploration (not committed)
+- `working_notes/` — exploration (committed, low-ceremony)
 - `docs_src/` — solid, tracked findings
 
 ---
@@ -68,7 +68,7 @@ All three generation scripts live in `src/data/`, alongside their output:
 
 - `src/ts_model_framework.py` — `SARIMAModel`, `ExponentialSmoothingModel`, `LightGBMModel` (all `TSModel`); `ModelEvaluator`, `ModelComparison`, `ModelTuner`; `ForecastOutput`, `EvaluationMetrics`
 - `src/ts_plots.py` — `TSPlotter` (forecast vs actual, residuals, uncertainty, PI coverage), `ComparisonPlotter`
-- `src/example_model_comparison.py` — runnable load → compare → diagnose → tune → finalize walkthrough
+- `working_notes/3_framework/example_model_comparison.py` — runnable load → compare → diagnose → tune → finalize walkthrough (train/val/test split: `ModelComparison` and `ModelTuner` score on `y_val`, `y_test` is used once for the final report)
 - Models consume/produce numpy arrays; every dataframe and file IO is polars
 
 ---

@@ -10,10 +10,9 @@ Time-Series-Project/
 │   ├── __init__.py
 │   ├── ts_model_framework.py      # Forecasting framework (models, evaluation, tuning, comparison)
 │   ├── ts_plots.py                # Generic plotly diagnostics for any ForecastOutput
-│   ├── example_model_comparison.py# Worked compare -> diagnose -> tune -> finalize workflow
 │   ├── notebooks/                 # Marimo notebooks kept alongside the framework
 │   │   ├── ts_model_explorer.py
-│   │   └── sarima_marimo.py
+│   │   └── sarima.py
 │   └── data/                      # Data generation pipeline + its output
 │       ├── generate_raw_data.py
 │       ├── generate_daily_metrics.py
@@ -27,7 +26,7 @@ Time-Series-Project/
 │   ├── todos.md                   # Task tracking
 │   ├── 0_archive/                 # Superseded exploration
 │   ├── 2_basic_forecasting/       # Early single-model forecasting
-│   ├── 3_framework/               # Notes behind ts_model_framework.py
+│   ├── 3_framework/               # Notes behind ts_model_framework.py + example_model_comparison.py (runnable walkthrough)
 │   ├── 5_forecast_products/       # Forecast-as-product exploration
 │   └── 6_extra_notebooks/         # Misc notebook ideas
 │
@@ -83,6 +82,8 @@ generated data in the same directory keeps that contract auditable in one place.
 |------|---------|
 | `ts_model_framework.py` | `TSModel` base class + `SARIMAModel`, `ExponentialSmoothingModel`, `LightGBMModel`; `ModelEvaluator`, `ModelComparison`, `ModelTuner`; `ForecastOutput` / `EvaluationMetrics` contracts |
 | `ts_plots.py` | `TSPlotter` and `ComparisonPlotter` — plotly diagnostics driven by `ForecastOutput` (forecast vs actual, residuals, uncertainty, PI coverage) |
-| `example_model_comparison.py` | Runnable end-to-end example: load -> compare -> diagnose -> tune -> finalize |
 
 Models take and return numpy arrays; all dataframe construction and IO uses polars (see DATA_STACK.md).
+
+The runnable end-to-end walkthrough (load -> compare -> diagnose -> tune -> finalize) is
+`working_notes/3_framework/example_model_comparison.py`, not in `src/`.
