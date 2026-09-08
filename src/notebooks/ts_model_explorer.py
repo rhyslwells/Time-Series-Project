@@ -3,23 +3,26 @@ Time Series Model Comparison & Interpretation
 ==============================================
 
 Purpose:
-    Fit SARIMA, Exponential Smoothing, and LightGBM on one asset's metering
-    data, compare them on RMSE/MAE/MAPE/PI coverage, and render diagnostic
-    plots for the best model plus a side-by-side comparison of all three.
+    Fit a seasonal-naive baseline plus SARIMA, Exponential Smoothing, and
+    LightGBM on one asset's metering data, compare them on RMSE/MAE/MAPE/PI
+    coverage, and render diagnostic plots for the best model plus a
+    side-by-side comparison of all four. The seasonal-naive model is the
+    reference the others are scored against (MASE = model MAE / baseline MAE).
 
 Data:
     src/data/metering_data.parquet, filtered to a single asset_id, split
     into train/test (last 4 days held out as test).
 
 Depends on:
-    src/ts_model_framework.py — SARIMAModel, ExponentialSmoothingModel,
-        LightGBMModel, ModelComparison
+    src/ts_model_framework.py — SeasonalNaiveModel, SARIMAModel,
+        ExponentialSmoothingModel, LightGBMModel, ModelComparison
     src/ts_plots.py — TSPlotter, ComparisonPlotter
 
 Flow (sections):
     1. Data Loading & Exploration   — load, plot full series, train/test split
     2. Understanding Metrics        — pointer to docs (no computation)
-    3. Model Comparison             — fit all 3 models, rank by RMSE
+    3. Model Comparison             — fit baseline + 3 models, rank by RMSE,
+       report each model's MASE against the seasonal-naive baseline
     4. Detailed Plot Analysis       — 4 diagnostic plots for the best model
        (forecast vs actual, residuals, uncertainty width, PI coverage)
     5. Comparing All Models         — overlay forecasts, metrics table
@@ -200,13 +203,14 @@ def _(mo):
 
 
 @app.cell
-def _(y_test, y_train):
+def _(pl, y_test, y_train):
     import sys
     from pathlib import Path
 
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
     from ts_model_framework import (
+        SeasonalNaiveModel,
         SARIMAModel,
         ExponentialSmoothingModel,
         LightGBMModel,
@@ -220,20 +224,30 @@ def _(y_test, y_train):
 
     # Add models
     print("\nAdding models to comparison...")
+    comp.add_model(SeasonalNaiveModel(y_train, season_length=48))
+    print("  [+] SeasonalNaive (baseline, s=48)")
+
     comp.add_model(SARIMAModel(y_train, order=(1, 1, 1), seasonal_order=(1, 1, 1, 48)))
-    print("  ✓ SARIMA(1,1,1)×(1,1,1,48)")
+    print("  [+] SARIMA(1,1,1)x(1,1,1,48)")
 
     comp.add_model(ExponentialSmoothingModel(y_train, seasonal_periods=48))
-    print("  ✓ ExponentialSmoothing")
+    print("  [+] ExponentialSmoothing")
 
     comp.add_model(LightGBMModel(y_train, lags=[1, 2, 48, 96]))
-    print("  ✓ LightGBM")
+    print("  [+] LightGBM")
 
     print(f"\nFitting {len(comp.models)} models...")
     comp.fit_all()
 
     print("\nEvaluating forecasts...")
     results_df = comp.evaluate_all(confidence_level=0.80)
+
+    # MASE: each model's MAE relative to the seasonal-naive baseline's MAE.
+    # < 1 beats "copy the same time yesterday"; >= 1 does not.
+    baseline_mae = results_df.filter(pl.col("Model") == "SeasonalNaive")["MAE"][0]
+    results_df = results_df.with_columns(
+        (pl.col("MAE") / baseline_mae).round(3).alias("MASE")
+    )
 
     print("MODEL COMPARISON RESULTS")
 
@@ -252,14 +266,17 @@ def _(mo, results_df):
 
     **Interpretation:**
     - **RMSE** (lower is better): Point forecast accuracy
-    - **MAPE**: Percentage error (scale-independent)
+    - **MASE**: model MAE / seasonal-naive MAE. < 1 beats the baseline; >= 1 means the
+      model has learned less than copying the same time yesterday
+    - **MAPE**: Percentage error (scale-independent; not usable for solar_battery — crosses zero)
     - **PI Coverage %**: Should be ~80% (matches target confidence)
     - **Uncertainty Width**: Average prediction interval width
 
     **Which model to use?**
-    1. Check RMSE rank (lowest wins)
-    2. Verify PI Coverage ≈ 80% (±5%)
-    3. If coverage off, model needs tuning or interval recalibration
+    1. Discard any model with MASE >= 1 — it does not beat the baseline
+    2. Among the rest, check RMSE rank (lowest wins)
+    3. Verify PI Coverage ≈ 80% (±5%)
+    4. If coverage off, model needs tuning or interval recalibration
     """)
     return
 
@@ -275,14 +292,18 @@ def _(mo):
 
 
 @app.cell
-def _(comp, results_df):
-    # Get best model from comparison
-    best_model_name = results_df["Model"][0]  # First row is lowest RMSE (sorted by Rank)
+def _(comp, pl, results_df):
+    # Best model = lowest RMSE among the real models (the seasonal-naive row is
+    # the baseline, not a deployment candidate).
+    ranked = results_df.filter(pl.col("Model") != "SeasonalNaive")
+    best_model_name = ranked["Model"][0]
     best_forecast = comp.get_forecast(best_model_name)
     best_metrics = comp.results[best_model_name]["metrics"]
 
-    print(f"Best Model: {best_model_name} (metrics detailed in Section 6)")
-    return best_forecast, best_metrics, best_model_name
+    best_mase = ranked["MASE"][0]
+    beats_baseline = "beats" if best_mase < 1 else "does NOT beat"
+    print(f"Best Model: {best_model_name} (MASE {best_mase:.3f} - {beats_baseline} baseline)")
+    return best_forecast, best_mase, best_metrics, best_model_name
 
 
 @app.cell
@@ -478,32 +499,32 @@ def _(mo):
 
 
 @app.cell
-def _(best_metrics):
+def _(best_mase, best_metrics):
+    # Mirrors the production-ready checklist in
+    # docs_src/theory/models-decisions.md - baseline-relative, not absolute kWh
+    # thresholds, since "good" depends on the asset and the horizon.
+    ratio = best_metrics.rmse / best_metrics.mae
     checks = {
-        f"RMSE {best_metrics.rmse:.2f} < 0.7 kWh (residential)": best_metrics.rmse < 0.7,
-        f"RMSE {best_metrics.rmse:.2f} < 1.3 kWh (commercial)": best_metrics.rmse < 1.3,
-        f"MAE {best_metrics.mae:.2f} < 0.5 kWh (residential)": best_metrics.mae < 0.5,
-        f"MAPE {best_metrics.mape:.2f}% < 15%": best_metrics.mape < 15,
-        f"PI Coverage {best_metrics.pi_coverage:.0f}% (target ±5%)": 75 <= best_metrics.pi_coverage <= 85,
-        "No systematic bias": True,  # Check residuals histogram (Section 4)
-        "Residuals bell-shaped": True,  # Check histogram (Section 4)
+        f"MASE {best_mase:.3f} < 1 (beats seasonal naive)": best_mase < 1,
+        f"RMSE/MAE ratio {ratio:.2f} < 1.5 (no dominant outliers)": ratio < 1.5,
+        f"PI Coverage {best_metrics.pi_coverage:.0f}% within 75-85": 75 <= best_metrics.pi_coverage <= 85,
+        "Residuals centered, no trend, not autocorrelated": None,  # inspect Section 4
+        "Uncertainty width varies with time of day (SARIMA only)": None,  # inspect Section 4
     }
 
     print("Production Readiness Checklist:")
     print("=" * 50)
     for check, result in checks.items():
-        status = "✓" if result else "✗"
+        status = "?" if result is None else ("[x]" if result else "[ ]")
         print(f"{status} {check}")
 
-    passed = sum(checks.values())
-    total = len(checks)
-    print(f"\nScore: {passed}/{total}")
-    if passed >= 5:
-        print("✓ LIKELY PRODUCTION-READY")
-    elif passed >= 4:
-        print("⚠ ACCEPTABLE, MONITOR CAREFULLY")
+    auto = [v for v in checks.values() if v is not None]
+    passed = sum(auto)
+    print(f"\nAutomated checks passed: {passed}/{len(auto)} (plus 2 to inspect visually)")
+    if passed == len(auto):
+        print("-> clears the automated bar; confirm the visual checks, then deploy")
     else:
-        print("✗ NEEDS MORE TUNING")
+        print("-> tune or reconsider the model class before deploying")
     return
 
 
@@ -518,16 +539,26 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-def _(best_metrics, best_model_name, mo):
+def _(best_mase, best_metrics, best_model_name, mo):
+    if best_mase >= 1:
+        verdict = (
+            f"Do not deploy {best_model_name} - MASE {best_mase:.3f} means it does not "
+            f"beat the seasonal-naive baseline. Ship the baseline or tune / change model class."
+        )
+    elif 75 <= best_metrics.pi_coverage <= 85:
+        verdict = f"Deploy {best_model_name}."
+    else:
+        verdict = f"Retrain {best_model_name} - coverage outside the 75-85% target range."
+
     mo.md(f"""
     ### Recommendations
 
     **Best Model: {best_model_name}**
 
-    {f"Deploy {best_model_name}" if 75 <= best_metrics.pi_coverage <= 85 else f"Retrain {best_model_name} - coverage outside 75-85% target range"}.
+    {verdict}
 
     Full selection logic, retrain triggers, tuning priority, and the production-ready checklist
-    are in [`docs_src/theory/model-decisions.md`](../../docs_src/theory/model-decisions.md).
+    are in [`docs_src/theory/models-decisions.md`](../../docs_src/theory/models-decisions.md).
     """)
     return
 

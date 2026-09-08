@@ -34,6 +34,7 @@ Compare and tune against `y_val`; touch `y_test` only for the single final numbe
 import numpy as np
 from ts_model_framework import (
     ModelComparison,
+    SeasonalNaiveModel,
     SARIMAModel,
     ExponentialSmoothingModel,
     LightGBMModel,
@@ -43,6 +44,7 @@ y_train = np.array([...])  # e.g. 336 points = 7 days x 48 half-hours
 y_val = np.array([...])  # e.g. 144 points = 3 days x 48 half-hours (model choice + tuning)
 
 comp = ModelComparison(y_train, y_val)
+comp.add_model(SeasonalNaiveModel(y_train, season_length=48))  # baseline — read every other row against it
 comp.add_model(SARIMAModel(y_train, order=(1, 1, 1), seasonal_order=(1, 1, 1, 48)))
 comp.add_model(ExponentialSmoothingModel(y_train, seasonal_periods=48))
 comp.add_model(LightGBMModel(y_train, lags=[1, 2, 48, 96]))
@@ -51,7 +53,9 @@ comp.fit_all()
 ranking = comp.evaluate_all()  # polars DataFrame ranked by RMSE
 ```
 
-`evaluate_all()` returns a **polars** DataFrame. `SARIMAModel(..., order=(1, 0, 1), ...)` —
+`evaluate_all()` returns a **polars** DataFrame. Divide each model's MAE by
+`SeasonalNaive`'s MAE in that table to get its MASE — a model that does not come out below 1
+is not beating "copy yesterday". `SARIMAModel(..., order=(1, 0, 1), ...)` —
 see [Models](../theory/models.md#sarimapdq-x-pdqs) for why `d=0` is the better default on
 this trend-free data.
 

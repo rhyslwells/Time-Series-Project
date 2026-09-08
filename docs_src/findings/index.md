@@ -12,7 +12,8 @@ notebooks, not here.
 | Three model classes run and can be compared on one split | Demonstrated; ranking not yet validated | [notebook](../notebooks/ts_model_explorer.md) |
 | Asset behavioural clustering | Proposed scheme only — no clusters computed | [Asset profiling](asset_profiling.md) |
 | Rolling-origin / walk-forward evaluation | Not started | — |
-| Seasonal-naive baseline and skill scores (MASE) | Not started | [Metrics](../theory/metrics.md#read-metrics-against-a-baseline) |
+| Seasonal-naive baseline model | `SeasonalNaiveModel` in the framework; not yet run across assets | [Metrics](../theory/metrics.md#read-metrics-against-a-baseline) |
+| Skill scores (MASE) computed from the baseline | Not started — still a manual ratio | [Metrics](../theory/metrics.md#mase-mean-absolute-scaled-error) |
 | Uncertainty calibration on this data | Not started | [Diagnostics](../theory/diagnostics.md) |
 
 ## What "demonstrated" means here

@@ -13,7 +13,7 @@
       
       
       
-        <link rel="prev" href="../">
+        <link rel="prev" href="../architecture/">
       
       
         <link rel="next" href="../models/">
@@ -531,6 +531,8 @@
       
         
       
+        
+      
     
     
     
@@ -586,6 +588,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -725,6 +755,17 @@
     <span class="md-ellipsis">
       
         PI Coverage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#proper-scoring-rules-for-intervals" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Proper scoring rules for intervals
       
     </span>
   </a>
@@ -1222,11 +1263,28 @@ single number.</p>
 <p>Sanity check: <code>mean_width ≈ 2 * z * std(residuals)</code> for a single-std interval. Note that only
 SARIMA produces a horizon-varying width in this framework; ExponentialSmoothing and LightGBM
 return a constant width (see <a href="../diagnostics/">Diagnostics</a>).</p>
+<h2 id="proper-scoring-rules-for-intervals">Proper scoring rules for intervals<a class="headerlink" href="#proper-scoring-rules-for-intervals" title="Permanent link">&para;</a></h2>
+<p>Coverage says whether the actual landed inside the band but nothing about how wide the band
+had to be. These two rules fold width and breach into one number, so a model cannot win by
+inflating its intervals.</p>
+<p><strong>Interval (Winkler) score</strong> for a central <span class="arithmatex">\((1-\alpha)\)</span> interval <span class="arithmatex">\([\hat{L}_t, \hat{U}_t]\)</span>:</p>
+<div class="arithmatex">\[W_t = (\hat{U}_t - \hat{L}_t) + \frac{2}{\alpha}(\hat{L}_t - y_t)\,\mathbb{1}[y_t &lt; \hat{L}_t] + \frac{2}{\alpha}(y_t - \hat{U}_t)\,\mathbb{1}[y_t &gt; \hat{U}_t]\]</div>
+<p>Pay the width always, plus a penalty scaled by <span class="arithmatex">\(2/\alpha\)</span> for each breach. Lower is better;
+average over the horizon. For an 80% interval, <span class="arithmatex">\(\alpha = 0.2\)</span> so each breach costs <span class="arithmatex">\(10\times\)</span>
+its distance outside the band.</p>
+<p><strong>Pinball loss</strong> at quantile <span class="arithmatex">\(q\)</span> (the same object, per quantile rather than per interval):</p>
+<div class="arithmatex">\[\rho_q(y_t, \hat{y}_t^{(q)}) = \max\big(q\,(y_t - \hat{y}_t^{(q)}),\ (q-1)(y_t - \hat{y}_t^{(q)})\big)\]</div>
+<p>Average over timesteps and over the quantiles the model reports. This is the loss a
+quantile-regression model already minimises, and it is the right target when comparing
+<code>solar_battery</code> interval quality where coverage is noisy and MAPE is unusable.</p>
+<p>Neither is implemented in <code>ModelEvaluator</code> yet — compute them from <code>forecast.lower</code>,
+<code>forecast.upper</code>, and the actuals.</p>
 <h2 id="read-metrics-against-a-baseline">Read metrics against a baseline<a class="headerlink" href="#read-metrics-against-a-baseline" title="Permanent link">&para;</a></h2>
 <p>An MAE of 0.4 means nothing on its own. The reference point is <strong>seasonal naive</strong>
 (<span class="arithmatex">\(\hat{y}_t = y_{t-48}\)</span> for a 30-minute series with a daily cycle). Compute the baseline's
 MAE/RMSE on the same test window first, then report the model as a ratio (that ratio is
-MASE). <code>archive/TimeSeries/Forecasting/Forecasting_Baseline.py</code> has a starting point.</p>
+MASE). <code>SeasonalNaiveModel</code> in the framework computes this baseline directly — add it to a
+<code>ModelComparison</code> and read the other models' MAE against its row.</p>
 <p>With 14 days of data there are only two weekly cycles, so a weekly seasonal-naive baseline
 (<span class="arithmatex">\(\hat{y}_t = y_{t-336}\)</span>) is barely estimable — daily seasonal naive is the honest reference here.</p>
 
@@ -1249,7 +1307,7 @@ MASE). <code>archive/TimeSeries/Forecasting/Forecasting_Baseline.py</code> has a
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 7, 2026 20:04:05 UTC">September 7, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 7, 2026 20:03:53 UTC">September 7, 2026</span>
   </span>
 
     
@@ -1285,7 +1343,7 @@ MASE). <code>archive/TimeSeries/Forecasting/Forecasting_Baseline.py</code> has a
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../" class="md-footer__link md-footer__link--prev" aria-label="Previous: Theory">
+          <a href="../architecture/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Architecture">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1295,7 +1353,7 @@ MASE). <code>archive/TimeSeries/Forecasting/Forecasting_Baseline.py</code> has a
                 Previous
               </span>
               <div class="md-ellipsis">
-                Theory
+                Architecture
               </div>
             </div>
           </a>

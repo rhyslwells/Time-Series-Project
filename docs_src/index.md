@@ -11,13 +11,13 @@ upper layers are design, described in [Forecast products](theory/forecast_produc
 - Diagnostic plots in `src/ts_plots.py` and a reading guide in [Diagnostics](theory/diagnostics.md).
 - Two exploration notebooks running one asset through the framework. See [Notebooks](notebooks/notebooks.md).
 
-Not yet built: rolling-origin evaluation, a seasonal-naive baseline, asset clustering, and
-everything above the per-asset forecast. [Findings](findings/index.md) tracks the honest status.
+Not yet built: rolling-origin evaluation, asset clustering, and everything above the
+per-asset forecast (layers 3+ in the [architecture](theory/architecture.md)). [Findings](findings/index.md) tracks the honest status.
 
 ## Reading path
 
 1. **[Data](data/index.md)** — what the dataset is, how it is generated, what each column means.
-2. **[Theory](theory/index.md)** — metrics, models, diagnostics, and the model-selection logic.
+2. **[Theory](theory/index.md)** — the [layer architecture](theory/architecture.md), metrics, models, diagnostics, and the model-selection logic.
 3. **[Coding](coding/index.md)** — how to call the framework, starting from loading the parquet data.
 4. **[Notebooks](notebooks/notebooks.md)** — the same workflow, interactive.
 5. **[Findings](findings/index.md)** — what has actually been established so far.

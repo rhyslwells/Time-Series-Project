@@ -531,6 +531,8 @@
       
         
       
+        
+      
     
     
     
@@ -586,6 +588,34 @@
           </label>
           <ul class="md-nav__list" data-md-scrollfix>
             
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
               
             
               
@@ -1196,6 +1226,17 @@ Read this as a map of where the system is heading.</p>
 <p>e.g. expected 4.2 MW, observed 2.8 MW -&gt; estimated response 1.4 MW. This is how forecast quality translates directly into measurement quality for anything being evaluated against a baseline.</p>
 <h2 id="anomaly-detection-via-residuals">Anomaly detection via residuals<a class="headerlink" href="#anomaly-detection-via-residuals" title="Permanent link">&para;</a></h2>
 <p>The residual <span class="arithmatex">\(e_t = y_t - \hat{y}_t\)</span> (see <a href="../diagnostics/">Diagnostics</a> for what it says about model fit) can also be read the other way: as a monitor on the <em>asset</em>, once the model itself is trusted. Unusually large or persistent residuals, or a step change in the residual distribution, can indicate an asset going offline, a meter fault, or a genuine behaviour change — a forecast of 4.8 MW against an actual of 0.2 MW is as likely to be a monitoring signal as a forecasting failure.</p>
+<p>Two caveats before relying on this:</p>
+<ul>
+<li><strong>Circularity.</strong> The model was fitted on history that already contains the asset's
+  anomalies, so it has partly learned them as normal and its residuals understate them. A
+  monitor needs a model trained on a clean or robustly-fitted reference period, not the same
+  fit used for forecasting.</li>
+<li><strong>Heteroskedastic residuals.</strong> Residual variance scales with level and time of day, so a
+  fixed threshold on the raw residual flags peak hours preferentially and misses off-peak
+  faults. Standardise first — divide each residual by the residual std for that time of day
+  (or half-hour slot) — then threshold the standardised series.</li>
+</ul>
 <h2 id="model-health-and-concept-drift">Model health and concept drift<a class="headerlink" href="#model-health-and-concept-drift" title="Permanent link">&para;</a></h2>
 <p>Beyond the aggregate MAE/RMSE in <a href="../metrics/">Metrics</a>, error is worth tracking segmented — by day of week, season, weather, or asset operating regime. A model that's accurate Monday-Friday but poor on weekends is telling you something about the model <em>and</em> the asset (a regime it doesn't understand), not just producing a lower average score. This segmented view is what should trigger the retrain/switch decisions in <a href="../models-decisions/">Decisions</a>, rather than a single rolling aggregate.</p>
 <h2 id="cross-asset-comparison-and-asset-classification">Cross-asset comparison and asset classification<a class="headerlink" href="#cross-asset-comparison-and-asset-classification" title="Permanent link">&para;</a></h2>
@@ -1234,7 +1275,7 @@ that name and it was consolidated into <code>daily_metrics.parquet</code>.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 7, 2026 20:04:05 UTC">September 7, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 7, 2026 19:49:21 UTC">September 7, 2026</span>
   </span>
 
     

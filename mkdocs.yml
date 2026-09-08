@@ -67,6 +67,7 @@ nav:
       - Synthetic metering data: data/synthetic_metering_data.md
   - Theory:
       - theory/index.md
+      - Architecture: theory/architecture.md
       - Metrics: theory/metrics.md
       - Models: theory/models.md
       - Diagnostics: theory/diagnostics.md

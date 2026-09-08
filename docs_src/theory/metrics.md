@@ -105,12 +105,38 @@ Sanity check: `mean_width ≈ 2 * z * std(residuals)` for a single-std interval.
 SARIMA produces a horizon-varying width in this framework; ExponentialSmoothing and LightGBM
 return a constant width (see [Diagnostics](diagnostics.md)).
 
+## Proper scoring rules for intervals
+
+Coverage says whether the actual landed inside the band but nothing about how wide the band
+had to be. These two rules fold width and breach into one number, so a model cannot win by
+inflating its intervals.
+
+**Interval (Winkler) score** for a central $(1-\alpha)$ interval $[\hat{L}_t, \hat{U}_t]$:
+
+$$W_t = (\hat{U}_t - \hat{L}_t) + \frac{2}{\alpha}(\hat{L}_t - y_t)\,\mathbb{1}[y_t < \hat{L}_t] + \frac{2}{\alpha}(y_t - \hat{U}_t)\,\mathbb{1}[y_t > \hat{U}_t]$$
+
+Pay the width always, plus a penalty scaled by $2/\alpha$ for each breach. Lower is better;
+average over the horizon. For an 80% interval, $\alpha = 0.2$ so each breach costs $10\times$
+its distance outside the band.
+
+**Pinball loss** at quantile $q$ (the same object, per quantile rather than per interval):
+
+$$\rho_q(y_t, \hat{y}_t^{(q)}) = \max\big(q\,(y_t - \hat{y}_t^{(q)}),\ (q-1)(y_t - \hat{y}_t^{(q)})\big)$$
+
+Average over timesteps and over the quantiles the model reports. This is the loss a
+quantile-regression model already minimises, and it is the right target when comparing
+`solar_battery` interval quality where coverage is noisy and MAPE is unusable.
+
+Neither is implemented in `ModelEvaluator` yet — compute them from `forecast.lower`,
+`forecast.upper`, and the actuals.
+
 ## Read metrics against a baseline
 
 An MAE of 0.4 means nothing on its own. The reference point is **seasonal naive**
 ($\hat{y}_t = y_{t-48}$ for a 30-minute series with a daily cycle). Compute the baseline's
 MAE/RMSE on the same test window first, then report the model as a ratio (that ratio is
-MASE). `archive/TimeSeries/Forecasting/Forecasting_Baseline.py` has a starting point.
+MASE). `SeasonalNaiveModel` in the framework computes this baseline directly — add it to a
+`ModelComparison` and read the other models' MAE against its row.
 
 With 14 days of data there are only two weekly cycles, so a weekly seasonal-naive baseline
 ($\hat{y}_t = y_{t-336}$) is barely estimable — daily seasonal naive is the honest reference here.

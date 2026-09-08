@@ -52,7 +52,7 @@ Two relationships the numbering hides:
 - **Separation of concerns**: each layer is independent and composable
 - **Reusable intermediates**: forecasts feed downstream layers as intermediate products
 - **Standard contracts**: consistent data schema across layers
-- **Swappable models**: support alternative forecasting approaches
+- **Swappable models**: SeasonalNaive baseline, SARIMA, ExponentialSmoothing, LightGBM — interchangeable behind the layer-2 contract
 - **Transparent flow**: data moves through layers in clear progression
 
 ## Key Decisions

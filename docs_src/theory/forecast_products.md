@@ -54,6 +54,17 @@ e.g. expected 4.2 MW, observed 2.8 MW -> estimated response 1.4 MW. This is how 
 
 The residual $e_t = y_t - \hat{y}_t$ (see [Diagnostics](diagnostics.md) for what it says about model fit) can also be read the other way: as a monitor on the *asset*, once the model itself is trusted. Unusually large or persistent residuals, or a step change in the residual distribution, can indicate an asset going offline, a meter fault, or a genuine behaviour change — a forecast of 4.8 MW against an actual of 0.2 MW is as likely to be a monitoring signal as a forecasting failure.
 
+Two caveats before relying on this:
+
+- **Circularity.** The model was fitted on history that already contains the asset's
+  anomalies, so it has partly learned them as normal and its residuals understate them. A
+  monitor needs a model trained on a clean or robustly-fitted reference period, not the same
+  fit used for forecasting.
+- **Heteroskedastic residuals.** Residual variance scales with level and time of day, so a
+  fixed threshold on the raw residual flags peak hours preferentially and misses off-peak
+  faults. Standardise first — divide each residual by the residual std for that time of day
+  (or half-hour slot) — then threshold the standardised series.
+
 ## Model health and concept drift
 
 Beyond the aggregate MAE/RMSE in [Metrics](metrics.md), error is worth tracking segmented — by day of week, season, weather, or asset operating regime. A model that's accurate Monday-Friday but poor on weekends is telling you something about the model *and* the asset (a regime it doesn't understand), not just producing a lower average score. This segmented view is what should trigger the retrain/switch decisions in [Decisions](models-decisions.md), rather than a single rolling aggregate.

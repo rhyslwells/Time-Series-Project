@@ -2,6 +2,7 @@
 
 Math, model behavior, and interpretation for the forecasting framework. Code usage lives in [Coding](../coding/index.md); this section covers the reasoning behind it.
 
+- [Architecture](architecture.md) — the layer model, each layer's inputs and outputs, the forecast contract, and which layers exist today
 - [Metrics](metrics.md) — MAE, RMSE, MAPE, MASE, PI coverage: formulas, expected ranges, and why every number is read against a seasonal-naive baseline at a stated horizon
 - [Models](models.md) — SARIMA, Exponential Smoothing, LightGBM: the math and when to use each
 - [Diagnostics](diagnostics.md) — how to read the four diagnostic plots, good vs bad cases
@@ -12,6 +13,7 @@ Math, model behavior, and interpretation for the forecasting framework. Code usa
 
 | Question | Page |
 |---|---|
+| "How do the layers fit together / what's built?" | [Architecture](architecture.md) |
 | "What's a good MAE/RMSE for my asset type?" | [Metrics](metrics.md) — but read it against a baseline, not an absolute threshold |
 | "How do I compare across assets of different sizes?" | [Metrics — MASE](metrics.md#mase-mean-absolute-scaled-error) |
 | "Why don't the metrics mean anything without a baseline?" | [Metrics](metrics.md#read-metrics-against-a-baseline) |

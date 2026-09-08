@@ -195,6 +195,59 @@ class ExponentialSmoothingModel(TSModel):
         self.fitted = False
 
 
+class SeasonalNaiveModel(TSModel):
+    """Seasonal naive baseline: yhat_t = y_{t-s}.
+
+    The reference every other model is scored against (MASE is the ratio of a
+    model's MAE to this model's MAE on the same window). On clean data with a
+    hard-coded daily profile this is a strong baseline and beating it is not
+    guaranteed.
+    """
+
+    def __init__(self, y_train: np.ndarray, season_length: int = 48):
+        super().__init__("SeasonalNaive", y_train)
+        self.season_length = season_length
+
+    def fit(self, **kwargs) -> None:
+        s = self.season_length
+        if len(self.y_train) <= s:
+            raise RuntimeError(
+                f"SeasonalNaive needs more than {s} training points, got {len(self.y_train)}"
+            )
+        # One-cycle-ahead in-sample residuals set the interval scale.
+        self._residual_std = float(np.std(self.y_train[s:] - self.y_train[:-s]))
+        self.model = self.y_train[-s:]
+        self.fitted = True
+
+    def forecast(self, steps: int, confidence_level: float = 0.80) -> ForecastOutput:
+        if not self.fitted:
+            raise RuntimeError("Model not fitted. Call fit() first.")
+
+        s = self.season_length
+        last_season = self.model
+        yhat = np.array([last_season[i % s] for i in range(steps)])
+
+        # h-step error accumulates one residual variance per seasonal cycle.
+        z_score = norm.ppf((1 + confidence_level) / 2)
+        cycles = np.floor(np.arange(steps) / s) + 1
+        margin = z_score * self._residual_std * np.sqrt(cycles)
+
+        return ForecastOutput(
+            prediction=yhat,
+            lower=yhat - margin,
+            upper=yhat + margin,
+            uncertainty_width=2 * margin
+        )
+
+    def get_params(self) -> Dict:
+        return {"season_length": self.season_length}
+
+    def set_params(self, **kwargs) -> None:
+        if "season_length" in kwargs:
+            self.season_length = kwargs["season_length"]
+        self.fitted = False
+
+
 class LightGBMModel(TSModel):
     """LightGBM for time series (lag features + seasonality)"""
     

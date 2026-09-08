@@ -2,6 +2,11 @@
 
 ## Choosing between them
 
+Always include **`SeasonalNaiveModel`** ($\hat{y}_t = y_{t-48}$) in the comparison — not as a
+candidate to deploy but as the reference the other three are scored against. A model that
+does not beat it (MASE ≥ 1) has learned less than copying yesterday. Its interval widens by
+one residual-std per seasonal cycle, so it is also a sanity check on interval scale.
+
 | | SARIMA | Exp. Smoothing | LightGBM |
 |---|---|---|---|
 | Best for | stable series with a single strong daily cycle | simple, stable seasonality | non-linear demand, multi-scale lags, exogenous features |
