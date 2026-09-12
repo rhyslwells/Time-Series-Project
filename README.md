@@ -1,8 +1,10 @@
-# Time Series Forecasting
+# Time Series Forecasting — Learning & Documentation
 
-A time series forecasting and analysis system focused on energy systems, flexibility forecasting, and optimization.
+A learning-focused project exploring time series forecasting methods applied to energy systems data. The primary goal is to **understand forecasting approaches** through clear documentation and reusable implementations.
 
-See: https://rhyslwells.github.io/Time-Series-Project/
+**Main deliverable:** [mkdocs documentation](https://rhyslwells.github.io/Time-Series-Project/) explaining forecasting methods, outcomes on realistic data, and key learnings.
+
+**Focus:** Education and clarity, not production deployment.
 
 
 ## Setup
@@ -35,14 +37,21 @@ For notebook-based analysis and consolidation:
 uv run marimo edit
 ```
 
+## How This Project Works
+
+1. **Synthetic data generation** (`src/data/`) — Creates realistic energy metering data (14 days × 15 assets × 30-min intervals)
+2. **Forecasting models** (`src/ts_model_framework.py`) — Multiple approaches (Seasonal Naive, SARIMA, Exponential Smoothing, LightGBM)
+3. **Evaluation & diagnostics** (`src/ts_plots.py`) — Performance metrics, uncertainty quantification, residual analysis
+4. **Documentation** (`docs_src/`) — Methodology explanations, results, and learnings captured in mkdocs
+
 ## Dependencies
 
-Core dependencies are kept minimal and focused:
+Core dependencies:
 
+- **polars**: Data operations (all I/O and transformations)
 - **statsmodels, scikit-learn, lightgbm**: Forecasting engines
-- **sktime, tbats, pmdarima**: Time series specialized tools
-- **pandas, numpy**: Data handling
-- **marimo, ipython**: Exploration and visualization
-- **matplotlib, plotly, seaborn**: Visualization
+- **numpy**: Numerical arrays for models
+- **marimo, ipython**: Exploration and consolidation
+- **matplotlib, plotly**: Visualization
 
-See `pyproject.toml` for the complete list and optional development tools.
+See `pyproject.toml` for the complete list.
