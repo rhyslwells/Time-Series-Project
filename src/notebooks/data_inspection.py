@@ -25,6 +25,8 @@ Flow (sections):
     5. Day-of-Week Patterns   - boxplot by weekday
     6. Autocorrelation        - ACF and PACF
     7. Rolling Mean & Variance
+    8. Stationarity Tests     - ADF and KPSS, combined read
+    9. Seasonal Decomposition - STL trend/seasonal/residual, strength scores
 
 Scope (see working_notes/8_gpt1/data_inspection.md):
     Missing values, timestamp validation, outlier detection/treatment, and
@@ -217,6 +219,51 @@ def _(mo):
 def _(DataInspector, asset_df, mo, timestamp_col, value_col):
     fig_rolling = DataInspector.rolling_stats_plot(asset_df, value_col, timestamp_col, window=48)
     mo.ui.plotly(fig_rolling)
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md("""
+    ## Section 8: Stationarity Tests
+
+    ADF and KPSS test different null hypotheses - agreement is conclusive, disagreement
+    narrows down whether the series needs detrending or differencing.
+    """)
+    return
+
+
+@app.cell
+def _(DataInspector, asset_df, value_col):
+    y_stationarity = asset_df[value_col].to_numpy()
+    stationarity = DataInspector.stationarity_tests(y_stationarity)
+    stationarity
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md("""
+    ## Section 9: Seasonal Decomposition
+
+    STL splits the series into trend, seasonal, and residual components. Strength scores
+    (Hyndman/Wang, each in [0, 1]) put a number on how much of the series each component
+    explains, rather than reading it off the ACF/PACF plot.
+    """)
+    return
+
+
+@app.cell
+def _(DataInspector, asset_df, value_col):
+    strength = DataInspector.seasonal_strength(asset_df, value_col, period=48)
+    strength
+    return
+
+
+@app.cell
+def _(DataInspector, asset_df, mo, value_col):
+    fig_stl = DataInspector.seasonal_decomposition_plot(asset_df, value_col, period=48)
+    mo.ui.plotly(fig_stl)
     return
 
 

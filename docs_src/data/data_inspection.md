@@ -17,7 +17,7 @@ capture in the first place, and that's established here, before any model exists
 
 ## What
 
-Six checks, each aimed at one modeling assumption:
+Ten checks, each aimed at one modeling assumption:
 
 | Check | Output | What it's for |
 |---|---|---|
@@ -28,15 +28,18 @@ Six checks, each aimed at one modeling assumption:
 | Autocorrelation (ACF) | Correlogram with a 95% white-noise band | Confirms the series has exploitable structure beyond noise, and identifies candidate seasonal periods or MA order |
 | Partial autocorrelation (PACF) | Correlogram with a 95% white-noise band | Isolates direct lag dependence from structure already explained by shorter lags: candidate AR order |
 | Rolling mean and variance | Rolling mean and rolling variance over time | A visual stationarity check: a flat rolling mean and variance support models that assume stationarity, drift in either argues against them |
+| Stationarity tests (ADF, KPSS) | A two-row result table plus a combined conclusion | Replaces the rolling-mean/variance eyeball test with a statistical one. ADF's null is a unit root; KPSS's null is stationarity, so the two disagreeing (rather than just one failing) tells you whether the series needs differencing or detrending |
+| Seasonal decomposition (STL) | Observed / trend / seasonal / residual panels | Splits the series into components explicitly, instead of inferring them from ACF bumps |
+| Trend and seasonal strength | Two scores in [0, 1] | Puts a number on how much of the series each component (trend, seasonal) explains beyond noise, so "there's seasonality" becomes "seasonal strength is 0.92" |
 
 ## How
 
 Each check is a function that takes a polars `DataFrame`, a `value_col` name, and an optional
 `timestamp_col` (default `"timestamp"`). The trend and rolling-stats checks also take a
-`window`, and the ACF/PACF check takes `nlags`. None of them assume any prior feature
-engineering: they run the same way on a raw series or on any other dataset with one timestamp
-column and one numeric field of interest, so the same checks apply regardless of what's being
-measured.
+`window`; the ACF/PACF check takes `nlags`; the STL-based checks take a `period` (the number
+of samples in one seasonal cycle). None of them assume any prior feature engineering: they
+run the same way on a raw series or on any other dataset with one timestamp column and one
+numeric field of interest, so the same checks apply regardless of what's being measured.
 
 ## Limitations
 

@@ -1,7 +1,8 @@
 """
 Generic time series data inspection module
 - Model-independent checks on a single value column of any polars DataFrame
-- Distribution, trend, time-of-day, day-of-week, ACF/PACF, rolling mean/variance
+- Distribution, trend, time-of-day, day-of-week, ACF/PACF, rolling mean/variance,
+  stationarity tests (ADF/KPSS), STL decomposition and seasonal/trend strength
 - Does not assume any feature engineering (e.g. src/data/generate_metering_features.py
   output) - only a timestamp column and one numeric value column are required
 """
@@ -247,3 +248,101 @@ class DataInspector:
         fig.update_layout(title_text=f"{title}: Autocorrelation", height=450, width=1200)
 
         return fig
+
+    @staticmethod
+    def stationarity_tests(values: np.ndarray) -> pl.DataFrame:
+        """ADF and KPSS stationarity tests, with a combined read.
+
+        ADF's null hypothesis is a unit root (non-stationary); rejecting it (p < 0.05)
+        indicates stationarity. KPSS's null hypothesis is stationarity; rejecting it
+        (p < 0.05) indicates non-stationarity. The two are complementary: agreement is
+        conclusive, disagreement narrows down which kind of non-stationarity is present
+        (trend vs difference).
+        """
+        import warnings
+        from statsmodels.tsa.stattools import adfuller, kpss
+
+        adf_stat, adf_pvalue = adfuller(values, autolag="AIC")[:2]
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            kpss_stat, kpss_pvalue = kpss(values, regression="c", nlags="auto")[:2]
+
+        adf_stationary = adf_pvalue < 0.05
+        kpss_stationary = kpss_pvalue >= 0.05
+
+        if adf_stationary and kpss_stationary:
+            conclusion = "stationary"
+        elif not adf_stationary and not kpss_stationary:
+            conclusion = "non-stationary"
+        elif adf_stationary and not kpss_stationary:
+            conclusion = "trend-stationary (detrend before treating as stationary)"
+        else:
+            conclusion = "difference-stationary (difference before treating as stationary)"
+
+        return pl.DataFrame({
+            "test": ["ADF", "KPSS"],
+            "statistic": [adf_stat, kpss_stat],
+            "p_value": [adf_pvalue, kpss_pvalue],
+            "null_hypothesis": ["unit root (non-stationary)", "stationary"],
+            "rejects_null_at_0.05": [bool(adf_stationary), bool(not kpss_stationary)],
+            "conclusion": [conclusion, conclusion],
+        })
+
+    @staticmethod
+    def seasonal_decomposition_plot(
+        df: pl.DataFrame,
+        value_col: str,
+        timestamp_col: str = "timestamp",
+        period: int = 48,
+        title: str = None,
+    ) -> go.Figure:
+        """Plot: STL decomposition into observed, trend, seasonal, and residual components"""
+        from statsmodels.tsa.seasonal import STL
+
+        timestamps, values = DataInspector.to_series(df, value_col, timestamp_col)
+        result = STL(values, period=period, robust=True).fit()
+
+        fig = make_subplots(
+            rows=4, cols=1, shared_xaxes=True,
+            subplot_titles=("Observed", "Trend", "Seasonal", "Residual"),
+        )
+        fig.add_trace(go.Scatter(x=timestamps, y=values, mode="lines", line=dict(color="steelblue")), row=1, col=1)
+        fig.add_trace(go.Scatter(x=timestamps, y=result.trend, mode="lines", line=dict(color="red")), row=2, col=1)
+        fig.add_trace(go.Scatter(x=timestamps, y=result.seasonal, mode="lines", line=dict(color="green")), row=3, col=1)
+        fig.add_trace(go.Scatter(x=timestamps, y=result.resid, mode="markers", marker=dict(color="gray", size=3)), row=4, col=1)
+
+        fig.update_layout(
+            title_text=title or f"{value_col}: STL Decomposition (period={period})",
+            height=800,
+            width=1200,
+            showlegend=False,
+        )
+        return fig
+
+    @staticmethod
+    def seasonal_strength(
+        df: pl.DataFrame,
+        value_col: str,
+        timestamp_col: str = "timestamp",
+        period: int = 48,
+    ) -> pl.DataFrame:
+        """Hyndman/Wang trend and seasonal strength from an STL decomposition, each in [0, 1].
+
+        strength = max(0, 1 - Var(residual) / Var(component + residual)). Near 0 means the
+        component adds nothing beyond noise; near 1 means it accounts for nearly all the
+        variation left after the other component is removed.
+        """
+        from statsmodels.tsa.seasonal import STL
+
+        _, values = DataInspector.to_series(df, value_col, timestamp_col)
+        result = STL(values, period=period, robust=True).fit()
+
+        resid_var = np.var(result.resid)
+        trend_strength = max(0.0, 1 - resid_var / np.var(result.trend + result.resid))
+        seasonal_strength = max(0.0, 1 - resid_var / np.var(result.seasonal + result.resid))
+
+        return pl.DataFrame({
+            "period": [period],
+            "trend_strength": [trend_strength],
+            "seasonal_strength": [seasonal_strength],
+        })
