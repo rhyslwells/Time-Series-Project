@@ -234,6 +234,44 @@ class TSPlotter:
         return fig
 
 
+    @staticmethod
+    def horizon_decay(
+        metrics_by_horizon: pl.DataFrame,
+        model_name: str = "Model"
+    ) -> go.Figure:
+        """Plot: MAE/RMSE by forecast horizon, from RollingOriginEvaluator.metrics_by_horizon"""
+
+        horizons = metrics_by_horizon["horizon"].to_list()
+        mae = metrics_by_horizon["mae"].to_list()
+        rmse = metrics_by_horizon["rmse"].to_list()
+
+        fig = go.Figure()
+
+        fig.add_trace(go.Scatter(
+            x=horizons, y=mae,
+            mode='lines+markers',
+            name='MAE',
+            line=dict(color='steelblue', width=2)
+        ))
+        fig.add_trace(go.Scatter(
+            x=horizons, y=rmse,
+            mode='lines+markers',
+            name='RMSE',
+            line=dict(color='salmon', width=2)
+        ))
+
+        fig.update_layout(
+            title=f"{model_name}: Forecast Error by Horizon (rolling-origin)",
+            xaxis_title="Horizon (steps ahead)",
+            yaxis_title="Error (kWh)",
+            height=450,
+            width=1200,
+            hovermode='x unified'
+        )
+
+        return fig
+
+
 class ComparisonPlotter:
     """Plots comparing multiple models"""
     

@@ -447,6 +447,96 @@ class ModelComparison:
         return self.results[model_name]['forecast']
 
 
+class RollingOriginEvaluator:
+    """Rolling-origin (walk-forward) evaluation, scored per forecast horizon.
+
+    ModelComparison/ModelTuner fit once and score one forecast against one
+    static y_val/y_test window - fast, but silent on whether that ranking
+    would hold on a different window, and on how error grows with lead time.
+    This class refits at each origin on an expanding window, forecasts
+    `horizon` steps, and keeps every (origin, horizon-step) error so it can
+    be grouped by horizon afterwards. It is a slower confirmation step, not
+    a replacement: run it on the model(s) that already won a cheap
+    ModelComparison/ModelTuner pass, not as the primary search loop.
+    """
+
+    def __init__(self, model_class, y: np.ndarray, min_train_size: int,
+                 horizon: int, step: int = 1):
+        self.model_class = model_class
+        self.y = y
+        self.min_train_size = min_train_size
+        self.horizon = horizon
+        self.step = step
+        self.records: List[Dict] = []
+
+    def run(self, model_kwargs: Optional[Dict] = None,
+            confidence_level: float = 0.80) -> pl.DataFrame:
+        """Walk the origin forward by `step`, refitting and forecasting at each one.
+
+        Returns one row per (origin, horizon-step) with actual, prediction,
+        interval bounds and error - the raw material for metrics_by_horizon()
+        and rolling_error_over_time().
+        """
+        model_kwargs = model_kwargs or {}
+        self.records = []
+        n = len(self.y)
+
+        for origin in range(self.min_train_size, n - self.horizon, self.step):
+            train = self.y[:origin]
+            actual = self.y[origin:origin + self.horizon]
+
+            try:
+                model = self.model_class(train, **model_kwargs)
+                model.fit()
+                forecast = model.forecast(self.horizon, confidence_level)
+            except Exception as e:
+                print(f"[fail] origin {origin} failed: {e}")
+                continue
+
+            for h in range(self.horizon):
+                self.records.append({
+                    "origin": origin,
+                    "horizon": h + 1,
+                    "actual": actual[h],
+                    "prediction": forecast.prediction[h],
+                    "lower": forecast.lower[h],
+                    "upper": forecast.upper[h],
+                    "error": actual[h] - forecast.prediction[h],
+                })
+
+        return pl.DataFrame(self.records)
+
+    @staticmethod
+    def metrics_by_horizon(results: pl.DataFrame) -> pl.DataFrame:
+        """MAE/RMSE/PI coverage grouped by horizon step, from run()'s output."""
+        return (
+            results
+            .group_by("horizon")
+            .agg([
+                pl.col("error").abs().mean().alias("mae"),
+                (pl.col("error") ** 2).mean().sqrt().alias("rmse"),
+                (
+                    (pl.col("actual") >= pl.col("lower"))
+                    & (pl.col("actual") <= pl.col("upper"))
+                ).mean().mul(100).alias("pi_coverage"),
+            ])
+            .sort("horizon")
+        )
+
+    @staticmethod
+    def rolling_error_over_time(results: pl.DataFrame, horizon: int = 1,
+                                 window: int = 12) -> pl.DataFrame:
+        """Rolling RMSE at a fixed horizon (default 1-step), ordered by origin.
+
+        Shows whether the model's near-term accuracy improves or degrades as
+        the training window grows, rather than just its average over the run.
+        """
+        one_step = results.filter(pl.col("horizon") == horizon).sort("origin")
+        return one_step.with_columns(
+            (pl.col("error") ** 2).rolling_mean(window_size=window).sqrt().alias("rolling_rmse")
+        )
+
+
 class ModelTuner:
     """Hyperparameter tuning for a single model.
 

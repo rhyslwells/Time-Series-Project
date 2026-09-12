@@ -71,6 +71,7 @@ nav:
       - Metrics: theory/metrics.md
       - Models: theory/models.md
       - Diagnostics: theory/diagnostics.md
+      - Rolling-origin evaluation: theory/rolling-origin-evaluation.md
       - Decisions: theory/models-decisions.md
       - Forecast products: theory/forecast_products.md
   - Coding:
