@@ -15,6 +15,11 @@ These checks also make model diagnostics interpretable later. A residual ACF onl
 model failed to capture structure if you already know the raw series had structure to
 capture in the first place, and that's established here, before any model exists.
 
+These checks are diagnostic, not a preprocessing gate: they surface structure (trend,
+seasonality, non-stationarity) so a model choice is informed, but they don't mandate
+differencing, detrending, or any other transformation of the raw series. See
+[Forecasting approach](../theory/forecasting-approach.md).
+
 ## What
 
 Ten checks, each aimed at one modeling assumption:

@@ -3,6 +3,7 @@
 Math, model behavior, and interpretation for the forecasting framework. Code usage lives in [Coding](../coding/index.md); this section covers the reasoning behind it.
 
 - [Architecture](architecture.md) — the layer model, each layer's inputs and outputs, the forecast contract, and which layers exist today
+- [Forecasting approach](forecasting-approach.md) — why the workflow stays model-agnostic and preprocessing isn't done just to satisfy one model's assumptions
 - [Metrics](metrics.md) — MAE, RMSE, MAPE, MASE, PI coverage: formulas, expected ranges, and why every number is read against a seasonal-naive baseline at a stated horizon
 - [Models](models.md) — SARIMA, Exponential Smoothing, LightGBM: the math and when to use each
 - [Diagnostics](diagnostics.md) — how to read the four diagnostic plots, good vs bad cases
@@ -19,6 +20,7 @@ Math, model behavior, and interpretation for the forecasting framework. Code usa
 | "How do I compare across assets of different sizes?" | [Metrics — MASE](metrics.md#mase-mean-absolute-scaled-error) |
 | "Why don't the metrics mean anything without a baseline?" | [Metrics](metrics.md#read-metrics-against-a-baseline) |
 | "Why does SARIMA use these parameters?" | [Models](models.md) |
+| "Why isn't the series differenced/detrended before fitting a model?" | [Forecasting approach](forecasting-approach.md) |
 | "How do I read this diagnostic plot?" | [Diagnostics](diagnostics.md) |
 | "Is this residual pattern actually a problem, or does it just look odd?" | [Diagnostics — Confirming diagnostics numerically](diagnostics.md#confirming-diagnostics-numerically) |
 | "Which model should I pick?" | [Decisions](models-decisions.md) |

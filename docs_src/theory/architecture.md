@@ -83,3 +83,6 @@ much uncertainty to absorb rather than baking that choice into the forecast. See
 - **Swappable models** — SARIMA, Exponential Smoothing, LightGBM and the seasonal-naive
   baseline are interchangeable behind the layer-2 contract.
 - **Transparent flow** — data moves through layers in a clear progression.
+- **Model-agnostic inspection** — layer 1 is inspected independently of any model in layer 2;
+  preprocessing lives inside each model rather than as a shared gating step. See
+  [Forecasting approach](forecasting-approach.md).
