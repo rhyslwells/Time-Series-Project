@@ -458,6 +458,15 @@ class RollingOriginEvaluator:
     be grouped by horizon afterwards. It is a slower confirmation step, not
     a replacement: run it on the model(s) that already won a cheap
     ModelComparison/ModelTuner pass, not as the primary search loop.
+
+    Cost and sample size on this project's data (672 points/asset, 14 days at 48
+    half-hour intervals): SARIMA's own fit takes ~12s per origin here, so `step=1`
+    with `horizon=48` means ~288 refits (~an hour) for one asset - use `step >=
+    horizon` for SARIMA (~6 origins, ~70s). That same non-overlapping step also
+    keeps origins statistically independent; a small `step` gives many rows but
+    they overlap so heavily (same day scored from near-identical training sets)
+    that per-horizon MAE/RMSE looks tighter than the data actually supports. See
+    docs_src/theory/rolling-origin-evaluation.md for the full reasoning.
     """
 
     def __init__(self, model_class, y: np.ndarray, min_train_size: int,

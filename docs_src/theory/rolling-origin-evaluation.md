@@ -56,3 +56,36 @@ by_horizon = evaluator.metrics_by_horizon(results)  # mae, rmse, pi_coverage per
 
 See [Metrics](metrics.md) for what MAE/RMSE/PI coverage mean, and
 [Diagnostics](diagnostics.md) for how to read the resulting plots.
+
+## Caveats specific to this dataset
+
+These matter before you point `RollingOriginEvaluator` at real data — they don't show up
+until you do the arithmetic for this project's actual size (672 points/asset: 14 days x 48
+half-hour intervals).
+
+**Refit cost.** Measured on this data: a single SARIMA `fit()+forecast()` on a 336-point
+training window takes **~12 seconds**; ExponentialSmoothing ~0.3s; SeasonalNaive ~0s. A
+`step=1` walk with `horizon=48` over one asset produces ~288 origins - **about an hour of
+SARIMA refitting for one asset alone**. Use a `step` at least as large as `horizon` for
+SARIMA (6 origins over 14 days, ~70s), or restrict rolling-origin confirmation to the
+cheaper models.
+
+**Sample size per horizon.** With `min_train_size=336` and `horizon=48`, non-overlapping
+origins (`step=48`) give only **6 origins total** - `metrics_by_horizon` is then averaging
+6 points at every horizon step. Overlapping origins (`step=1`) give 288 rows, but they are
+not 288 independent samples: neighbouring origins share nearly all their training data and
+forecast overlapping stretches of the same day, so the resulting MAE/RMSE looks far more
+precise than it is. This is the same "barely estimable" problem [Metrics](metrics.md)
+already flags for a weekly seasonal-naive baseline, sharper here because a single day's
+worth of data is being reused across dozens of "different" origins. Treat a small-`step`
+run as a smoother look at the shape of horizon decay, not as a tighter confidence interval
+on it.
+
+**Flat width is horizon-dependent, not model-dependent.** [Diagnostics](diagnostics.md#uncertainty-width-over-time)
+notes only SARIMA produces horizon-varying interval width. That holds for a rolling-origin
+run with `horizon <= season_length` (e.g. `horizon=48` here): `SeasonalNaiveModel`'s margin
+scales with `floor(h / season_length) + 1`, which stays at 1 for every step inside one
+season, so both SeasonalNaive and ExponentialSmoothing report flat width in that run. Run
+`RollingOriginEvaluator` with `horizon > season_length` (e.g. 96, two days) and
+SeasonalNaive's width will step up at h=49 - expected, not a bug, but worth knowing before
+reading a flat-vs-growing plot as a model property rather than a horizon-length artefact.
