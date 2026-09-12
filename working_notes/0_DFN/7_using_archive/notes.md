@@ -1,6 +1,6 @@
 
 
-# Case 2: DONE:
+# Case 2: DONE
 
 C:\Users\RhysL\Desktop\Time Series Project\archive\ML_Tools-TimeSeries\residual_analysis.py
 
