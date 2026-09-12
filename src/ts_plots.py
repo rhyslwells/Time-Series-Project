@@ -140,6 +140,100 @@ class TSPlotter:
         return fig
     
     @staticmethod
+    def residuals_qq(
+        y_test: np.ndarray,
+        forecast: ForecastOutput,
+        model_name: str = "Model"
+    ) -> go.Figure:
+        """Plot: Q-Q plot of residuals against a normal distribution.
+
+        Applies to any model's ForecastOutput (residuals = y_test - forecast.prediction),
+        not just SARIMA - unlike statsmodels' `plot_diagnostics()`, which is built from the
+        SARIMAX state-space innovations and has no equivalent for LightGBM/SeasonalNaive.
+        Points hugging the red line mean residuals are approximately normal - the assumption
+        behind the framework's z-score prediction intervals. See ResidualDiagnostics.normality_stats
+        for the numeric counterpart (skew, excess kurtosis, Jarque-Bera).
+        """
+        from scipy.stats import probplot
+
+        residuals = y_test - forecast.prediction
+        (theoretical_q, sample_q), (slope, intercept, _) = probplot(residuals, dist="norm")
+
+        fig = go.Figure()
+
+        fig.add_trace(go.Scatter(
+            x=theoretical_q, y=sample_q,
+            mode='markers',
+            name='Residuals',
+            marker=dict(color='steelblue', size=6)
+        ))
+
+        line_x = np.array([theoretical_q.min(), theoretical_q.max()])
+        fig.add_trace(go.Scatter(
+            x=line_x, y=slope * line_x + intercept,
+            mode='lines',
+            name='Normal fit',
+            line=dict(color='red', width=1.5, dash='dash')
+        ))
+
+        fig.update_layout(
+            title=f"{model_name}: Residual Q-Q Plot",
+            xaxis_title="Theoretical Quantiles",
+            yaxis_title="Sample Quantiles (kWh)",
+            height=450,
+            width=600,
+            hovermode='closest'
+        )
+
+        return fig
+
+    @staticmethod
+    def residuals_acf(
+        y_test: np.ndarray,
+        forecast: ForecastOutput,
+        model_name: str = "Model",
+        nlags: int = 20
+    ) -> go.Figure:
+        """Plot: Autocorrelation (correlogram) of residuals, with a 95% white-noise band.
+
+        Applies to any model's ForecastOutput, same residual definition as `residuals_qq`
+        and `residuals_diagnostic`. Bars outside the dashed band flag autocorrelated
+        residuals (structure the model missed) - the visual counterpart to
+        ResidualDiagnostics.ljung_box, which gives the same read as a p-value.
+        `nlags` defaults to 20; keep it well under len(residuals) since ACF estimates
+        get noisy near the sample size, which matters on this project's short test windows.
+        """
+        from statsmodels.tsa.stattools import acf
+
+        residuals = y_test - forecast.prediction
+        nlags = min(nlags, len(residuals) - 1)
+        values = acf(residuals, nlags=nlags, fft=False)
+        conf_band = 1.96 / np.sqrt(len(residuals))
+
+        fig = go.Figure()
+
+        fig.add_trace(go.Bar(
+            x=list(range(len(values))), y=values,
+            name='ACF',
+            marker_color='steelblue'
+        ))
+
+        fig.add_hline(y=conf_band, line_dash='dash', line_color='red')
+        fig.add_hline(y=-conf_band, line_dash='dash', line_color='red')
+        fig.add_hline(y=0, line_dash='solid', line_color='black', line_width=1)
+
+        fig.update_layout(
+            title=f"{model_name}: Residual Autocorrelation (ACF)",
+            xaxis_title="Lag",
+            yaxis_title="ACF",
+            height=450,
+            width=800,
+            showlegend=False
+        )
+
+        return fig
+
+    @staticmethod
     def uncertainty_analysis(
         forecast: ForecastOutput,
         model_name: str = "Model"

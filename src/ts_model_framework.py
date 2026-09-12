@@ -15,7 +15,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 from sklearn.metrics import mean_absolute_error, mean_squared_error, mean_absolute_percentage_error
-from scipy.stats import norm
+from scipy.stats import norm, skew, kurtosis, jarque_bera
 
 
 @dataclass
@@ -367,6 +367,64 @@ class ModelEvaluator:
             pi_coverage=coverage,
             mean_uncertainty_width=mean_width
         )
+
+
+class ResidualDiagnostics:
+    """Statistical tests for forecast residuals: does the docs.md "Confirm with:"
+    line diagnostics.md points at but that no code computed - Ljung-Box for
+    autocorrelated residuals, and skew/kurtosis/Jarque-Bera for heavy tails.
+
+    Operates on `y_true - forecast.prediction` (test-set residuals), same as
+    `ts_plots.TSPlotter.residuals_diagnostic`. That makes it model-agnostic: it
+    applies equally to SARIMA, ExponentialSmoothing, LightGBM and SeasonalNaive,
+    since it only needs actual vs. predicted values, not a model's internals.
+    This is deliberately not `model_fit.resid` + `model_fit.plot_diagnostics()`
+    (the SARIMAX-specific in-sample innovations diagnostic) - those rely on the
+    state-space representation and have no equivalent for LightGBM/SeasonalNaive.
+    """
+
+    @staticmethod
+    def ljung_box(residuals: np.ndarray, lags: Optional[List[int]] = None) -> pl.DataFrame:
+        """Ljung-Box test for residual autocorrelation at the given lags.
+
+        p < 0.05 at a lag means residuals are not white noise at that lag - the
+        model left structure on the table (diagnostics.md's "autocorrelated
+        residuals" case). Default lags cap at len(residuals) // 5 since the test
+        is unreliable once lags approach the sample size, which matters on this
+        project's short (~100-200 point) test windows.
+        """
+        from statsmodels.stats.diagnostic import acorr_ljungbox
+
+        residuals = np.asarray(residuals)
+        if lags is None:
+            max_lag = max(1, min(20, len(residuals) // 5))
+            lags = [max_lag]
+
+        result = acorr_ljungbox(residuals, lags=lags, return_df=True)
+        return pl.from_pandas(result.reset_index().rename(columns={"index": "lag"}))
+
+    @staticmethod
+    def normality_stats(residuals: np.ndarray) -> Dict[str, float]:
+        """Mean, std, skew, excess kurtosis and Jarque-Bera normality test.
+
+        Excess kurtosis >> 0 is diagnostics.md's "heavy tails" case: real-world
+        PI coverage will run below the reported target even if the residual mean
+        is centered. Jarque-Bera folds skew and kurtosis into one normality test
+        (p < 0.05 rejects normality); on short test windows (<50 points) treat it
+        as a rough signal, not a firm verdict, since it needs a reasonable
+        sample size to have power.
+        """
+        residuals = np.asarray(residuals)
+        jb_stat, jb_pvalue = jarque_bera(residuals)
+
+        return {
+            "mean": float(np.mean(residuals)),
+            "std": float(np.std(residuals)),
+            "skew": float(skew(residuals)),
+            "excess_kurtosis": float(kurtosis(residuals)),
+            "jarque_bera_stat": float(jb_stat),
+            "jarque_bera_pvalue": float(jb_pvalue),
+        }
 
 
 class ModelComparison:

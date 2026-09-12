@@ -18,11 +18,15 @@ This page would be clearer with example figures for each failure mode — worth 
 
 **Good case:** residuals bounce randomly around 0 with no trend, mostly within ±2x the model's own uncertainty band, and the histogram is roughly bell-shaped and centered at 0.
 
-**Autocorrelated residuals:** consecutive residuals cluster on the same side (several positive in a row, then several negative) instead of bouncing randomly. This means the model missed structure — errors compound instead of self-correcting. Fix: add AR terms (p/P) or seasonal differencing (D); check the ACF/PACF of the residuals for which. *Confirm with:* Ljung-Box on the residuals, or a visible spike in their ACF.
+**Autocorrelated residuals:** consecutive residuals cluster on the same side (several positive in a row, then several negative) instead of bouncing randomly. This means the model missed structure — errors compound instead of self-correcting. Fix: add AR terms (p/P) or seasonal differencing (D); check the ACF/PACF of the residuals for which. *Confirm with:* Ljung-Box on the residuals, or a visible spike in their ACF — see
+[Confirming diagnostics numerically](#confirming-diagnostics-numerically) for both.
 
 **Systematic bias:** residuals sit almost entirely on one side of zero and the histogram is visibly skewed. All-positive means the forecast underestimates; all-negative means it overestimates. Fix: check the seasonal component is capturing the daily shape, or retrain on data that better represents current conditions. (Adding non-seasonal differencing is not the fix here — the series has no trend.) *Confirm with:* sign test on the residuals, or simply the fraction above zero.
 
-**Heavy tails:** the histogram has a normal-looking center but disproportionately tall bars at the extremes. The normal-residual assumption behind the PI calculation breaks down, so real-world coverage will run below what the model reports. Fix: remove/inspect outliers in training data, use a more robust model, or predict quantiles directly instead of assuming normality. *Confirm with:* excess kurtosis, or PI coverage below the reported target despite a centered residual mean.
+**Heavy tails:** the histogram has a normal-looking center but disproportionately tall bars at the extremes. The normal-residual assumption behind the PI calculation breaks down, so real-world coverage will run below what the model reports. Fix: remove/inspect outliers in training data, use a more robust model, or predict quantiles directly instead of assuming normality. *Confirm with:* excess kurtosis, or PI coverage below the reported target despite a
+centered residual mean — see [Confirming diagnostics
+numerically](#confirming-diagnostics-numerically) for the Q-Q plot and
+`ResidualDiagnostics.normality_stats`.
 
 ## Uncertainty width over time
 
@@ -58,6 +62,60 @@ Each point is colored by whether the actual fell inside (green) or outside (red)
 **Clustered reds (time-of-day pattern):** coverage looks fine in aggregate but reds concentrate in a specific window (e.g. daytime hours) while off-peak hours are all green. The model hasn't captured a time-of-day effect properly — check the seasonal component (SARIMA: P, D > 0) or the hour-of-day feature (LightGBM), and consider retraining on data from the current season.
 
 **All-green (over-coverage):** ~100% coverage against an 80% target means the interval is far wider than necessary. Point forecast may itself be flat (model "giving up" rather than genuinely uncertain) — check `forecast.std()` isn't near zero before assuming the width is simply conservative-but-correct.
+
+## Confirming diagnostics numerically
+
+The "Confirm with:" lines above name a test but didn't used to point at code. Two more
+`TSPlotter` methods and one new class close that gap, all built on the same
+`residuals = y_test - forecast.prediction` used by `residuals_diagnostic` above - so, like
+that method, **they apply to every `TSModel` subclass** (SARIMA, ExponentialSmoothing,
+LightGBM, SeasonalNaive), not just the statsmodels-backed ones. This is deliberately not
+the same thing as `SARIMAX.plot_diagnostics()` or `model_fit.summary()`'s Jarque-Bera /
+heteroskedasticity rows (see `archive/ML_Tools-TimeSeries/residual_analysis.py`) - those
+read the state-space innovations off a fitted `SARIMAXResults` object and have no
+equivalent for LightGBM or SeasonalNaive, whose "residuals" only exist as
+actual-minus-prediction after the fact.
+
+**`TSPlotter.residuals_qq(y_test, forecast, model_name)`** - Q-Q plot of residuals against
+a normal distribution. Points hugging the red line support the normality assumption behind
+the framework's z-score prediction intervals; a curved or S-shaped pattern is the visual
+form of the "heavy tails" case above.
+
+**`TSPlotter.residuals_acf(y_test, forecast, model_name, nlags=20)`** - correlogram of
+residuals with a 95% white-noise band ($\pm 1.96/\sqrt{n}$). Bars outside the band are the
+visual form of "autocorrelated residuals" above.
+
+**`ResidualDiagnostics`** (in `ts_model_framework.py`) gives the numeric counterpart to
+both plots:
+
+- `ljung_box(residuals, lags=None)` - p < 0.05 at a lag means residuals are not white
+  noise there (structure the model missed). Default lag caps at `len(residuals) // 5` since
+  the test loses reliability as lags approach the sample size - relevant here because test
+  windows are short (a 4-day test split is 192 points).
+- `normality_stats(residuals)` - mean, std, skew, excess kurtosis, and a Jarque-Bera
+  normality test (p < 0.05 rejects normality). On a test window under ~50 points, treat
+  Jarque-Bera as a rough signal rather than a firm verdict.
+
+```python
+from ts_model_framework import ResidualDiagnostics
+
+residuals = y_test - forecast.prediction
+ResidualDiagnostics.ljung_box(residuals)        # polars DataFrame: lag, lb_stat, lb_pvalue
+ResidualDiagnostics.normality_stats(residuals)  # dict: mean, std, skew, excess_kurtosis, jarque_bera_*
+```
+
+Neither test replaces the plot - a p-value gives no sense of *where* the autocorrelation
+sits (which lag) or *how* the tails are heavy (see [Metrics — proper scoring
+rules](metrics.md#proper-scoring-rules-for-intervals) for a related "one number isn't
+enough" case). Use them together: the plot for shape, the test for a threshold to act on.
+
+**LightGBM caveat:** a low Ljung-Box p-value here doesn't automatically mean "the model
+missed structure" for LightGBM. [Models](models.md#lightgbm-gradient-boosting) notes its
+`forecast()` is recursive - past step ~96 every lag feature is itself a prior prediction,
+so errors compound with horizon by construction. Autocorrelated residuals from that
+compounding are a forecasting-strategy artifact, not necessarily a fixable model fit
+issue; check whether the autocorrelation grows with horizon (consistent with compounding)
+before reaching for more AR-like structure the way you would for SARIMA.
 
 ## Ranking models against each other
 

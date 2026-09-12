@@ -20,6 +20,7 @@ Math, model behavior, and interpretation for the forecasting framework. Code usa
 | "Why don't the metrics mean anything without a baseline?" | [Metrics](metrics.md#read-metrics-against-a-baseline) |
 | "Why does SARIMA use these parameters?" | [Models](models.md) |
 | "How do I read this diagnostic plot?" | [Diagnostics](diagnostics.md) |
+| "Is this residual pattern actually a problem, or does it just look odd?" | [Diagnostics — Confirming diagnostics numerically](diagnostics.md#confirming-diagnostics-numerically) |
 | "Which model should I pick?" | [Decisions](models-decisions.md) |
 | "Is one train/test split enough to trust a model?" | [Rolling-origin evaluation](rolling-origin-evaluation.md) |
 | "How far ahead can I trust this forecast?" | [Rolling-origin evaluation](rolling-origin-evaluation.md#what-it-answers-that-the-single-split-doesnt) |
