@@ -13,8 +13,10 @@
       
       
       
-        <link rel="prev" href="../">
+        <link rel="prev" href="../diagnostics/">
       
+      
+        <link rel="next" href="../models-decisions/">
       
       
         
@@ -25,7 +27,7 @@
     
     
       
-        <title>Asset profiling - Time Series Forecasting</title>
+        <title>Rolling-origin evaluation - Time Series Forecasting</title>
       
     
     
@@ -78,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#asset-profiling" class="md-skip">
+        <a href="#rolling-origin-evaluation" class="md-skip">
           Skip to content
         </a>
       
@@ -114,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Asset profiling
+              Rolling-origin evaluation
             
           </span>
         </div>
@@ -275,11 +277,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../theory/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
           
   
   
@@ -341,13 +345,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../findings/" class="md-tabs__link">
           
   
   
@@ -508,6 +510,8 @@
       
   
   
+    
+  
   
   
     
@@ -535,22 +539,24 @@
     
     
       
+        
+        
+      
       
     
     
       
-        
-        
-      
     
-    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
-  
-  
-  
-    <a href="../../theory/" class="md-nav__link">
-      
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
   
   
   <span class="md-ellipsis">
@@ -564,12 +570,317 @@
   
   
 
-      
-        <span class="md-nav__icon md-icon"></span>
-      
-    </a>
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_3" id="__nav_3_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Theory
   
 
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../metrics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../diagnostics/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Diagnostics
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rolling-origin evaluation
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Rolling-origin evaluation
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#the-problem-with-a-single-traintest-split" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The problem with a single train/test split
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-rolling-origin-does-instead" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What rolling-origin does instead
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-it-answers-that-the-single-split-doesnt" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What it answers that the single split doesn't
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#relationship-to-the-existing-framework" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Relationship to the existing framework
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models-decisions/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Decisions
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../forecast_products/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Forecast products
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -699,8 +1010,6 @@
       
   
   
-    
-  
   
   
     
@@ -716,24 +1025,22 @@
     
     
       
-        
-        
-      
       
     
     
       
+        
+        
+      
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
       
         
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" checked>
-        
-          
-          <div class="md-nav__link md-nav__container">
-            <a href="../" class="md-nav__link ">
-              
+  
+  
+  
+    <a href="../../findings/" class="md-nav__link">
+      
   
   
   <span class="md-ellipsis">
@@ -747,160 +1054,12 @@
   
   
 
-            </a>
-            
-              
-              <label class="md-nav__link " for="__nav_6" id="__nav_6_label" tabindex="">
-                <span class="md-nav__icon md-icon"></span>
-              </label>
-            
-          </div>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_6">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Findings
+      
+        <span class="md-nav__icon md-icon"></span>
+      
+    </a>
   
 
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Asset profiling
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Asset profiling
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#idea" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Idea
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#characteristics-to-analyse" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Characteristics to analyse
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#proposed-cluster-scheme-illustrative" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Proposed cluster scheme (illustrative)
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#next-steps" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Next steps
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#related" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Related
-      
-    </span>
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
       
     </li>
   
@@ -952,7 +1111,7 @@
         <a href="../" class="md-path__link">
           
   <span class="md-ellipsis">
-    Findings
+    Theory
   </span>
 
         </a>
@@ -974,69 +1133,55 @@
   
 
 
-<h1 id="asset-profiling">Asset profiling<a class="headerlink" href="#asset-profiling" title="Permanent link">&para;</a></h1>
-<div class="admonition warning">
-<p class="admonition-title">Proposed — not implemented</p>
-<p>No clusters have been computed. Nothing in the repo runs a clustering step, and the
-table below is a proposed scheme, not a result. This page records the intended approach
-so it is not lost.</p>
-</div>
-<h2 id="idea">Idea<a class="headerlink" href="#idea" title="Permanent link">&para;</a></h2>
-<p>Assets could be grouped into behavioural clusters from their time-series characteristics,
-and each cluster routed to the model class that suits it — cheaper and more principled than
-grid-searching every asset individually. The per-asset inputs this would build on already
-exist in <a href="../../data/data_generation/"><code>daily_metrics.parquet</code></a>.</p>
-<h2 id="characteristics-to-analyse">Characteristics to analyse<a class="headerlink" href="#characteristics-to-analyse" title="Permanent link">&para;</a></h2>
+<h1 id="rolling-origin-evaluation">Rolling-Origin Evaluation<a class="headerlink" href="#rolling-origin-evaluation" title="Permanent link">&para;</a></h1>
+<h2 id="the-problem-with-a-single-traintest-split">The problem with a single train/test split<a class="headerlink" href="#the-problem-with-a-single-traintest-split" title="Permanent link">&para;</a></h2>
+<p><code>ModelComparison</code> and <code>ModelTuner</code> fit a model once and score one forecast against one
+static held-out window. That's fast, and fine for narrowing down model family and
+hyperparameters. But one number from one window can't tell you two things:</p>
 <ul>
-<li>Mean load</li>
-<li>Variance and coefficient of variation</li>
-<li>Seasonality strength — needs a definition; the standard is
-  <span class="arithmatex">\(F_S = \max(0,\, 1 - \operatorname{Var}(R)/\operatorname{Var}(S+R))\)</span> from an STL decomposition</li>
-<li>Autocorrelation (ACF lag-1)</li>
-<li>Intermittency ratio (fraction of near-zero values)</li>
-<li>Peak-to-average ratio</li>
-<li>Ramp frequency and magnitude</li>
+<li><strong>Whether that window was representative.</strong> With 14 days of data, a 3-4 day test
+  block is a small, specific slice — a model can look best simply because it fit that
+  particular stretch (e.g. a quiet period, or one that happened to avoid an EV charging
+  spike).</li>
+<li><strong>How error grows with lead time.</strong> A forecast scored as one block treats a 1-step-ahead
+  prediction and a 96-step-ahead prediction as equally weighted contributions to the same
+  RMSE. It has nothing to say about whether the day-ahead (h=48) forecast is as trustworthy
+  as the next-30-min (h=1) one.</li>
 </ul>
-<h2 id="proposed-cluster-scheme-illustrative">Proposed cluster scheme (illustrative)<a class="headerlink" href="#proposed-cluster-scheme-illustrative" title="Permanent link">&para;</a></h2>
-<table>
-<thead>
-<tr>
-<th>Cluster</th>
-<th>Characteristics</th>
-<th>Candidate model</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Stable</td>
-<td>Low variance, high seasonality strength</td>
-<td>SARIMA</td>
-</tr>
-<tr>
-<td>Variable</td>
-<td>High variance, weak seasonality</td>
-<td>LightGBM</td>
-</tr>
-<tr>
-<td>Intermittent</td>
-<td>Low mean, many near-zero values</td>
-<td>Quantile regression</td>
-</tr>
-</tbody>
-</table>
-<p>With only two asset types in the current dataset (<code>ev_charging</code>, <code>solar_battery</code>) and 14
-days of history, this scheme cannot yet be tested meaningfully.</p>
-<h2 id="next-steps">Next steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<h2 id="what-rolling-origin-does-instead">What rolling-origin does instead<a class="headerlink" href="#what-rolling-origin-does-instead" title="Permanent link">&para;</a></h2>
+<p>Walk the training window forward one origin at a time. At each origin, refit on
+everything up to that point, forecast <code>horizon</code> steps ahead, and record the error at each
+step of that horizon separately. Repeating this across many origins gives many
+overlapping scored windows instead of one, and grouping the results by horizon step shows
+error as a function of lead time rather than a single averaged number.</p>
+<p>This mirrors how the model would actually be used in deployment — forecasting forward from
+whatever data exists <em>right now</em> — rather than training once on a fixed cutoff.</p>
+<h2 id="what-it-answers-that-the-single-split-doesnt">What it answers that the single split doesn't<a class="headerlink" href="#what-it-answers-that-the-single-split-doesnt" title="Permanent link">&para;</a></h2>
 <ul>
-<li>Compute the characteristics above from <code>daily_metrics.parquet</code></li>
-<li>Cluster and inspect stability over the 14 days</li>
-<li>Only then compare a cluster-routed model choice against per-asset selection</li>
+<li><strong>Is the ranking from <code>ModelComparison</code> stable, or an artefact of the split?</strong> Scoring
+  the same models across many origins shows whether the winner keeps winning.</li>
+<li><strong>How far ahead can this forecast be trusted?</strong> Error-by-horizon typically increases
+  with lead time; the point where it crosses an acceptable threshold is the honest limit
+  of the forecast, not "the length of <code>y_test</code>".</li>
+<li><strong>Does accuracy improve as more history accumulates?</strong> Tracking error at a fixed horizon
+  (e.g. 1-step) across origins shows whether the model benefits from a growing training
+  window or is roughly flat regardless of how much data it sees.</li>
 </ul>
-<h2 id="related">Related<a class="headerlink" href="#related" title="Permanent link">&para;</a></h2>
-<ul>
-<li><a href="../../data/feature_engineering/">Feature engineering</a> — how the daily metrics are built</li>
-<li><a href="../../theory/forecast_products/#cross-asset-comparison-and-asset-classification">Forecast products</a> — where this fits in the layer model</li>
-</ul>
+<h2 id="relationship-to-the-existing-framework">Relationship to the existing framework<a class="headerlink" href="#relationship-to-the-existing-framework" title="Permanent link">&para;</a></h2>
+<p>This is a slower, higher-fidelity <strong>confirmation</strong> step, not a replacement for
+<code>ModelComparison</code>/<code>ModelTuner</code>. Those stay the cheap first pass for choosing a model
+family and searching hyperparameters — refitting at every origin for every candidate
+would be expensive for little benefit during search. Rolling-origin evaluation runs
+afterwards, once, on whichever model already won that cheap pass, to confirm the choice
+generalises across windows and to characterise how far ahead it can be trusted. It reuses
+the same <code>TSModel</code> subclasses and the same <code>ForecastOutput</code>/<code>EvaluationMetrics</code>
+contracts — only the evaluation loop around them differs.</p>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">evaluator</span> <span class="o">=</span> <span class="n">RollingOriginEvaluator</span><span class="p">(</span><span class="n">SeasonalNaiveModel</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">min_train_size</span><span class="o">=</span><span class="mi">336</span><span class="p">,</span> <span class="n">horizon</span><span class="o">=</span><span class="mi">48</span><span class="p">)</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">results</span> <span class="o">=</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">by_horizon</span> <span class="o">=</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">metrics_by_horizon</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>  <span class="c1"># mae, rmse, pi_coverage per horizon step</span>
+</span></code></pre></div>
+<p>See <a href="../metrics/">Metrics</a> for what MAE/RMSE/PI coverage mean, and
+<a href="../diagnostics/">Diagnostics</a> for how to read the resulting plots.</p>
 
 
 
@@ -1093,7 +1238,7 @@ days of history, this scheme cannot yet be tested meaningfully.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../" class="md-footer__link md-footer__link--prev" aria-label="Previous: Findings">
+          <a href="../diagnostics/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Diagnostics">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1103,11 +1248,27 @@ days of history, this scheme cannot yet be tested meaningfully.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Findings
+                Diagnostics
               </div>
             </div>
           </a>
         
+        
+          
+          <a href="../models-decisions/" class="md-footer__link md-footer__link--next" aria-label="Next: Decisions">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Decisions
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
         
       </nav>
     
