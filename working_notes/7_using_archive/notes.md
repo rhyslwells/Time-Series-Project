@@ -1,7 +1,8 @@
 
 
-# Prompt 2:
+# Case 2: DONE:
 
+C:\Users\RhysL\Desktop\Time Series Project\archive\ML_Tools-TimeSeries\residual_analysis.py
 
 
 # Case 1: DONE
