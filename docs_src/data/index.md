@@ -12,6 +12,7 @@ Schemas, units, quality notes, and the generation pipeline for the synthetic met
 | "How do the daily metrics get onto the 30-minute series?" | [Feature engineering](feature_engineering.md) |
 | "kW or kWh?" | [Units](#units), below |
 | "Are there known bugs in the generators?" | [Known issues](data_generation.md#known-issues) |
+| "What temporal structure does a series have, before fitting a model?" | [Data inspection](data_inspection.md) |
 
 ## The pipeline at a glance
 

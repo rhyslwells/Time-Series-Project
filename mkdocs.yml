@@ -65,6 +65,7 @@ nav:
       - Data generation: data/data_generation.md
       - Feature engineering: data/feature_engineering.md
       - Synthetic metering data: data/synthetic_metering_data.md
+      - Data inspection: data/data_inspection.md
   - Theory:
       - theory/index.md
       - Architecture: theory/architecture.md
