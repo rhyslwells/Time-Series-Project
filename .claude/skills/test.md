@@ -23,7 +23,7 @@ Verify implementation against the locked acceptance criteria and data contracts.
 4. **Data sanity (5 min)**
    - Spot-check values (are they reasonable? No NaNs where shouldn't be?)
    - Time series alignment (no gaps, correct resolution?)
-   - For forecasts: pass ramp rate validation?
+   - For forecasts: pass ramp rate validation (daily_metrics.parquet ramp columns)?
 
 ---
 
@@ -44,7 +44,7 @@ print(result.head())
 # Full pipeline: input → this layer → output
 input_data = load_metering_data()
 output = my_layer.predict(input_data)
-assert output validates against ramp_rates.parquet
+assert output validates against daily_metrics.parquet ramp rate columns
 ```
 
 ---

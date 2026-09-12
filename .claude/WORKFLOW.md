@@ -19,13 +19,7 @@
 
 ## Forecasting System Layers
 
-The system progresses through these layers:
-
-```
-Raw metering → Forecasts → Derived features → Flexibility/uncertainty → Optimization
-```
-
-### Layer Separation
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the full 8-layer model and diagram. In short:
 
 - Maintain clear boundaries between forecasting layers
 - Treat forecasts as reusable intermediate products (not final outputs)
@@ -34,18 +28,4 @@ Raw metering → Forecasts → Derived features → Flexibility/uncertainty → 
 
 ### Architectural Decisions
 
-Before implementing changes to:
-- Splitting/combining forecast layers
-- Forecast output contracts
-- New model types or aggregation approaches
-- Major restructuring of src/
-
-**Always ask first.** Otherwise proceed with implementation based on the framework in this file and ARCHITECTURE.md.
-
-## Behavior When Uncertain
-
-1. Analyze existing repository structure
-2. Infer the most conservative change
-3. Present assumptions explicitly
-4. Ask for clarification before introducing architectural changes
-5. Default to preserving existing patterns and conventions
+See [CLAUDE.md](CLAUDE.md#key-architectural-decisions) for what to ask about before changing, and its "Behavior When Uncertain" section for how to proceed otherwise.

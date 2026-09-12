@@ -13,7 +13,6 @@
 - **Don't over-engineer**: don't add features, refactoring, or abstractions beyond what the task requires
 - **Trust guarantees**: don't add error handling for scenarios that can't happen
 - **Validation at boundaries**: only validate external input, not internal state
-- **Minimal comments**: only explain WHY (non-obvious constraints, workarounds); never explain WHAT
 - **Prefer deletion**: if code is unused, delete it completely (no `_removed` comments)
 - **Follow repository patterns**: defer to existing conventions, not generic best practices
 

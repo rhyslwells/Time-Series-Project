@@ -9,7 +9,7 @@ Check implementation against project patterns, standards, and design decisions.
 ## Workflow
 
 1. **Code review (5 min)**
-   - [ ] Follows CODING_STANDARDS.md (polars for data ops, type hints, brief comments)
+   - [ ] Follows CODING_STANDARDS.md (polars for data ops, minimal WHY-only comments)
    - [ ] Well-named functions/variables (explain logic via names, not comments)
    - [ ] No debug code, print statements, or TODOs left in production code
    - [ ] Location correct (src/ = production-ready, archive/ = exploratory)
@@ -37,7 +37,7 @@ Check implementation against project patterns, standards, and design decisions.
 ```
 CODE REVIEW
 ──────────
-Standards: ✓ polars / ✓ type hints / ✓ no cruft
+Standards: ✓ polars / ✓ no emojis / ✓ no cruft
 Architecture: ✓ layer separation / ✓ contracts clear / ✓ no circular deps
 Docs: ✓ matches current / ✓ notes stale docs for sync
 Edge cases: ✓ empty input / ✓ all assets / ✓ time series bounds

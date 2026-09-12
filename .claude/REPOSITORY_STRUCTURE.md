@@ -61,25 +61,9 @@ generated data in the same directory keeps that contract auditable in one place.
 
 ## Key Production Files
 
-### Data pipeline (`src/data/`)
-
-| File | Purpose |
-|------|---------|
-| `generate_raw_data.py` | Synthesizes metering_data_raw.csv (14 days x 15 assets x 30-min) |
-| `generate_daily_metrics.py` | Reads the raw CSV, writes metering_data.parquet + daily_metrics.parquet |
-| `generate_metering_features.py` | Joins daily_metrics.parquet onto metering_data.parquet, broadcast per day |
-| `metering_data.parquet` | Raw 30-min metering (10,080 rows) |
-| `daily_metrics.parquet` | Daily aggregates + behavioral metrics (210 rows) |
-| `metering_data_with_features.parquet` | 30-min metering + daily features broadcast across each day's 48 rows (10,080 rows) |
-
-### Forecasting framework (`src/`)
-
-| File | Purpose |
-|------|---------|
-| `ts_model_framework.py` | `TSModel` base class + `SARIMAModel`, `ExponentialSmoothingModel`, `LightGBMModel`; `ModelEvaluator`, `ModelComparison`, `ModelTuner`; `ForecastOutput` / `EvaluationMetrics` contracts |
-| `ts_plots.py` | `TSPlotter` and `ComparisonPlotter` — plotly diagnostics driven by `ForecastOutput` (forecast vs actual, residuals, uncertainty, PI coverage) |
-
-Models take and return numpy arrays; all dataframe construction and IO uses polars (see DATA_STACK.md).
+See [DATA_STACK.md](DATA_STACK.md) for the data pipeline scripts/outputs and
+[CLAUDE.md](CLAUDE.md#forecasting-framework-quick-reference) for the forecasting framework files.
+Models take and return numpy arrays; all dataframe construction and IO uses polars.
 
 The runnable end-to-end walkthrough (load -> compare -> diagnose -> tune -> finalize) is
 `working_notes/3_framework/example_model_comparison.py`, not in `src/`.

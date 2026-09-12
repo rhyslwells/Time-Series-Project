@@ -18,7 +18,5 @@ All code and documentation must be text-based and professional:
 
 ## Data Operations
 
-- Use **polars** exclusively (not pandas)
-- Leverage lazy evaluation and columnar storage
-- Chain methods for clarity: `.filter()`, `.select()`, `.with_columns()`
-- All CSV/parquet I/O through polars
+- Use **polars** exclusively (not pandas) for all CSV/parquet I/O and dataframe work
+- See [DATA_STACK.md](DATA_STACK.md) for the polars/numpy boundary and API details

@@ -31,7 +31,7 @@ Example:
 ```
 Input: metering_data.parquet (30-min intervals, asset_id, timestamp, value)
 Output: daily_predictions (24 rows per asset, date, sum of 30-min forecasts, asset_id)
-Constraint: Must validate output sums match ramp_rates bounds
+Constraint: Must validate output sums against ramp rate columns in daily_metrics.parquet
 ```
 
 ### 3. Acceptance Criteria (1.5 min max)
@@ -55,7 +55,7 @@ Write 3–5 specific, testable criteria. If they're vague, rewrite them.
 - **Size limits:** (e.g., "must not exceed 2GB in memory")
 - **Dependency locks:** (e.g., "cannot refactor polars pipeline during this work")
 - **Data bounds:** (e.g., "must work on all 15 assets, not just EV")
-- **Location:** Where does code go? (src/ = production, archive/ = exploratory)
+- **Location:** Where does code go? (src/ = production, archive/ = exploratory; see REPOSITORY_STRUCTURE.md)
 
 ### 5. Estimated Effort (30 sec)
 **Rough size:** tiny (< 30 min), small (< 2 hr), medium (< 4 hr), large (> 4 hr, consider splitting)
@@ -155,7 +155,7 @@ Effort: small
 Goal: Fix ramp rate validation rejecting valid 40 kW/h transitions under 50 kW/h threshold
 
 Input/Output:
-  In:  ramp_rates.parquet (asset_id, max_up_ramp, max_down_ramp)
+  In:  daily_metrics.parquet ramp rate columns (asset_id, max_up_ramp, max_down_ramp)
   Out: Same structure, validation logic corrected
 
 Acceptance Criteria:

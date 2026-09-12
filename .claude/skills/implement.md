@@ -19,7 +19,7 @@ Build to the locked scope. Validation is part of implementation, not a separate 
    - Follow acceptance criteria as checklist
    - Validate data contracts as you build (don't leave it)
    - Test on actual data (full 2-week dataset), not mocks
-   - For time series: validate against ramp_rates.parquet if relevant
+   - For time series: validate against the ramp rate columns in daily_metrics.parquet if relevant
 
 4. **Acceptance criteria check (5 min)**
    - [ ] Criterion 1 passes—how did you verify?
