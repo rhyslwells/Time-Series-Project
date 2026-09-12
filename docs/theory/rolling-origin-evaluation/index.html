@@ -814,6 +814,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#caveats-specific-to-this-dataset" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Caveats specific to this dataset
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1182,6 +1193,34 @@ contracts — only the evaluation loop around them differs.</p>
 </span></code></pre></div>
 <p>See <a href="../metrics/">Metrics</a> for what MAE/RMSE/PI coverage mean, and
 <a href="../diagnostics/">Diagnostics</a> for how to read the resulting plots.</p>
+<h2 id="caveats-specific-to-this-dataset">Caveats specific to this dataset<a class="headerlink" href="#caveats-specific-to-this-dataset" title="Permanent link">&para;</a></h2>
+<p>These matter before you point <code>RollingOriginEvaluator</code> at real data — they don't show up
+until you do the arithmetic for this project's actual size (672 points/asset: 14 days x 48
+half-hour intervals).</p>
+<p><strong>Refit cost.</strong> Measured on this data: a single SARIMA <code>fit()+forecast()</code> on a 336-point
+training window takes <strong>~12 seconds</strong>; ExponentialSmoothing ~0.3s; SeasonalNaive ~0s. A
+<code>step=1</code> walk with <code>horizon=48</code> over one asset produces ~288 origins - <strong>about an hour of
+SARIMA refitting for one asset alone</strong>. Use a <code>step</code> at least as large as <code>horizon</code> for
+SARIMA (6 origins over 14 days, ~70s), or restrict rolling-origin confirmation to the
+cheaper models.</p>
+<p><strong>Sample size per horizon.</strong> With <code>min_train_size=336</code> and <code>horizon=48</code>, non-overlapping
+origins (<code>step=48</code>) give only <strong>6 origins total</strong> - <code>metrics_by_horizon</code> is then averaging
+6 points at every horizon step. Overlapping origins (<code>step=1</code>) give 288 rows, but they are
+not 288 independent samples: neighbouring origins share nearly all their training data and
+forecast overlapping stretches of the same day, so the resulting MAE/RMSE looks far more
+precise than it is. This is the same "barely estimable" problem <a href="../metrics/">Metrics</a>
+already flags for a weekly seasonal-naive baseline, sharper here because a single day's
+worth of data is being reused across dozens of "different" origins. Treat a small-<code>step</code>
+run as a smoother look at the shape of horizon decay, not as a tighter confidence interval
+on it.</p>
+<p><strong>Flat width is horizon-dependent, not model-dependent.</strong> <a href="../diagnostics/#uncertainty-width-over-time">Diagnostics</a>
+notes only SARIMA produces horizon-varying interval width. That holds for a rolling-origin
+run with <code>horizon &lt;= season_length</code> (e.g. <code>horizon=48</code> here): <code>SeasonalNaiveModel</code>'s margin
+scales with <code>floor(h / season_length) + 1</code>, which stays at 1 for every step inside one
+season, so both SeasonalNaive and ExponentialSmoothing report flat width in that run. Run
+<code>RollingOriginEvaluator</code> with <code>horizon &gt; season_length</code> (e.g. 96, two days) and
+SeasonalNaive's width will step up at h=49 - expected, not a bug, but worth knowing before
+reading a flat-vs-growing plot as a model property rather than a horizon-length artefact.</p>
 
 
 
@@ -1202,7 +1241,7 @@ contracts — only the evaluation loop around them differs.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 12, 2026 07:20:40 UTC">September 12, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 12, 2026 07:37:23 UTC">September 12, 2026</span>
   </span>
 
     
