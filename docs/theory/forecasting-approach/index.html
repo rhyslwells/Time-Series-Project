@@ -13,10 +13,6 @@
       
       
       
-        <link rel="prev" href="../notebooks/">
-      
-      
-        <link rel="next" href="../ts_model_explorer/">
       
       
         
@@ -27,7 +23,7 @@
     
     
       
-        <title>SARIMA forecasting - Time Series Forecasting</title>
+        <title>Forecasting approach - Time Series Forecasting</title>
       
     
     
@@ -80,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#sarima-forecasting-pipeline" class="md-skip">
+        <a href="#forecasting-approach" class="md-skip">
           Skip to content
         </a>
       
@@ -116,7 +112,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              SARIMA forecasting
+              Forecasting approach
             
           </span>
         </div>
@@ -281,7 +277,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../theory/" class="md-tabs__link">
+        <a href="../" class="md-tabs__link">
           
   
   
@@ -321,13 +317,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="../notebooks/" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../notebooks/notebooks/" class="md-tabs__link">
           
   
   
@@ -553,7 +547,7 @@
   
   
   
-    <a href="../../theory/" class="md-nav__link">
+    <a href="../" class="md-nav__link">
       
   
   
@@ -644,40 +638,37 @@
       
   
   
+  
+  
     
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+      
+    
+    
+      
+        
+        
+      
+    
+    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+      
+        
   
   
   
-    
-    
+    <a href="../../notebooks/notebooks/" class="md-nav__link">
       
-        
-      
-        
-      
-        
-      
-    
-    
-    
-      
-        
-        
-      
-      
-    
-    
-      
-    
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
-      
-        
-        
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
-        
-          
-          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
-            
   
   
   <span class="md-ellipsis">
@@ -691,116 +682,12 @@
   
   
 
-            <span class="md-nav__icon md-icon"></span>
-          </label>
-        
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_5">
-            <span class="md-nav__icon md-icon"></span>
-            
-  
-    Notebooks
-  
-
-          </label>
-          <ul class="md-nav__list" data-md-scrollfix>
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../notebooks/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Exploration notebooks
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-    
-  
-  
-  
-    <li class="md-nav__item md-nav__item--active">
       
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+        <span class="md-nav__icon md-icon"></span>
       
-      
-        
-      
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    SARIMA forecasting
+    </a>
   
 
-    
-  </span>
-  
-  
-
-      </a>
-      
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../ts_model_explorer/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Model comparison
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-          </ul>
-        </nav>
       
     </li>
   
@@ -883,46 +770,6 @@
   
 
 
-  <nav class="md-path" aria-label="Navigation" >
-    <ol class="md-path__list">
-      
-        
-  
-  
-    <li class="md-path__item">
-      <a href="../.." class="md-path__link">
-        
-  <span class="md-ellipsis">
-    Home
-  </span>
-
-      </a>
-    </li>
-  
-
-      
-      
-        
-  
-  
-    
-    
-      <li class="md-path__item">
-        <a href="../notebooks/" class="md-path__link">
-          
-  <span class="md-ellipsis">
-    Notebooks
-  </span>
-
-        </a>
-      </li>
-    
-  
-
-      
-    </ol>
-  </nav>
-
               
               <article class="md-content__inner md-typeset">
                 
@@ -933,18 +780,34 @@
   
 
 
-<h1 id="sarima-forecasting-pipeline">SARIMA forecasting pipeline<a class="headerlink" href="#sarima-forecasting-pipeline" title="Permanent link">&para;</a></h1>
-<p><a href="../sarima_export.html" rel="noopener" target="_blank">Open the full-screen version</a></p>
-<p><iframe
-  src="../sarima_export.html"
-  title="SARIMA forecasting notebook"
-  loading="lazy"
-  style="width: 100%; height: 85vh; border: none;">
-</iframe>
-</p>
-<p>Run locally:
-<div class="language-bash highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>uv<span class="w"> </span>run<span class="w"> </span>marimo<span class="w"> </span>edit<span class="w"> </span>src/notebooks/sarima.py
-</span></code></pre></div></p>
+<h1 id="forecasting-approach">Forecasting approach<a class="headerlink" href="#forecasting-approach" title="Permanent link">&para;</a></h1>
+<h2 id="principle">Principle<a class="headerlink" href="#principle" title="Permanent link">&para;</a></h2>
+<p>The forecasting workflow stays model-agnostic wherever practical. The raw series is
+inspected independently of any forecasting model — see <a href="../../data/data_inspection/">Data inspection</a>
+— and model-specific requirements (a seasonal period, a stationarity assumption, an error
+distribution) stay inside the individual model implementations rather than driving a shared
+preprocessing step.</p>
+<h2 id="avoid-unnecessary-transformations">Avoid unnecessary transformations<a class="headerlink" href="#avoid-unnecessary-transformations" title="Permanent link">&para;</a></h2>
+<p>Do not transform the underlying series just to satisfy the assumptions of one particular
+model. In particular, stationarity is not treated as a prerequisite for starting the
+forecasting process: differencing, transformations, or other preprocessing are introduced
+later, and only if a specific model needs them.</p>
+<p>For the current short-term forecasting problem, models consume the raw metering values
+directly.</p>
+<h2 id="model-interchangeability">Model interchangeability<a class="headerlink" href="#model-interchangeability" title="Permanent link">&para;</a></h2>
+<p>Different forecasting approaches — <a href="../models/">SARIMA, Exponential Smoothing, LightGBM</a>, or
+others — should be substitutable without redesigning the data-inspection step that precedes
+them. Each model handles the series' characteristics (seasonality, stationarity, scale)
+according to its own methodology; the forecasting problem and evaluation framework
+(<a href="../models-decisions/">Decisions</a>) stay the same regardless of which model is in use.</p>
+<h2 id="current-focus">Current focus<a class="headerlink" href="#current-focus" title="Permanent link">&para;</a></h2>
+<p>The current test case is deliberately narrow:</p>
+<ul>
+<li>Two weeks of synthetic 30-minute data</li>
+<li>~8-hour forecast horizon (16 future half-hour observations)</li>
+</ul>
+<p>More model-specific preprocessing and transformation decisions are added later, only if a
+specific model's diagnostics call for them.</p>
 
 
 
@@ -996,44 +859,6 @@
       
         <footer class="md-footer">
   
-    
-      
-      <nav class="md-footer__inner md-grid" aria-label="Footer" >
-        
-          
-          <a href="../notebooks/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Exploration notebooks">
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
-            </div>
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Previous
-              </span>
-              <div class="md-ellipsis">
-                Exploration notebooks
-              </div>
-            </div>
-          </a>
-        
-        
-          
-          <a href="../ts_model_explorer/" class="md-footer__link md-footer__link--next" aria-label="Next: Model comparison">
-            <div class="md-footer__title">
-              <span class="md-footer__direction">
-                Next
-              </span>
-              <div class="md-ellipsis">
-                Model comparison
-              </div>
-            </div>
-            <div class="md-footer__button md-icon">
-              
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
-            </div>
-          </a>
-        
-      </nav>
     
   
   <div class="md-footer-meta md-typeset">
