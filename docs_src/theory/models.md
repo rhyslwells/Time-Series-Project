@@ -18,6 +18,10 @@ No "typical winner" column: with 14 days and one fixed 10/4 split, the ranking b
 three models is largely noise. Rolling-origin evaluation is the fix and it is not yet
 implemented anywhere.
 
+For a deeper LightGBM-vs-SARIMA comparison — trade-offs, ARIMA-to-ML pitfalls, and how to
+compare the two fairly — see [Supervised vs statistical
+models](../modeling/supervised_vs_statistical_models.md).
+
 ## The weekly cycle no default configuration captures
 
 `generate_raw_data.py` injects a 1.2/0.8 weekday/weekend factor for EV assets, and the data

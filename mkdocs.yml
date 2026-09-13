@@ -64,6 +64,8 @@ nav:
       - data/index.md
       - Data generation: data/data_generation.md
       - Feature engineering: data/feature_engineering.md
+      - Feature validation: data/feature_validation.md
+      - Feature selection: data/feature_selection.md
       - Synthetic metering data: data/synthetic_metering_data.md
       - Data inspection: data/data_inspection.md
   - Theory:
@@ -75,6 +77,8 @@ nav:
       - Rolling-origin evaluation: theory/rolling-origin-evaluation.md
       - Decisions: theory/models-decisions.md
       - Forecast products: theory/forecast_products.md
+  - Modeling:
+      - Supervised vs statistical models: modeling/supervised_vs_statistical_models.md
   - Coding:
       - coding/index.md
       - Framework usage: coding/framework_usage.md

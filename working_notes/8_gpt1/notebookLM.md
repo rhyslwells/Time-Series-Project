@@ -11,3 +11,4 @@ Investigate how to use Google NotebookLM more effectively to support the current
   - identifying useful explanations, methods, and references
   - supporting the development of the existing time-series notes
 - Establish a practical workflow for using NotebookLM alongside the existing MKDocs notes and research process.
+

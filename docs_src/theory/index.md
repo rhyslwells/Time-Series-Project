@@ -10,6 +10,7 @@ Math, model behavior, and interpretation for the forecasting framework. Code usa
 - [Rolling-origin evaluation](rolling-origin-evaluation.md) — why one train/test split isn't enough, and how error-by-horizon confirms a model choice
 - [Decisions](models-decisions.md) — model selection, retrain triggers, tuning guide, deploy checklist
 - [Forecast products](forecast_products.md) — turning a forecast into derived signals: uncertainty, event probability, anomaly detection, asset classification, portfolio and flexibility forecasting (design, not yet built)
+- [Supervised vs statistical models](../modeling/supervised_vs_statistical_models.md) — LightGBM vs SARIMA as a worked comparison: when to choose each, ARIMA-to-ML pitfalls, and how to compare them fairly
 
 ## Find an answer fast
 
@@ -31,3 +32,4 @@ Math, model behavior, and interpretation for the forecasting framework. Code usa
 | "How do I turn a forecast into a flexibility envelope?" | [Forecast Products](forecast_products.md#flexibility-forecasting) |
 | "How do I classify assets by behaviour?" | [Forecast Products](forecast_products.md#cross-asset-comparison-and-asset-classification) |
 | "How do I call the framework code?" | [Coding](../coding/framework_usage.md) |
+| "LightGBM or SARIMA — which and why?" | [Supervised vs statistical models](../modeling/supervised_vs_statistical_models.md) |

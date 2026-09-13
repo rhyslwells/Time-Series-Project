@@ -10,6 +10,8 @@ Schemas, units, quality notes, and the generation pipeline for the synthetic met
 | "How is the data generated? What are the formulas?" | [Data generation](data_generation.md) |
 | "What does each `daily_metrics` column mean?" | [Data generation](data_generation.md#daily_metricsparquet-daily-aggregates-and-behavioral-features) |
 | "How do the daily metrics get onto the 30-minute series?" | [Feature engineering](feature_engineering.md) |
+| "How do I catch feature leakage before training on these features?" | [Feature validation](feature_validation.md) |
+| "Which `feat_*` columns should a model actually use?" | [Feature selection](feature_selection.md) (proposed, not yet implemented) |
 | "kW or kWh?" | [Units](#units), below |
 | "Are there known bugs in the generators?" | [Known issues](data_generation.md#known-issues) |
 | "What temporal structure does a series have, before fitting a model?" | [Data inspection](data_inspection.md) |
