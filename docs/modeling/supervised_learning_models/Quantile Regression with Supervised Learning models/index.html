@@ -13,6 +13,10 @@
       
       
       
+        <link rel="prev" href="../feature_engineering/">
+      
+      
+        <link rel="next" href="../../../coding/">
       
       
         
@@ -23,7 +27,7 @@
     
     
       
-        <title>Quantile Regression with Supervised Learning models - Time Series Forecasting</title>
+        <title>Quantile regression with LightGBM - Time Series Forecasting</title>
       
     
     
@@ -76,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#phase-2-quantile-regression-with-supervised-learning-models" class="md-skip">
+        <a href="#quantile-regression-with-lightgbm" class="md-skip">
           Skip to content
         </a>
       
@@ -112,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Quantile Regression with Supervised Learning models
+              Quantile regression with LightGBM
             
           </span>
         </div>
@@ -295,10 +299,12 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
+      <li class="md-tabs__item md-tabs__item--active">
         <a href="../../supervised_vs_statistical_models/" class="md-tabs__link">
           
   
@@ -603,6 +609,8 @@
       
   
   
+    
+  
   
   
     
@@ -610,26 +618,31 @@
       
         
       
-    
-    
-    
+        
       
+        
       
+    
     
     
       
         
         
       
+      
     
-    <li class="md-nav__item md-nav__item--pruned md-nav__item--nested">
+    
+      
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
       
         
-  
-  
-  
-    <a href="../../supervised_vs_statistical_models/" class="md-nav__link">
-      
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
   
   
   <span class="md-ellipsis">
@@ -643,12 +656,197 @@
   
   
 
-      
-        <span class="md-nav__icon md-icon"></span>
-      
-    </a>
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Modeling
   
 
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../supervised_vs_statistical_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervised vs statistical models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../feature_engineering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Feature engineering (supervised learning)
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantile regression with LightGBM
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quantile regression with LightGBM
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#quantile-regression-vs-mean-residual-variance" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Quantile regression vs. mean + residual variance
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#one-multi-objective-model-vs-three-separate-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        One multi-objective model vs. three separate models
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#calibration-does-lightgbm-guarantee-p10-p50-p90" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Calibration: does LightGBM guarantee P10 &lt;= P50 &lt;= P90?
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hyperparameters-and-validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hyperparameters and validation
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
       
     </li>
   
@@ -851,6 +1049,46 @@
   
 
 
+  <nav class="md-path" aria-label="Navigation" >
+    <ol class="md-path__list">
+      
+        
+  
+  
+    <li class="md-path__item">
+      <a href="../../.." class="md-path__link">
+        
+  <span class="md-ellipsis">
+    Home
+  </span>
+
+      </a>
+    </li>
+  
+
+      
+      
+        
+  
+  
+    
+    
+      <li class="md-path__item">
+        <a href="../../supervised_vs_statistical_models/" class="md-path__link">
+          
+  <span class="md-ellipsis">
+    Modeling
+  </span>
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ol>
+  </nav>
+
               
               <article class="md-content__inner md-typeset">
                 
@@ -861,23 +1099,59 @@
   
 
 
-  <h1>Quantile Regression with Supervised Learning models</h1>
-
-<h3 id="phase-2-quantile-regression-with-supervised-learning-models">Phase 2: Quantile Regression with Supervised Learning models<a class="headerlink" href="#phase-2-quantile-regression-with-supervised-learning-models" title="Permanent link">&para;</a></h3>
-<p>Standalone note to be integrated to docs </p>
-<p>Uwse lightgbm as an example of a supervised learning model that can be used for quantile regression..</p>
-<h4 id="uncertainty-quantification">Uncertainty quantification<a class="headerlink" href="#uncertainty-quantification" title="Permanent link">&para;</a></h4>
+<h1 id="quantile-regression-with-lightgbm">Quantile regression with LightGBM<a class="headerlink" href="#quantile-regression-with-lightgbm" title="Permanent link">&para;</a></h1>
+<p>How <code>LightGBMModel</code> (<code>src/ts_models.py</code>) quantifies forecast uncertainty: three separate
+<code>LGBMRegressor</code> models, one per quantile level (default P10/P50/P90), instead of the
+residual-std margin the other <code>TSModel</code> subclasses use.</p>
+<h2 id="quantile-regression-vs-mean-residual-variance">Quantile regression vs. mean + residual variance<a class="headerlink" href="#quantile-regression-vs-mean-residual-variance" title="Permanent link">&para;</a></h2>
+<p><code>SARIMAModel</code> and <code>ExponentialSmoothingModel</code> predict a single conditional mean and derive
+<code>lower</code>/<code>upper</code> from a constant residual-std margin (<code>yhat +/- z * residual_std</code>) — this
+assumes the residual distribution is symmetric and doesn't widen or narrow with the
+covariates. Quantile regression instead fits the model directly to the conditional quantile
+of the target (<span class="arithmatex">\(P(Y \le \hat{y}_\tau \mid X) = \tau\)</span> for quantile level <span class="arithmatex">\(\tau\)</span>), so the
+interval width can vary with the input features rather than being fixed — e.g. wider
+intervals at hours with historically higher variance, narrower ones where the asset behaves
+predictably. LightGBM supports this natively via <code>objective="quantile"</code> with a per-model
+<code>alpha</code> parameter set to the target quantile.</p>
+<h2 id="one-multi-objective-model-vs-three-separate-models">One multi-objective model vs. three separate models<a class="headerlink" href="#one-multi-objective-model-vs-three-separate-models" title="Permanent link">&para;</a></h2>
+<p><code>LightGBMModel</code> fits <strong>three separate models</strong> (<code>self.models: Dict[float, LGBMRegressor]</code>,
+keyed by quantile level), not one model with multiple outputs:</p>
 <ul>
-<li>What is quantile regression and how does it differ from predicting mean + residual variance?</li>
-<li>Can you explain how to use tree-based models to estimate prediction intervals (P10, P50, P90)? Can you predict the distribution of the target variable using quantile regression with LightGBM? How do you interpret the results?</li>
-<li>What are the pros and cons of training one multi-objective model vs. three separate quantile models?</li>
+<li><strong>Pros:</strong> each model is a standard <code>LGBMRegressor</code> — no custom multi-output wrapper,
+  works with the existing <code>.fit()</code>/<code>.predict()</code> calling convention, and each quantile can
+  in principle be tuned independently (different <code>num_leaves</code>/<code>learning_rate</code> per quantile)
+  if the data warrants it.</li>
+<li><strong>Cons:</strong> 3x training cost, and — the main gotcha below — no built-in guarantee that the
+  three models agree with each other row-by-row.</li>
+<li><strong>Why not one multi-objective model:</strong> LightGBM's <code>LGBMRegressor</code> takes one <code>objective</code>
+  per model instance; a genuinely joint multi-quantile model needs a custom objective/loss
+  (e.g. pinball loss summed across quantiles) which adds implementation complexity for a
+  15-asset, 3-quantile use case where training cost is negligible either way.</li>
 </ul>
-<h4 id="model-specific-guidance">Model-specific guidance<a class="headerlink" href="#model-specific-guidance" title="Permanent link">&para;</a></h4>
+<h2 id="calibration-does-lightgbm-guarantee-p10-p50-p90">Calibration: does LightGBM guarantee P10 &lt;= P50 &lt;= P90?<a class="headerlink" href="#calibration-does-lightgbm-guarantee-p10-p50-p90" title="Permanent link">&para;</a></h2>
+<p>No. Each quantile model is trained independently, so nothing stops the P10 model from
+predicting <em>above</em> the P50 model's output for a given row, especially with limited training
+data or extreme feature values. <code>LightGBMModel._stack_quantiles</code> handles this by sorting the
+three predictions row-wise (<code>np.sort(q_arr, axis=1)</code>) after prediction, then assigning the
+lowest sorted value to <code>lower</code>, the value at the level closest to 0.5 to <code>prediction</code>, and
+the highest to <code>upper</code>. This is a post-hoc monotonization, not a training-time constraint —
+it guarantees a valid, non-crossing interval in the output, but does not fix miscalibration
+(e.g. P10 that is <em>systematically</em> too high).</p>
+<h2 id="hyperparameters-and-validation">Hyperparameters and validation<a class="headerlink" href="#hyperparameters-and-validation" title="Permanent link">&para;</a></h2>
 <ul>
-<li>How does LightGBM's quantile loss function work? Are there gotchas with hyperparameters?</li>
-<li>How should I validate quantile regression models? Is standard RMSE sufficient, or do I need calibration tests?</li>
+<li><strong>Gotchas:</strong> <code>objective="quantile"</code> needs its <code>alpha</code> set per model instance (0.1, 0.5, 0.9
+  by default here); forgetting to vary <code>alpha</code> across the three models silently trains three
+  identical mean-ish regressors. <code>num_leaves</code>/<code>learning_rate</code> are shared across all three
+  quantile models in the current implementation — reasonable at this dataset size, but a
+  place to revisit if the P10/P90 models underfit while P50 overfits (or vice versa).</li>
+<li><strong>Validation:</strong> point-forecast metrics (MAE/RMSE on <code>prediction</code>, i.e. the P50 model) are
+  necessary but not sufficient — they say nothing about whether the intervals are well
+  calibrated. Use <code>pi_coverage</code> from <code>EvaluationMetrics</code>/<code>ModelEvaluator</code> (already wired up
+  for <code>LightGBMModel</code> like every other <code>TSModel</code>) to check the fraction of actuals falling
+  inside <code>[lower, upper]</code> against the nominal level implied by the chosen quantiles (P10/P90
+  should cover ~80%). See <a href="../../../theory/rolling-origin-evaluation/">Rolling-origin evaluation</a>
+  for validating this across multiple forecast origins rather than a single train/test split.</li>
 </ul>
-<hr />
 
 
 
@@ -898,7 +1172,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 13, 2026 17:16:01 UTC">September 13, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 13, 2026 18:00:34 UTC">September 13, 2026</span>
   </span>
 
     
@@ -929,6 +1203,44 @@
       
         <footer class="md-footer">
   
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../feature_engineering/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Feature engineering (supervised learning)">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                Feature engineering (supervised learning)
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../../../coding/" class="md-footer__link md-footer__link--next" aria-label="Next: Coding">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Coding
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
     
   
   <div class="md-footer-meta md-typeset">

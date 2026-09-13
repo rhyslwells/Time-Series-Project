@@ -13,28 +13,28 @@
       
       
       
-        <link rel="prev" href="../../theory/forecast_products/">
+        <link rel="prev" href="../../supervised_vs_statistical_models/">
       
       
-        <link rel="next" href="../supervised_learning_models/feature_engineering/">
+        <link rel="next" href="../Quantile%20Regression%20with%20Supervised%20Learning%20models/">
       
       
         
       
       
-      <link rel="icon" href="../../assets/images/favicon.png">
+      <link rel="icon" href="../../../assets/images/favicon.png">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
-        <title>Supervised vs statistical models - Time Series Forecasting</title>
+        <title>Feature engineering (supervised learning) - Time Series Forecasting</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.ec1eaa64.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.ab4e12ef.min.css">
       
       
 
@@ -53,9 +53,9 @@
       
     
     
-      <link rel="stylesheet" href="../../stylesheets/extra.css">
+      <link rel="stylesheet" href="../../../stylesheets/extra.css">
     
-    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
     
       
 
@@ -80,7 +80,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#supervised-vs-statistical-models" class="md-skip">
+        <a href="#feature-engineering-for-supervised-learning-models" class="md-skip">
           Skip to content
         </a>
       
@@ -96,7 +96,7 @@
 
 <header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../.." title="Time Series Forecasting" class="md-header__button md-logo" aria-label="Time Series Forecasting" data-md-component="logo">
+    <a href="../../.." title="Time Series Forecasting" class="md-header__button md-logo" aria-label="Time Series Forecasting" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -116,7 +116,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Supervised vs statistical models
+              Feature engineering (supervised learning)
             
           </span>
         </div>
@@ -238,7 +238,7 @@
   
   
     <li class="md-tabs__item">
-      <a href="../.." class="md-tabs__link">
+      <a href="../../.." class="md-tabs__link">
         
   
   
@@ -259,7 +259,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../data/" class="md-tabs__link">
+        <a href="../../../data/" class="md-tabs__link">
           
   
   
@@ -281,7 +281,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../theory/" class="md-tabs__link">
+        <a href="../../../theory/" class="md-tabs__link">
           
   
   
@@ -305,7 +305,7 @@
     
     
       <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+        <a href="../../supervised_vs_statistical_models/" class="md-tabs__link">
           
   
   
@@ -327,7 +327,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../coding/" class="md-tabs__link">
+        <a href="../../../coding/" class="md-tabs__link">
           
   
   
@@ -349,7 +349,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../notebooks/notebooks/" class="md-tabs__link">
+        <a href="../../../notebooks/notebooks/" class="md-tabs__link">
           
   
   
@@ -371,7 +371,7 @@
     
     
       <li class="md-tabs__item">
-        <a href="../../findings/" class="md-tabs__link">
+        <a href="../../../findings/" class="md-tabs__link">
           
   
   
@@ -415,7 +415,7 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted md-nav--integrated" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../.." title="Time Series Forecasting" class="md-nav__button md-logo" aria-label="Time Series Forecasting" data-md-component="logo">
+    <a href="../../.." title="Time Series Forecasting" class="md-nav__button md-logo" aria-label="Time Series Forecasting" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -445,7 +445,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../.." class="md-nav__link">
+      <a href="../../.." class="md-nav__link">
         
   
   
@@ -508,7 +508,7 @@
   
   
   
-    <a href="../../data/" class="md-nav__link">
+    <a href="../../../data/" class="md-nav__link">
       
   
   
@@ -579,7 +579,7 @@
   
   
   
-    <a href="../../theory/" class="md-nav__link">
+    <a href="../../../theory/" class="md-nav__link">
       
   
   
@@ -674,6 +674,34 @@
                 
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../../supervised_vs_statistical_models/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Supervised vs statistical models
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
     
   
   
@@ -693,7 +721,7 @@
   <span class="md-ellipsis">
     
   
-    Supervised vs statistical models
+    Feature engineering (supervised learning)
   
 
     
@@ -711,7 +739,7 @@
   <span class="md-ellipsis">
     
   
-    Supervised vs statistical models
+    Feature engineering (supervised learning)
   
 
     
@@ -737,10 +765,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#when-to-choose-lightgbm-over-sarima" class="md-nav__link">
+  <a href="#why-a-separate-table" class="md-nav__link">
     <span class="md-ellipsis">
       
-        When to choose LightGBM over SARIMA
+        Why a separate table
       
     </span>
   </a>
@@ -748,10 +776,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#pitfalls-when-moving-from-arima-to-a-supervised-model" class="md-nav__link">
+  <a href="#feature-groups" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Pitfalls when moving from ARIMA to a supervised model
+        Feature groups
       
     </span>
   </a>
@@ -759,10 +787,49 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#comparing-sarima-and-lightgbm-fairly" class="md-nav__link">
+  <a href="#look-ahead-handling" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Comparing SARIMA and LightGBM fairly
+        Look-ahead handling
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-data" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output data
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Output data">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#metering_data_supervised_learningparquet" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        metering_data_supervised_learning.parquet
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#validation" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation
       
     </span>
   </a>
@@ -785,35 +852,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../supervised_learning_models/feature_engineering/" class="md-nav__link">
-        
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Feature engineering (supervised learning)
-  
-
-    
-  </span>
-  
-  
-
-      </a>
-    </li>
-  
-
-              
-            
-              
-                
-  
-  
-  
-  
-    <li class="md-nav__item">
-      <a href="../supervised_learning_models/Quantile%20Regression%20with%20Supervised%20Learning%20models/" class="md-nav__link">
+      <a href="../Quantile%20Regression%20with%20Supervised%20Learning%20models/" class="md-nav__link">
         
   
   
@@ -876,7 +915,7 @@
   
   
   
-    <a href="../../coding/" class="md-nav__link">
+    <a href="../../../coding/" class="md-nav__link">
       
   
   
@@ -935,7 +974,7 @@
   
   
   
-    <a href="../../notebooks/notebooks/" class="md-nav__link">
+    <a href="../../../notebooks/notebooks/" class="md-nav__link">
       
   
   
@@ -994,7 +1033,7 @@
   
   
   
-    <a href="../../findings/" class="md-nav__link">
+    <a href="../../../findings/" class="md-nav__link">
       
   
   
@@ -1045,7 +1084,7 @@
   
   
     <li class="md-path__item">
-      <a href="../.." class="md-path__link">
+      <a href="../../.." class="md-path__link">
         
   <span class="md-ellipsis">
     Home
@@ -1063,7 +1102,7 @@
     
     
       <li class="md-path__item">
-        <a href="./" class="md-path__link">
+        <a href="../../supervised_vs_statistical_models/" class="md-path__link">
           
   <span class="md-ellipsis">
     Modeling
@@ -1088,75 +1127,105 @@
   
 
 
-<h1 id="supervised-vs-statistical-models">Supervised vs statistical models<a class="headerlink" href="#supervised-vs-statistical-models" title="Permanent link">&para;</a></h1>
-<p>LightGBM (supervised/tree-based) and SARIMA (classical statistical) as a worked
-comparison of the two model families available in the framework — see <a href="../../theory/models/">Models</a>
-for the full parameter-level treatment of each.</p>
-<h2 id="when-to-choose-lightgbm-over-sarima">When to choose LightGBM over SARIMA<a class="headerlink" href="#when-to-choose-lightgbm-over-sarima" title="Permanent link">&para;</a></h2>
-<p>For 30-minute short-term load forecasting, LightGBM is generally preferred over SARIMA once
-any of the following hold:</p>
-<ul>
-<li><strong>Nested seasonality.</strong> The data has both a daily (48-step) and weekly (336-step) cycle.
-  SARIMA takes a single seasonal period, so fitting a large <code>s=336</code> term directly is
-  computationally expensive and unstable — see <a href="../../theory/models/#the-weekly-cycle-no-default-configuration-captures">the weekly-cycle
-  gap</a> for why this
-  project's defaults miss it either way.</li>
-<li><strong>Exogenous drivers.</strong> Temperature, day-of-week, holiday indicators. LightGBM incorporates
-  arbitrary numerical and categorical features alongside lags natively; SARIMA needs
-  SARIMAX-style extensions.</li>
-<li><strong>Non-linear relationships.</strong> Tree splits capture non-linear responses (e.g. heating/cooling
-  demand under temperature extremes) without explicit transformations.</li>
-</ul>
+<h1 id="feature-engineering-for-supervised-learning-models">Feature engineering for supervised learning models<a class="headerlink" href="#feature-engineering-for-supervised-learning-models" title="Permanent link">&para;</a></h1>
+<p>How <code>metering_data_supervised_learning.parquet</code> is built from <code>metering_data.parquet</code> and
+<code>daily_metrics.parquet</code>. This is a separate, richer table from
+<a href="../data/feature_engineering.md"><code>metering_data_with_features.parquet</code></a> — that one broadcasts
+same-day daily metrics for general-purpose slicing; this one is a leakage-safe model matrix
+purpose-built for training a supervised regressor (LightGBM) directly against <code>metering_kwh</code>.</p>
+<p><strong>Source:</strong> <code>src/data/generate_metering_features.py</code> (<code>build_supervised_learning_features</code>)</p>
+<h2 id="why-a-separate-table">Why a separate table<a class="headerlink" href="#why-a-separate-table" title="Permanent link">&para;</a></h2>
+<p><code>metering_data_with_features.parquet</code> joins each day's <code>daily_metrics.parquet</code> row onto its
+<em>own</em> 48 half-hour rows — convenient for inspection, but it leaks same-day totals into any
+row that claims to forecast that day. It also carries no lag, rolling-window, or cyclical
+columns at all. Rather than complicate that table's contract for existing consumers, the
+supervised-learning table is generated alongside it, unused by anything that reads the
+original file.</p>
+<h2 id="feature-groups">Feature groups<a class="headerlink" href="#feature-groups" title="Permanent link">&para;</a></h2>
+<p>All features are computed per <code>asset_id</code>, sorted by <code>timestamp</code>, using only observations
+strictly before each row's own timestamp — see <a href="#look-ahead-handling">Look-ahead handling</a>.</p>
 <table>
 <thead>
 <tr>
-<th></th>
-<th>SARIMA</th>
-<th>LightGBM</th>
+<th>Group</th>
+<th>Columns</th>
+<th>Definition</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Advantages</td>
-<td>Parsimonious and statistically transparent; no feature matrix — differencing and autocorrelation are modeled internally</td>
-<td>Scales to large, high-dimensional feature sets; combines lags, calendar flags, Fourier terms, and weather forecasts freely</td>
+<td>Target</td>
+<td><code>metering_kwh</code></td>
+<td>raw value, unchanged</td>
 </tr>
 <tr>
-<td>Limitations</td>
-<td>Fails on high-frequency multi-seasonality; incorporating exogenous features requires SARIMAX complexity</td>
-<td>Cannot extrapolate past the training range (trees output constant step functions — see <a href="../../theory/models/#lightgbm-gradient-boosting">the interval pitfall</a>); needs manual lag/rolling-window engineering</td>
+<td>Short lags</td>
+<td><code>feat_lag_1</code> .. <code>feat_lag_4</code></td>
+<td><code>shift(1..4)</code> — last 30min to 2hr</td>
+</tr>
+<tr>
+<td>Seasonal lags</td>
+<td><code>feat_lag_48</code>, <code>feat_lag_96</code></td>
+<td><code>shift(48)</code>, <code>shift(96)</code> — same time 1 and 2 days ago</td>
+</tr>
+<tr>
+<td>Rolling (6h)</td>
+<td><code>feat_roll_mean_6h</code>, <code>feat_roll_std_6h</code></td>
+<td>mean/std of <code>shift(1)</code> over a 12-step window</td>
+</tr>
+<tr>
+<td>Rolling (24h)</td>
+<td><code>feat_roll_mean_24h</code>, <code>feat_roll_std_24h</code></td>
+<td>mean/std of <code>shift(1)</code> over a 48-step window</td>
+</tr>
+<tr>
+<td>Cyclical time</td>
+<td><code>feat_hour_sin</code>, <code>feat_hour_cos</code></td>
+<td>sin/cos of hour-of-day, 24h period</td>
+</tr>
+<tr>
+<td>Cyclical time</td>
+<td><code>feat_dow_sin</code>, <code>feat_dow_cos</code></td>
+<td>sin/cos of day-of-week, 7d period</td>
+</tr>
+<tr>
+<td>Daily context</td>
+<td><code>feat_daily_energy_kwh</code> ... <code>feat_peak_to_avg_ratio</code> (12 columns)</td>
+<td><code>daily_metrics.parquet</code> joined on <code>date - 1 day</code></td>
 </tr>
 </tbody>
 </table>
-<h2 id="pitfalls-when-moving-from-arima-to-a-supervised-model">Pitfalls when moving from ARIMA to a supervised model<a class="headerlink" href="#pitfalls-when-moving-from-arima-to-a-supervised-model" title="Permanent link">&para;</a></h2>
+<p>26 feature columns total.</p>
+<h2 id="look-ahead-handling">Look-ahead handling<a class="headerlink" href="#look-ahead-handling" title="Permanent link">&para;</a></h2>
 <ul>
-<li><strong>Look-ahead bias.</strong> Random k-fold CV shuffles rows, letting future data leak into training;
-  fitting scalers or imputers on whole-dataset statistics does the same. Use walk-forward
-  validation — see <a href="../../theory/rolling-origin-evaluation/">Rolling-origin evaluation</a>.</li>
-<li><strong>Time isn't automatic.</strong> ARIMA models time dependence explicitly; a supervised model treats
-  rows as independent (<span class="arithmatex">\(X \to y\)</span>) unless lag, rolling-statistic, and calendar features are
-  engineered by hand.</li>
-<li><strong>Unaddressed trend.</strong> Tree models can't extrapolate a linear trend — remove it (differencing,
-  or model-and-subtract) before training if one is present. This dataset has none; see
-  <a href="../../theory/forecasting-approach/">Forecasting approach</a>.</li>
-<li><strong>Feature explosion.</strong> Generating many lags and rolling windows without selection (PACF,
-  information criteria) overloads the tree model and overfits.</li>
-<li><strong>Leading <code>NaN</code>s from lagging.</strong> Drop them chronologically; never fill with future values.</li>
+<li><strong>Lag and rolling columns</strong> use <code>shift</code>/<code>rolling</code> <em>over</em> <code>asset_id</code>, so no feature ever
+  reads a value at or after its own row's timestamp.</li>
+<li><strong>Rolling stats</strong> are computed on the already-<code>shift(1)</code>'d series, so a 24h rolling window
+  needs 48 prior observations <em>plus</em> the shift — 49 rows of history.</li>
+<li><strong>Daily context columns</strong> join <code>daily_metrics.parquet</code> on the <em>previous</em> calendar day
+  (<code>date - 1</code>), not the same day — this is the fix <code>feature_engineering.md</code> documents as
+  "proposed, not implemented" for <code>metering_data_with_features.parquet</code>; here it's applied
+  directly.</li>
+<li>The binding constraint across all of the above is <code>feat_lag_96</code> (needs 96 prior rows), so
+  the <strong>first 96 rows of each asset are dropped</strong>. Every remaining row is fully non-null.</li>
 </ul>
-<h2 id="comparing-sarima-and-lightgbm-fairly">Comparing SARIMA and LightGBM fairly<a class="headerlink" href="#comparing-sarima-and-lightgbm-fairly" title="Permanent link">&para;</a></h2>
-<ol>
-<li><strong>Walk-forward validation.</strong> Score both models on a rolling or expanding window that respects
-   chronological order — never a randomized split. See <a href="../../theory/rolling-origin-evaluation/">Rolling-origin
-   evaluation</a>.</li>
-<li><strong>Same test horizon.</strong> Both models forecast the identical out-of-sample timestamps.</li>
-<li><strong>Invert transformations before scoring.</strong> Differencing, Box-Cox, or scaling must be undone
-   before computing <a href="../../theory/metrics/">RMSE, MAE, or MAPE</a> so both models are scored on the
-   raw target scale.</li>
-<li><strong>Equal information constraints.</strong> LightGBM's features must use only observations available
-   before forecast step <span class="arithmatex">\(t\)</span>. If SARIMA gets no future exogenous data, LightGBM gets none either.</li>
-</ol>
-<p>Once both are scored, <a href="../../theory/models-decisions/">Decisions</a> covers the baseline check and
-deploy criteria that apply regardless of model family.</p>
+<h2 id="output-data">Output data<a class="headerlink" href="#output-data" title="Permanent link">&para;</a></h2>
+<h3 id="metering_data_supervised_learningparquet">metering_data_supervised_learning.parquet<a class="headerlink" href="#metering_data_supervised_learningparquet" title="Permanent link">&para;</a></h3>
+<p><strong>Schema:</strong> <code>asset_id</code>, <code>timestamp</code>, <code>metering_kwh</code> (target), plus the 26 <code>feat_*</code> columns
+above.</p>
+<p><strong>Size:</strong> 8,640 rows — 15 assets x (672 raw rows - 96 dropped for lookback) = 15 x 576.</p>
+<p><strong>Usage:</strong> direct model matrix for <code>LightGBMModel</code> and other supervised-learning estimators;
+each row is leakage-safe to train and predict on as-is, with no further lagging required.</p>
+<h2 id="validation">Validation<a class="headerlink" href="#validation" title="Permanent link">&para;</a></h2>
+<p>Before training on this table, spot-check:</p>
+<ul>
+<li>Zero nulls across all <code>feat_*</code> columns (verified at generation time — see script output).</li>
+<li><code>feat_lag_1</code> at row <code>t</code> equals <code>metering_kwh</code> at row <code>t-1</code> for the same <code>asset_id</code>.</li>
+<li><code>feat_daily_energy_kwh</code> at any row on date <code>d</code> matches <code>daily_metrics.parquet</code>'s value for
+  date <code>d - 1</code>, not <code>d</code>.</li>
+</ul>
+<p>See <a href="../data/feature_validation.md">Feature validation</a> for the general chronological-split
+and leakage-check methodology this table is built to satisfy.</p>
 
 
 
@@ -1213,7 +1282,7 @@ deploy criteria that apply regardless of model family.</p>
       <nav class="md-footer__inner md-grid" aria-label="Footer" >
         
           
-          <a href="../../theory/forecast_products/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Forecast products">
+          <a href="../../supervised_vs_statistical_models/" class="md-footer__link md-footer__link--prev" aria-label="Previous: Supervised vs statistical models">
             <div class="md-footer__button md-icon">
               
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
@@ -1223,20 +1292,20 @@ deploy criteria that apply regardless of model family.</p>
                 Previous
               </span>
               <div class="md-ellipsis">
-                Forecast products
+                Supervised vs statistical models
               </div>
             </div>
           </a>
         
         
           
-          <a href="../supervised_learning_models/feature_engineering/" class="md-footer__link md-footer__link--next" aria-label="Next: Feature engineering (supervised learning)">
+          <a href="../Quantile%20Regression%20with%20Supervised%20Learning%20models/" class="md-footer__link md-footer__link--next" aria-label="Next: Quantile regression with LightGBM">
             <div class="md-footer__title">
               <span class="md-footer__direction">
                 Next
               </span>
               <div class="md-ellipsis">
-                Feature engineering (supervised learning)
+                Quantile regression with LightGBM
               </div>
             </div>
             <div class="md-footer__button md-icon">
@@ -1288,12 +1357,12 @@ deploy criteria that apply regardless of model family.</p>
     
       
       
-      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["content.code.copy", "header.autohide", "navigation.indexes", "navigation.instant", "navigation.path", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.footer", "navigation.prune", "search.highlight", "search.share", "search.suggest", "toc.follow", "toc.integrate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+      <script id="__config" type="application/json">{"annotate": null, "base": "../../..", "features": ["content.code.copy", "header.autohide", "navigation.indexes", "navigation.instant", "navigation.path", "navigation.tabs", "navigation.tabs.sticky", "navigation.top", "navigation.tracking", "navigation.footer", "navigation.prune", "search.highlight", "search.share", "search.suggest", "toc.follow", "toc.integrate"], "search": "../../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      <script src="../../../assets/javascripts/bundle.d7400e89.min.js"></script>
       
-        <script src="../../javascripts/mathjax.js"></script>
+        <script src="../../../javascripts/mathjax.js"></script>
       
         <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
       
