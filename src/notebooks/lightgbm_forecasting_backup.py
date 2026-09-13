@@ -15,7 +15,7 @@ def _():
     import marimo as mo
     import polars as pl
     import numpy as np
-    from scipy.stats import norm
+    import optuna
     import warnings
 
     from ts_models import LightGBMModel, SARIMAModel
@@ -23,6 +23,7 @@ def _():
     from ts_plots import TSPlotter, ComparisonPlotter
 
     warnings.filterwarnings("ignore")
+    optuna.logging.set_verbosity(optuna.logging.WARNING)
     return (
         ComparisonPlotter,
         LightGBMModel,
@@ -31,6 +32,7 @@ def _():
         TSPlotter,
         mo,
         np,
+        optuna,
         pl,
     )
 
@@ -48,14 +50,20 @@ def _(mo):
        features: lags, rolling stats, cyclical time encoding, lagged daily context)
     2. **Feature Overview** — ranges and correlation with the target
     3. **Train/Test Split** — chronological, same asset/test length as the SARIMA notebook
-    4. **Fit LightGBM (quantile regression)** — three `LGBMRegressor` models (P10/P50/P90)
-    5. **Feature Importance** — which engineered features the P50 model actually splits on
-    6. **Forecasting** — point forecast + 80% prediction interval from the fitted quantiles
-    7. **Evaluation** — MAE, RMSE, MAPE, PI coverage (`ModelEvaluator`, same contract as SARIMA)
-    8. **Uncertainty Analysis** — does interval width vary across the test set?
-    9. **Probability Events** — P(forecast > threshold), interpolated from the fitted quantiles
-    10. **Visualizations** — reuses `TSPlotter`, unmodified
-    11. **Comparison to SARIMA** — same asset, same test window
+    4. **Fit Baseline LightGBM** — all 26 features, default hyperparams — needed to get a
+       first read on feature importance before selecting anything
+    5. **Feature Importance** — which engineered features the baseline model splits on
+    6. **Feature Selection** — keep the top-10 by importance
+    7. **Hyperparameter Tuning** — Optuna study over `num_leaves`/`learning_rate`/
+       `n_estimators` on the reduced feature set, scored on a validation slice of train
+    8. **Fit Final LightGBM** — top-10 features + tuned hyperparams — this is the model
+       every section from here on evaluates, forecasts, and plots
+    9. **Forecasting** — point forecast + 80% prediction interval from the fitted quantiles
+    10. **Evaluation** — MAE, RMSE, MAPE, PI coverage (`ModelEvaluator`, same contract as SARIMA)
+    11. **Uncertainty Analysis** — does interval width vary across the test set?
+    12. **Probability Events** — P(forecast > threshold), interpolated from the fitted quantiles
+    13. **Visualizations** — reuses `TSPlotter`, unmodified
+    14. **Comparison** — baseline vs. tuned-and-reduced vs. SARIMA, same asset/test window
 
     ## Key Concepts
 
@@ -68,6 +76,12 @@ def _(mo):
     pinball loss for P10/P50/P90, instead of a single point forecast plus a residual-std
     margin. See
     [`docs_src/modeling/supervised_learning_models/Quantile Regression with Supervised Learning models.md`](<../../docs_src/modeling/supervised_learning_models/Quantile Regression with Supervised Learning models.md>).
+
+    **Why a baseline fit comes before tuning/selection**: choosing which features to keep
+    needs feature importances, and importances need a fitted model. So Section 4 fits once
+    on everything just to get that read, Sections 6-7 use it to narrow down features and
+    hyperparameters, and Section 8 is the one real fit whose forecasts, metrics, and plots
+    the rest of the notebook shows — not the baseline's.
 
     ### A caveat this notebook does not paper over
 
@@ -192,22 +206,173 @@ def _(asset_sup, feature_cols):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Section 4: Fit LightGBM (Quantile Regression)
+    ## Section 4: Fit Baseline LightGBM (All Features, Default Hyperparams)
 
     External-features mode: `X_train` supplied, so `LightGBMModel` fits three
-    `LGBMRegressor` models (`objective="quantile"`, one per level in `quantile_levels`)
-    on the engineered feature matrix instead of building its own lag features from
-    `y_train` alone.
+    `LGBMRegressor` models (`objective="quantile"`, one per level in `quantile_levels`) on
+    the full engineered feature matrix. This baseline exists only to produce feature
+    importances for Section 6 — it is not the model the rest of the notebook evaluates.
     """)
     return
 
 
 @app.cell
 def _(LightGBMModel, X_train, y_train):
-    print("Fitting LightGBM (P10/P50/P90 quantile models)...")
+    print("Fitting baseline LightGBM (all 26 features, default hyperparams)...")
 
-    lgbm = LightGBMModel(y_train, X_train=X_train, quantile_levels=[0.1, 0.5, 0.9])
-    lgbm.fit()
+    lgbm_baseline = LightGBMModel(
+        y_train, X_train=X_train, quantile_levels=[0.1, 0.5, 0.9]
+    )
+    lgbm_baseline.fit()
+
+    print(f"  Status: {'Fitted' if lgbm_baseline.fitted else 'Failed'}")
+    return (lgbm_baseline,)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md("""
+    ## Section 5: Feature Importance (Baseline)
+
+    Which engineered features the baseline's P50 (median) model actually splits on.
+    """)
+    return
+
+
+@app.cell
+def _(feature_cols, lgbm_baseline, pl):
+    importances = pl.DataFrame(
+        {
+            "feature": feature_cols,
+            "importance": lgbm_baseline.models[0.5].feature_importances_,
+        }
+    ).sort("importance", descending=True)
+
+    print("Feature importance (baseline P50 model), top 10:")
+    print(importances.head(10))
+    return (importances,)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md("""
+    ## Section 6: Feature Selection
+
+    Keep the top-10 features by baseline importance — the cheapest way to check whether
+    the other 16 are earning their place, without a formal selection procedure
+    (`docs_src/data/feature_selection.md` covers PACF/information-criteria approaches for
+    when this needs to be more rigorous). This reduced set is what Section 7's tuning and
+    Section 8's final fit both use.
+    """)
+    return
+
+
+@app.cell
+def _(X_test, X_train, feature_cols, importances):
+    top_features = importances["feature"].head(10).to_list()
+    top_idx = [feature_cols.index(f) for f in top_features]
+
+    X_train_sel = X_train[:, top_idx]
+    X_test_sel = X_test[:, top_idx]
+
+    print(f"Selected features ({len(top_features)}): {top_features}")
+    return X_test_sel, X_train_sel, top_features
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md("""
+    ## Section 7: Hyperparameter Tuning (Optuna)
+
+    `ModelTuner.grid_search` (`ts_evaluation.py`) only calls `model_class(y_train,
+    **params)` and `forecast(steps, confidence_level)` — no `X_train`/`X_test` — so it
+    doesn't support this notebook's external-features mode without extending the
+    framework. An Optuna study plugged in directly here instead: `optuna.create_study`
+    samples `num_leaves`/`learning_rate`/`n_estimators` (TPE sampler, the Optuna default —
+    picks the next trial's parameters based on what previous trials scored, rather than
+    exhausting a fixed grid), each trial fit on the Section 6 feature subset and scored on
+    a validation slice carved out of *train* (last 2 days), never on `y_test` — tuning
+    against the test set would make the reported improvement optimistic by construction
+    (same reasoning `ModelTuner`'s docstring gives).
+    """)
+    return
+
+
+@app.cell
+def _(LightGBMModel, ModelEvaluator, X_train_sel, optuna, y_train):
+    val_len = 2 * 48  # 2 days, carved out of train
+
+    tune_train_X, tune_val_X = X_train_sel[:-val_len], X_train_sel[-val_len:]
+    tune_train_y, tune_val_y = y_train[:-val_len], y_train[-val_len:]
+
+    def objective(trial):
+        params = {
+            "num_leaves": trial.suggest_int("num_leaves", 7, 63),
+            "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.2, log=True),
+            "n_estimators": trial.suggest_int("n_estimators", 50, 300),
+        }
+        candidate = LightGBMModel(
+            tune_train_y,
+            X_train=tune_train_X,
+            num_leaves=params["num_leaves"],
+            learning_rate=params["learning_rate"],
+            quantile_levels=[0.1, 0.5, 0.9],
+        )
+        candidate.fit(n_estimators=params["n_estimators"])
+        candidate_forecast = candidate.forecast(
+            steps=len(tune_val_y), confidence_level=0.80, X_test=tune_val_X
+        )
+        return ModelEvaluator.evaluate(tune_val_y, candidate_forecast).rmse
+
+    study = optuna.create_study(
+        direction="minimize", sampler=optuna.samplers.TPESampler(seed=42)
+    )
+    study.optimize(objective, n_trials=20, show_progress_bar=False)
+
+    best_num_leaves = study.best_params["num_leaves"]
+    best_learning_rate = study.best_params["learning_rate"]
+    best_n_estimators = study.best_params["n_estimators"]
+
+    print(f"Optuna study: {len(study.trials)} trials, scored on a 2-day validation slice of train")
+    print(f"Best RMSE: {study.best_value:.4f}")
+    print(f"Best params: {study.best_params}")
+    return best_learning_rate, best_n_estimators, best_num_leaves
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md("""
+    ## Section 8: Fit Final LightGBM (Top-10 Features, Tuned Hyperparams)
+
+    This is the model every section from here on evaluates, forecasts, and plots —
+    Sections 4-7 exist to arrive at this configuration, not to be read as a fair
+    default-vs-tuned comparison on their own (that comparison is Section 14).
+    """)
+    return
+
+
+@app.cell
+def _(
+    LightGBMModel,
+    X_train_sel,
+    best_learning_rate,
+    best_n_estimators,
+    best_num_leaves,
+    y_train,
+):
+    print(
+        f"Fitting final LightGBM (top-10 features, num_leaves={best_num_leaves}, "
+        f"learning_rate={best_learning_rate:.4f}, n_estimators={best_n_estimators})..."
+    )
+
+    lgbm = LightGBMModel(
+        y_train,
+        X_train=X_train_sel,
+        num_leaves=best_num_leaves,
+        learning_rate=best_learning_rate,
+        quantile_levels=[0.1, 0.5, 0.9],
+    )
+    lgbm.fit(n_estimators=best_n_estimators)
 
     print(f"  Status: {'Fitted' if lgbm.fitted else 'Failed'}")
     print(f"  Quantile levels: {lgbm.quantile_levels}")
@@ -217,43 +382,19 @@ def _(LightGBMModel, X_train, y_train):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Section 5: Feature Importance
+    ## Section 9: Generate Forecasts with Uncertainty
 
-    Which engineered features the P50 (median) model actually splits on.
+    `forecast()` in external-features mode requires a matching `X_test` — here, the
+    Section 6 feature subset for the test window (see the Summary's caveat about what
+    these lag features actually represent on the test set).
     """)
     return
 
 
 @app.cell
-def _(feature_cols, lgbm, pl):
-    importances = pl.DataFrame(
-        {
-            "feature": feature_cols,
-            "importance": lgbm.models[0.5].feature_importances_,
-        }
-    ).sort("importance", descending=True)
-
-    print("Feature importance (P50 model), top 10:")
-    print(importances.head(10))
-    return
-
-
-@app.cell(hide_code=True)
-def _(mo):
-    mo.md("""
-    ## Section 6: Generate Forecasts with Uncertainty
-
-    `forecast()` in external-features mode requires a matching `X_test` — the
-    pre-engineered feature rows for the forecast horizon (see the caveat in the Summary
-    about what these lag features actually represent on the test set).
-    """)
-    return
-
-
-@app.cell
-def _(X_test, lgbm, y_test):
+def _(X_test_sel, lgbm, y_test):
     forecast_output = lgbm.forecast(
-        steps=len(y_test), confidence_level=0.80, X_test=X_test
+        steps=len(y_test), confidence_level=0.80, X_test=X_test_sel
     )
     yhat = forecast_output.prediction
     lower = forecast_output.lower
@@ -269,7 +410,7 @@ def _(X_test, lgbm, y_test):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Section 7: Standard Forecast Output Contract
+    ## Section 10: Standard Forecast Output Contract
 
     Same contract as every other model in the framework:
 
@@ -311,7 +452,7 @@ def _(asset_id, forecast_output, pl, test_timestamps, y_test):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Section 8: Model Evaluation
+    ## Section 11: Model Evaluation
     """)
     return
 
@@ -331,7 +472,7 @@ def _(ModelEvaluator, forecast_output, y_test):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Section 9: Uncertainty Analysis
+    ## Section 12: Uncertainty Analysis
 
     Unlike SARIMA/ExponentialSmoothing's constant residual-std margin, quantile
     regression's interval width can vary row-by-row with the input features.
@@ -361,7 +502,7 @@ def _(forecast_df):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Section 10: Forecast Probability of Events
+    ## Section 13: Forecast Probability of Events
 
     P(forecast > threshold), interpolated directly from the three fitted quantile
     predictions rather than assuming a normal distribution around the point forecast.
@@ -370,7 +511,7 @@ def _(mo):
 
 
 @app.cell
-def _(X_test, lgbm, np, y_train):
+def _(X_test_sel, lgbm, np, y_train):
     thresholds = [
         np.percentile(y_train, 25),
         np.percentile(y_train, 50),
@@ -379,7 +520,7 @@ def _(X_test, lgbm, np, y_train):
 
     q_levels = np.array(lgbm.quantile_levels)
     q_preds = np.stack(
-        [lgbm.models[q].predict(X_test) for q in lgbm.quantile_levels], axis=1
+        [lgbm.models[q].predict(X_test_sel) for q in lgbm.quantile_levels], axis=1
     )
     q_preds_sorted = np.sort(q_preds, axis=1)
 
@@ -402,7 +543,7 @@ def _(X_test, lgbm, np, y_train):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Section 11: Visualizations
+    ## Section 14: Visualizations
     """)
     return
 
@@ -437,13 +578,25 @@ def _(TSPlotter, forecast_output, test_timestamps, y_test):
 @app.cell(hide_code=True)
 def _(mo):
     mo.md("""
-    ## Section 12: Comparison to SARIMA
+    ## Section 15: Comparison — Baseline vs. Tuned+Reduced vs. SARIMA
 
-    Same asset, same test window (`test_timestamps` from Section 3) — SARIMA is trained
-    on all raw history available before the test window starts, including the 2 days the
-    supervised table drops for lookback, so its training window is slightly longer.
+    Same asset, same test window (`test_timestamps` from Section 3). Includes the
+    Section 4 baseline (all 26 features, default hyperparams) alongside the Section 8
+    final model, so the selection/tuning work in Sections 6-7 shows up as a real
+    before/after rather than being asserted. SARIMA is trained on all raw history
+    available before the test window starts, including the 2 days the supervised table
+    drops for lookback, so its training window is slightly longer.
     """)
     return
+
+
+@app.cell
+def _(ModelEvaluator, X_test, lgbm_baseline, y_test):
+    baseline_forecast = lgbm_baseline.forecast(
+        steps=len(y_test), confidence_level=0.80, X_test=X_test
+    )
+    baseline_metrics = ModelEvaluator.evaluate(y_test, baseline_forecast)
+    return (baseline_metrics,)
 
 
 @app.cell
@@ -471,6 +624,7 @@ def _(SARIMAModel, pl, test_timestamps, train_timestamps):
 def _(
     ComparisonPlotter,
     ModelEvaluator,
+    baseline_metrics,
     metrics,
     sarima_forecast,
     sarima_test,
@@ -478,23 +632,31 @@ def _(
     sarima_metrics = ModelEvaluator.evaluate(sarima_test, sarima_forecast)
 
     comparison_fig = ComparisonPlotter.metrics_comparison(
-        {"LightGBM (quantile)": metrics, "SARIMA": sarima_metrics}
+        {
+            "LightGBM (baseline)": baseline_metrics,
+            "LightGBM (tuned+reduced)": metrics,
+            "SARIMA": sarima_metrics,
+        }
     )
     comparison_fig
     return (sarima_metrics,)
 
 
 @app.cell
-def _(metrics, sarima_metrics):
+def _(baseline_metrics, metrics, sarima_metrics):
     print("Side-by-side:")
-    print(f"  LightGBM (quantile): {metrics}")
-    print(f"  SARIMA:               {sarima_metrics}")
+    print(f"  LightGBM (baseline):      {baseline_metrics}")
+    print(f"  LightGBM (tuned+reduced): {metrics}")
+    print(f"  SARIMA:                   {sarima_metrics}")
 
-    better = "LightGBM" if metrics.rmse < sarima_metrics.rmse else "SARIMA"
-    print(f"\nLower RMSE: {better}")
+    tuning_helped = metrics.rmse < baseline_metrics.rmse
+    print(
+        f"\nTuning + feature selection {'improved' if tuning_helped else 'did not improve'} "
+        f"RMSE vs. the baseline ({baseline_metrics.rmse:.4f} -> {metrics.rmse:.4f})."
+    )
     print(
         "Remember the Summary's caveat: LightGBM's test-set lag features are true "
-        "observed values, not recursively forecast ones, so this comparison is not "
+        "observed values, not recursively forecast ones, so the SARIMA comparison is not "
         "fully apples-to-apples with SARIMA's genuine multi-step forecast."
     )
     return
@@ -507,10 +669,12 @@ def _(mo):
 
     - Quantify the optimism from using true lag features on the test set — e.g. compare
       against `LightGBMModel`'s internal-features (recursive) mode on the same asset/window.
-    - Tune `num_leaves`/`learning_rate` per quantile level rather than sharing them across
-      all three (see Task 2.1's open question in `LIGHTGBM_PLAN.md`).
-    - Feature selection: the full 26-feature set is used as-is; narrow it using the
-      importances from Section 5 and `docs_src/data/feature_selection.md`.
+    - Section 7's study is intentionally small (20 trials, 3 parameters); widen the search
+      space or trial count, or extend `ModelTuner` to support `X_train`/`X_test` if this
+      becomes a recurring need across notebooks rather than a one-off here.
+    - Section 6 selects features by baseline importance alone; a more rigorous pass (PACF,
+      information criteria — see `docs_src/data/feature_selection.md`) may find a different
+      subset than "top-10 by importance."
     """)
     return
 

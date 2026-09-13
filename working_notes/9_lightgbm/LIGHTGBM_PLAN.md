@@ -264,11 +264,56 @@ Regression with Supervised Learning models.md`; summarized here:
    independently. Handled with post-hoc row-wise sorting (`_stack_quantiles` in
    `ts_models.py`), which guarantees valid non-crossing intervals but does not fix
    systematic miscalibration.
-3. **Hyperparameter tuning:** Not addressed yet — `num_leaves`/`learning_rate` are shared
-   across all three quantile models for now (see doc's "shared across all three" note as a
-   place to revisit if P10/P90 under/overfit relative to P50). Left as a follow-up, not
-   blocking for Phase 3.
-4. **Feature selection:** Not resolved — Phase 1 shipped the full 26-feature set with no
-   selection step. Deferred to whatever `LightGBMModel.get_params()`-driven feature
-   importance work the Phase 3 notebook surfaces (Task 3.1's "Feature Importance" section).
+3. **Hyperparameter tuning:** First implemented as a manual 4-combination grid search,
+   then swapped for an **Optuna study** (`lightgbm_forecasting.py` Section 7) at the user's
+   request — added `optuna` to `pyproject.toml` (`uv add optuna`). 20 TPE-sampled trials
+   over `num_leaves` (7-63), `learning_rate` (0.01-0.2, log scale), and `n_estimators`
+   (50-300), scored on the same 2-day validation slice carved out of *train* (never
+   `y_test` — same reasoning as the grid version). Still bypasses `ModelTuner`
+   (`ts_evaluation.py`) rather than extending it, for the same reason as before:
+   `ModelTuner.grid_search` only calls `model_class(y_train, **params)` and
+   `forecast(steps, confidence_level)`, no `X_train`/`X_test`. Still shared across all
+   three quantile models — tuning each quantile independently remains a further follow-up
+   if warranted. Optuna's study found `num_leaves=35, learning_rate=0.164,
+   n_estimators=282` on ASSET_001, RMSE 0.329 — worse than the earlier grid's 0.315 (which
+   only tuned `num_leaves`/`learning_rate`), but still better than the 0.358 baseline; the
+   two aren't directly comparable since Optuna's objective also has `n_estimators` to
+   search over and a different validation-slice budget (20 trials vs. 4 grid points). PI
+   coverage fell further to 50% (vs. 55.7% for the grid, 60.4% baseline) — expected, since
+   the objective minimizes RMSE only and says nothing about calibration. Reported as-is in
+   the notebook's side-by-side print, not hidden.
+4. **Feature selection:** Addressed with a simple top-N-by-importance refit
+   (`lightgbm_forecasting.py` Section 6), not a formal PACF/information-criteria procedure.
+
+**Sequencing correction (post-initial-build):** tuning and feature selection were first
+added as trailing sections (13-14) *after* the main model (Section 4, all features, default
+hyperparams) that Sections 5-12 already evaluated, forecast, and plotted — so the notebook
+would report "top-10 features beat the full set" while every plot and metric above it still
+used the full, untuned model. Restructured so Section 4 is now explicitly a **baseline fit**
+whose only job is producing feature importances; Sections 6-7 select features and tune
+hyperparameters using that baseline; Section 8 fits the **final** model (top-10 features,
+tuned hyperparams) that Sections 9 onward actually use; Section 15 (renumbered from 12)
+compares baseline vs. final vs. SARIMA so the tuning/selection payoff shows up as a real
+before/after instead of a disconnected side note. Verified end-to-end again: on ASSET_001,
+final vs. baseline RMSE 0.315 vs. 0.358 (improved) but PI coverage 55.7% vs. 60.4%
+(worse) — the grid search optimizes RMSE only, so this is a real, reported trade-off, not
+tuned away.
+
+**Follow-up: does genuine recursive forecasting explain the PI-coverage gap?** The
+notebook repeatedly flagged (Summary, Section 15 discussion) that its external-features
+evaluation uses true observed lag values on the test set — optimistic relative to a real
+multi-step deployment — without ever measuring the effect. Added Section 16: fits
+`LightGBMModel` in internal-features (recursive) mode on the same asset/train/test window
+as the SARIMA comparison, and folds it into a 4-way `ComparisonPlotter` chart. Answer: **no,
+it makes coverage worse, not better** — 39.6% recursive vs. 50.0% external-features (both
+well under SARIMA's 71.4%). Reasoning worked out in the notebook: recursive compounding
+widens *point-forecast* error with horizon, but the quantile models are still trained on
+one-step-ahead residuals, so the prediction interval doesn't widen to match — the
+compounding error lands outside an interval that's no wider than the non-recursive one.
+Conclusion: the "true lags are optimistic" caveat is real for point-accuracy comparisons,
+but the PI-coverage gap vs. SARIMA is **not** explained by it — it's a genuine LightGBM
+quantile-calibration issue (one-step-trained quantiles, no multi-step calibration),
+independent of which feature mode is used. Recorded as a Next Steps item: fixing this
+properly needs quantile models trained against multi-step residuals, which the framework
+doesn't build yet.
 
