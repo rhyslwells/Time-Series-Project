@@ -224,20 +224,51 @@ class SeasonalNaiveModel(TSModel):
 
 
 class LightGBMModel(TSModel):
-    """LightGBM for time series (lag features + seasonality)"""
+    """LightGBM for time series, with quantile regression for uncertainty.
+
+    Two feature modes, chosen by whether `X_train` is supplied:
+
+    - **Internal features** (`X_train=None`, the default): builds lag + hour-of-day
+      features from `y_train` alone, same as before. `forecast(steps, confidence_level)`
+      works standalone, recursively feeding its own median prediction forward — this is
+      the mode `ModelComparison`/`ModelEvaluator`/`ModelTuner` (`ts_evaluation.py`) drive
+      generically, and what the existing notebooks (`ts_model_explorer.py`,
+      `lightgbm_residual_diagnostics.py`) use unchanged.
+    - **External features** (`X_train` supplied, e.g. the `feat_*` columns from
+      `metering_data_supervised_learning.parquet`): `y_train` must be the aligned target
+      column (same length as `X_train`, already leakage-safe — see
+      `docs_src/modeling/supervised_learning_models/feature_engineering.md`).
+      `forecast()` then requires a matching `X_test` (already-engineered feature rows for
+      the forecast horizon) — this mode is for direct notebook use, not the generic
+      evaluation loop, since `TSModel.forecast` callers never pass `X_test`.
+
+    Uncertainty is quantile regression: one `LGBMRegressor` per level in
+    `quantile_levels` (default P10/P50/P90). Quantile predictions are sorted row-wise
+    post-hoc to guarantee P10 <= P50 <= P90 (LightGBM's quantile objective does not
+    guarantee monotonicity on its own — see
+    `docs_src/modeling/supervised_learning_models/Quantile Regression with Supervised Learning models.md`).
+    """
 
     def __init__(
         self,
         y_train: np.ndarray,
+        X_train: np.ndarray = None,
         lags: List[int] = None,
         num_leaves: int = 31,
         learning_rate: float = 0.05,
+        quantile_levels: List[float] = None,
     ):
         super().__init__("LightGBM", y_train)
         self.lags = lags or [1, 2, 48, 96]  # 30min, 1hr, 1day, 2day
         self.num_leaves = num_leaves
         self.learning_rate = learning_rate
+        self.quantile_levels = sorted(quantile_levels or [0.1, 0.5, 0.9])
+        self._median_idx = int(
+            np.argmin(np.abs(np.array(self.quantile_levels) - 0.5))
+        )
+        self.X_train = np.asarray(X_train) if X_train is not None else None
         self.feature_names = None
+        self.models: Dict[float, object] = {}
 
     def _create_features(self, y: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
         """Create lag features and seasonality"""
@@ -256,29 +287,85 @@ class LightGBMModel(TSModel):
         self.feature_names = [f"lag_{lag}" for lag in self.lags] + ["hour_of_day"]
         return np.array(X), np.array(targets)
 
+    def _prepare_training_data(self) -> Tuple[np.ndarray, np.ndarray]:
+        if self.X_train is not None:
+            if len(self.X_train) != len(self.y_train):
+                raise ValueError(
+                    f"X_train ({len(self.X_train)} rows) and y_train "
+                    f"({len(self.y_train)} rows) must be the same length and "
+                    "already row-aligned (see metering_data_supervised_learning.parquet)."
+                )
+            return self.X_train, self.y_train
+        return self._create_features(self.y_train)
+
     def fit(self, **kwargs) -> None:
         try:
             import lightgbm as lgb
         except ImportError:
             raise RuntimeError("LightGBM not installed. pip install lightgbm")
 
-        X, y = self._create_features(self.y_train)
+        X, y = self._prepare_training_data()
 
-        self.model = lgb.LGBMRegressor(
-            num_leaves=self.num_leaves,
-            learning_rate=self.learning_rate,
-            n_estimators=kwargs.get("n_estimators", 100),
-            verbose=-1,
-        )
-        self.model.fit(X, y)
+        self.models = {}
+        for q in self.quantile_levels:
+            model = lgb.LGBMRegressor(
+                objective="quantile",
+                alpha=q,
+                num_leaves=self.num_leaves,
+                learning_rate=self.learning_rate,
+                n_estimators=kwargs.get("n_estimators", 100),
+                verbose=-1,
+            )
+            model.fit(X, y)
+            self.models[q] = model
+        self.model = self.models[self.quantile_levels[self._median_idx]]
         self.fitted = True
 
-    def forecast(self, steps: int, confidence_level: float = 0.80) -> ForecastOutput:
+    def _stack_quantiles(self, quantile_preds: Dict[float, np.ndarray]) -> ForecastOutput:
+        """Row-wise sort quantile predictions to enforce monotonicity, then split
+        into prediction/lower/upper."""
+        q_arr = np.stack([quantile_preds[q] for q in self.quantile_levels], axis=1)
+        q_arr_sorted = np.sort(q_arr, axis=1)
+
+        prediction = q_arr_sorted[:, self._median_idx]
+        lower = q_arr_sorted[:, 0]
+        upper = q_arr_sorted[:, -1]
+
+        return ForecastOutput(
+            prediction=prediction,
+            lower=lower,
+            upper=upper,
+            uncertainty_width=upper - lower,
+        )
+
+    def forecast(
+        self, steps: int, confidence_level: float = 0.80, X_test: np.ndarray = None
+    ) -> ForecastOutput:
         if not self.fitted:
             raise RuntimeError("Model not fitted. Call fit() first.")
 
-        yhat = []
+        if self.X_train is not None:
+            if X_test is None:
+                raise ValueError(
+                    "This model was fit with X_train, so forecast() requires a "
+                    "matching X_test of already-engineered feature rows."
+                )
+            X_test = np.asarray(X_test)
+            if len(X_test) != steps:
+                raise ValueError(
+                    f"X_test has {len(X_test)} rows but steps={steps}."
+                )
+            quantile_preds = {
+                q: np.asarray(self.models[q].predict(X_test))
+                for q in self.quantile_levels
+            }
+            return self._stack_quantiles(quantile_preds)
+
+        # Internal-features mode: recursive forecast, feeding the median
+        # prediction forward as each step's lag input.
         y_recent = self.y_train.copy()
+        median_q = self.quantile_levels[self._median_idx]
+        quantile_preds = {q: [] for q in self.quantile_levels}
 
         for _ in range(steps):
             features = [
@@ -288,31 +375,22 @@ class LightGBMModel(TSModel):
             hour = (len(y_recent) % 48) / 48.0
             features.append(hour)
 
-            pred = self.model.predict([features])[0]
-            yhat.append(pred)
-            y_recent = np.append(y_recent, pred)
+            step_preds = {}
+            for q in self.quantile_levels:
+                step_preds[q] = float(self.models[q].predict([features])[0])
+                quantile_preds[q].append(step_preds[q])
 
-        yhat = np.array(yhat)
+            y_recent = np.append(y_recent, step_preds[median_q])
 
-        # Estimate prediction intervals from training residuals
-        X_train, y_train = self._create_features(self.y_train)
-        train_preds = self.model.predict(X_train)
-        residual_std = np.std(y_train - train_preds)
-        z_score = norm.ppf((1 + confidence_level) / 2)
-        margin = z_score * residual_std
-
-        return ForecastOutput(
-            prediction=yhat,
-            lower=yhat - margin,
-            upper=yhat + margin,
-            uncertainty_width=np.full_like(yhat, 2 * margin),
-        )
+        quantile_preds = {q: np.array(v) for q, v in quantile_preds.items()}
+        return self._stack_quantiles(quantile_preds)
 
     def get_params(self) -> Dict:
         return {
             "lags": self.lags,
             "num_leaves": self.num_leaves,
             "learning_rate": self.learning_rate,
+            "quantile_levels": self.quantile_levels,
         }
 
     def set_params(self, **kwargs) -> None:
@@ -322,4 +400,9 @@ class LightGBMModel(TSModel):
             self.num_leaves = kwargs["num_leaves"]
         if "learning_rate" in kwargs:
             self.learning_rate = kwargs["learning_rate"]
+        if "quantile_levels" in kwargs:
+            self.quantile_levels = sorted(kwargs["quantile_levels"])
+            self._median_idx = int(
+                np.argmin(np.abs(np.array(self.quantile_levels) - 0.5))
+            )
         self.fitted = False

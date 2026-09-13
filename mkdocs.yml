@@ -79,6 +79,8 @@ nav:
       - Forecast products: theory/forecast_products.md
   - Modeling:
       - Supervised vs statistical models: modeling/supervised_vs_statistical_models.md
+      - Feature engineering (supervised learning): modeling/supervised_learning_models/feature_engineering.md
+      - Quantile regression with LightGBM: "modeling/supervised_learning_models/Quantile Regression with Supervised Learning models.md"
   - Coding:
       - coding/index.md
       - Framework usage: coding/framework_usage.md
