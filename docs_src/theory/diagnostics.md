@@ -34,7 +34,7 @@ numerically](#confirming-diagnostics-numerically) for the Q-Q plot and
 
 **Flat width:** the interval is the same size at every hour. For **ExponentialSmoothing and
 LightGBM this is structural, not a fitting failure** — both return `np.full_like(...)`, a
-single residual std broadcast across the whole horizon (`ts_model_framework.py:175, :273`).
+single residual std broadcast across the whole horizon (`ts_models.py:142, :293`).
 Only SARIMA's width is diagnostic here. Where you do want conditional width, the fix is a
 residual-std model or explicit quantile models. This is also the dominant real problem in
 this codebase: load-forecast residual variance scales with level and time of day, and a
@@ -85,7 +85,7 @@ form of the "heavy tails" case above.
 residuals with a 95% white-noise band ($\pm 1.96/\sqrt{n}$). Bars outside the band are the
 visual form of "autocorrelated residuals" above.
 
-**`ResidualDiagnostics`** (in `ts_model_framework.py`) gives the numeric counterpart to
+**`ResidualDiagnostics`** (in `ts_evaluation.py`) gives the numeric counterpart to
 both plots:
 
 - `ljung_box(residuals, lags=None)` - p < 0.05 at a lag means residuals are not white
@@ -97,7 +97,7 @@ both plots:
   Jarque-Bera as a rough signal rather than a firm verdict.
 
 ```python
-from ts_model_framework import ResidualDiagnostics
+from ts_evaluation import ResidualDiagnostics
 
 residuals = y_test - forecast.prediction
 ResidualDiagnostics.ljung_box(residuals)        # polars DataFrame: lag, lb_stat, lb_pvalue

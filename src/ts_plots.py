@@ -10,7 +10,7 @@ import polars as pl
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from typing import Dict, List
-from ts_model_framework import ForecastOutput, EvaluationMetrics
+from ts_contracts import ForecastOutput, EvaluationMetrics
 
 
 class TSPlotter:

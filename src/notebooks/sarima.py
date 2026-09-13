@@ -18,7 +18,8 @@ def _():
     from scipy.stats import norm
     import warnings
 
-    from ts_model_framework import SARIMAModel, ModelEvaluator
+    from ts_models import SARIMAModel
+    from ts_evaluation import ModelEvaluator
     from ts_plots import TSPlotter
 
     warnings.filterwarnings("ignore")

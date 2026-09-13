@@ -1,6 +1,6 @@
 # Framework Usage
 
-How to use `ts_model_framework.py` (models, comparison, tuning) and `ts_plots.py` (diagnostics) in `src/`. For the reasoning behind the metrics and models, see [Theory](../theory/index.md).
+How to use `ts_contracts.py` (output contracts), `ts_models.py` (models), `ts_evaluation.py` (comparison, tuning) and `ts_plots.py` (diagnostics) in `src/`. For the reasoning behind the metrics and models, see [Theory](../theory/index.md).
 
 ## From parquet to numpy
 
@@ -32,13 +32,13 @@ Compare and tune against `y_val`; touch `y_test` only for the single final numbe
 
 ```python
 import numpy as np
-from ts_model_framework import (
-    ModelComparison,
+from ts_models import (
     SeasonalNaiveModel,
     SARIMAModel,
     ExponentialSmoothingModel,
     LightGBMModel,
 )
+from ts_evaluation import ModelComparison
 
 y_train = np.array([...])  # e.g. 336 points = 7 days x 48 half-hours
 y_val = np.array([...])  # e.g. 144 points = 3 days x 48 half-hours (model choice + tuning)
@@ -121,7 +121,8 @@ still only one realisation; a rolling-origin (walk-forward) evaluation is the st
 approach and is not yet implemented.
 
 ```python
-from ts_model_framework import ModelTuner, SARIMAModel
+from ts_models import SARIMAModel
+from ts_evaluation import ModelTuner
 
 tuner = ModelTuner(SARIMAModel, y_train, y_val)
 param_grid = {
@@ -155,7 +156,7 @@ param_grid = {
 Refit on train+val with the tuned params and report once on the held-back test set:
 
 ```python
-from ts_model_framework import ModelEvaluator
+from ts_evaluation import ModelEvaluator
 
 y_fit = np.concatenate([y_train, y_val])
 final_model = SARIMAModel(y_fit, **best_params)
@@ -204,4 +205,4 @@ if (
 
 ## Files
 
-`ts_model_framework.py` and `ts_plots.py` live in `src/` and are self-contained — no project-specific data loading inside them. Dependencies: `statsmodels`, `scikit-learn`, `lightgbm`, `scipy`, `numpy`, `plotly`. All dataframe IO is `polars`; the models exchange numpy arrays.
+`ts_contracts.py`, `ts_models.py`, `ts_evaluation.py`, and `ts_plots.py` live in `src/` and are self-contained — no project-specific data loading inside them. Dependencies: `statsmodels`, `scikit-learn`, `lightgbm`, `scipy`, `numpy`, `plotly`. All dataframe IO is `polars`; the models exchange numpy arrays.

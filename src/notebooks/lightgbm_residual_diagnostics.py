@@ -16,7 +16,8 @@ def _():
     import polars as pl
     import warnings
 
-    from ts_model_framework import LightGBMModel, ModelEvaluator, ResidualDiagnostics
+    from ts_models import LightGBMModel
+    from ts_evaluation import ModelEvaluator, ResidualDiagnostics
     from ts_plots import TSPlotter
 
     warnings.filterwarnings("ignore")
@@ -31,7 +32,7 @@ def _(mo):
     Numeric confirmation for LightGBM's residual diagnostics — same treatment as
     [`sarima_residual_diagnostics.py`](sarima_residual_diagnostics.py) (Q-Q plot, ACF
     correlogram, Ljung-Box, normality stats), same asset/split, same
-    `metering_data.parquet` source, swapping in `ts_model_framework.LightGBMModel`
+    `metering_data.parquet` source, swapping in `ts_models.LightGBMModel`
     (lags `[1, 2, 48, 96]` + hour-of-day) for SARIMA.
 
     - **Q-Q plot** — is the normality assumption behind the prediction intervals reasonable?

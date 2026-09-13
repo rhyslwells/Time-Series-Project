@@ -40,7 +40,7 @@ uv run marimo edit
 ## How This Project Works
 
 1. **Synthetic data generation** (`src/data/`) — Creates realistic energy metering data (14 days × 15 assets × 30-min intervals)
-2. **Forecasting models** (`src/ts_model_framework.py`) — Multiple approaches (Seasonal Naive, SARIMA, Exponential Smoothing, LightGBM)
+2. **Forecasting models** (`src/ts_models.py`, `src/ts_evaluation.py`) — Multiple approaches (Seasonal Naive, SARIMA, Exponential Smoothing, LightGBM)
 3. **Evaluation & diagnostics** (`src/ts_plots.py`) — Performance metrics, uncertainty quantification, residual analysis
 4. **Documentation** (`docs_src/`) — Methodology explanations, results, and learnings captured in mkdocs
 

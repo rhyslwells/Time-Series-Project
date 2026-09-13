@@ -16,7 +16,7 @@ Implementation reference for this project's code. For the math and reasoning beh
 
 ## Pages
 
-- [Framework usage](framework_usage.md) — `ts_model_framework.py` and `ts_plots.py`: loading data, comparison, tuning, plotting, output contracts, and the known caveats (test-set tuning, MAPE scale, constant-width intervals).
+- [Framework usage](framework_usage.md) — `ts_contracts.py`, `ts_models.py`, `ts_evaluation.py`, and `ts_plots.py`: loading data, comparison, tuning, plotting, output contracts, and the known caveats (test-set tuning, MAPE scale, constant-width intervals).
 - [MkDocs setup](mkdocs.md) — the `docs_src/` → `docs/` split, the deploy workflow, local build/serve, and marimo export.
 
 A runnable version of the full compare → diagnose → tune → finalise flow is in

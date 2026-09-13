@@ -13,7 +13,7 @@ loading series for models, and assembling result/ranking tables. Do not import p
 ### Boundary with modeling libraries
 
 `statsmodels`, `scikit-learn`, and `lightgbm` operate on **numpy arrays**, not dataframes.
-The forecasting framework (`src/ts_model_framework.py`) follows this split:
+The forecasting framework (`src/ts_contracts.py`, `src/ts_models.py`, `src/ts_evaluation.py`) follows this split:
 
 - polars reads the parquet and selects the series; `.to_numpy()` hands it to the model
 - models pass numpy arrays internally and return `ForecastOutput` (numpy arrays)

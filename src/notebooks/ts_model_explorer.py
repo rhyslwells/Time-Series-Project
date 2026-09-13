@@ -14,8 +14,9 @@ Data:
     into train/test (last 4 days held out as test).
 
 Depends on:
-    src/ts_model_framework.py — SeasonalNaiveModel, SARIMAModel,
-        ExponentialSmoothingModel, LightGBMModel, ModelComparison
+    src/ts_models.py — SeasonalNaiveModel, SARIMAModel,
+        ExponentialSmoothingModel, LightGBMModel
+    src/ts_evaluation.py — ModelComparison
     src/ts_plots.py — TSPlotter, ComparisonPlotter
 
 Flow (sections):
@@ -76,7 +77,7 @@ def _(mo):
 
     **Framework Pattern Used:**
 
-    This notebook uses `ts_model_framework.py` classes to demonstrate best practices:
+    This notebook uses `ts_models.py`/`ts_evaluation.py` classes to demonstrate best practices:
 
     1. **ModelComparison** — Orchestrates fitting + evaluation for multiple models
     2. **TSModel subclasses** — SARIMAModel, ExponentialSmoothingModel, LightGBMModel
@@ -92,7 +93,7 @@ def _(mo):
 
     **To add a new model:**
     ```python
-    from ts_model_framework import TSModel
+    from ts_models import TSModel
 
     class MyNewModel(TSModel):
         def fit(self):
@@ -209,13 +210,13 @@ def _(pl, y_test, y_train):
 
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
-    from ts_model_framework import (
+    from ts_models import (
         SeasonalNaiveModel,
         SARIMAModel,
         ExponentialSmoothingModel,
         LightGBMModel,
-        ModelComparison,
     )
+    from ts_evaluation import ModelComparison
     from ts_plots import TSPlotter, ComparisonPlotter
 
     print("INITIALIZING MODEL COMPARISON")

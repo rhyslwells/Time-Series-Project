@@ -7,7 +7,7 @@ upper layers are design, described in [Forecast products](theory/forecast_produc
 ## What exists today
 
 - A synthetic dataset: 15 assets (EV charging and solar+battery), 14 days, 30-minute intervals, in three parquet files. See [Data](data/index.md).
-- A forecasting framework in `src/ts_model_framework.py`: `SARIMAModel`, `ExponentialSmoothingModel`, `LightGBMModel`, plus comparison, tuning and evaluation. See [Coding](coding/index.md).
+- A forecasting framework in `src/ts_models.py` (`SARIMAModel`, `ExponentialSmoothingModel`, `LightGBMModel`) and `src/ts_evaluation.py` (comparison, tuning and evaluation). See [Coding](coding/index.md).
 - Diagnostic plots in `src/ts_plots.py` and a reading guide in [Diagnostics](theory/diagnostics.md).
 - Two exploration notebooks running one asset through the framework. See [Notebooks](notebooks/notebooks.md).
 

@@ -6,7 +6,7 @@ swapped without touching anything downstream, and the derived signals in layer 3
 care which model produced the forecast.
 
 !!! note "What exists today"
-    Layers 1-2 are built (`src/data/` and `src/ts_model_framework.py`). Everything from
+    Layers 1-2 are built (`src/data/` and `src/ts_models.py`/`src/ts_evaluation.py`). Everything from
     layer 3 up is design — see [Forecast products](forecast_products.md). This page
     describes the intended shape; it does not add or change any code.
 

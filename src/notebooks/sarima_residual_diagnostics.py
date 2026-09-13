@@ -17,7 +17,8 @@ def _():
     import numpy as np
     import warnings
 
-    from ts_model_framework import SARIMAModel, ModelEvaluator, ResidualDiagnostics
+    from ts_models import SARIMAModel
+    from ts_evaluation import ModelEvaluator, ResidualDiagnostics
     from ts_plots import TSPlotter
 
     warnings.filterwarnings("ignore")
