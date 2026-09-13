@@ -1259,7 +1259,7 @@ numerically</a> for the Q-Q plot and
 <p><strong>Good case:</strong> width tracks actual volatility — narrow during stable stretches (e.g. midday for an office), wider during transitions (morning ramp-up, evening ramp-down). Mean width roughly matches <code>2 x z x std(residuals)</code>.</p>
 <p><strong>Flat width:</strong> the interval is the same size at every hour. For <strong>ExponentialSmoothing and
 LightGBM this is structural, not a fitting failure</strong> — both return <code>np.full_like(...)</code>, a
-single residual std broadcast across the whole horizon (<code>ts_model_framework.py:175, :273</code>).
+single residual std broadcast across the whole horizon (<code>ts_models.py:142, :293</code>).
 Only SARIMA's width is diagnostic here. Where you do want conditional width, the fix is a
 residual-std model or explicit quantile models. This is also the dominant real problem in
 this codebase: load-forecast residual variance scales with level and time of day, and a
@@ -1298,7 +1298,7 @@ form of the "heavy tails" case above.</p>
 <p><strong><code>TSPlotter.residuals_acf(y_test, forecast, model_name, nlags=20)</code></strong> - correlogram of
 residuals with a 95% white-noise band (<span class="arithmatex">\(\pm 1.96/\sqrt{n}\)</span>). Bars outside the band are the
 visual form of "autocorrelated residuals" above.</p>
-<p><strong><code>ResidualDiagnostics</code></strong> (in <code>ts_model_framework.py</code>) gives the numeric counterpart to
+<p><strong><code>ResidualDiagnostics</code></strong> (in <code>ts_evaluation.py</code>) gives the numeric counterpart to
 both plots:</p>
 <ul>
 <li><code>ljung_box(residuals, lags=None)</code> - p &lt; 0.05 at a lag means residuals are not white
@@ -1309,7 +1309,7 @@ both plots:</p>
   normality test (p &lt; 0.05 rejects normality). On a test window under ~50 points, treat
   Jarque-Bera as a rough signal rather than a firm verdict.</li>
 </ul>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ts_model_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResidualDiagnostics</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ts_evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ResidualDiagnostics</span>
 </span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">residuals</span> <span class="o">=</span> <span class="n">y_test</span> <span class="o">-</span> <span class="n">forecast</span><span class="o">.</span><span class="n">prediction</span>
 </span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="n">ResidualDiagnostics</span><span class="o">.</span><span class="n">ljung_box</span><span class="p">(</span><span class="n">residuals</span><span class="p">)</span>        <span class="c1"># polars DataFrame: lag, lb_stat, lb_pvalue</span>
@@ -1348,7 +1348,7 @@ before reaching for more AR-like structure the way you would for SARIMA.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 13, 2026 08:04:40 UTC">September 13, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 13, 2026 17:16:01 UTC">September 13, 2026</span>
   </span>
 
     

@@ -1132,7 +1132,7 @@
 
 
 <h1 id="framework-usage">Framework Usage<a class="headerlink" href="#framework-usage" title="Permanent link">&para;</a></h1>
-<p>How to use <code>ts_model_framework.py</code> (models, comparison, tuning) and <code>ts_plots.py</code> (diagnostics) in <code>src/</code>. For the reasoning behind the metrics and models, see <a href="../../theory/">Theory</a>.</p>
+<p>How to use <code>ts_contracts.py</code> (output contracts), <code>ts_models.py</code> (models), <code>ts_evaluation.py</code> (comparison, tuning) and <code>ts_plots.py</code> (diagnostics) in <code>src/</code>. For the reasoning behind the metrics and models, see <a href="../../theory/">Theory</a>.</p>
 <h2 id="from-parquet-to-numpy">From parquet to numpy<a class="headerlink" href="#from-parquet-to-numpy" title="Permanent link">&para;</a></h2>
 <p><code>metering_data.parquet</code> holds all 15 assets. The models take a 1-D numpy array for one
 asset, so filter, sort, pull the target column, and hold back the tail of the series: a
@@ -1156,13 +1156,13 @@ report. Data IO is polars; the models exchange numpy.</p>
 <p>Compare and tune against <code>y_val</code>; touch <code>y_test</code> only for the single final number.</p>
 <h2 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ts_model_framework</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">ModelComparison</span><span class="p">,</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">SeasonalNaiveModel</span><span class="p">,</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">SARIMAModel</span><span class="p">,</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">ExponentialSmoothingModel</span><span class="p">,</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    <span class="n">LightGBMModel</span><span class="p">,</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="p">)</span>
+</span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ts_models</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+</span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    <span class="n">SeasonalNaiveModel</span><span class="p">,</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    <span class="n">SARIMAModel</span><span class="p">,</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    <span class="n">ExponentialSmoothingModel</span><span class="p">,</span>
+</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    <span class="n">LightGBMModel</span><span class="p">,</span>
+</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="p">)</span>
+</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ts_evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelComparison</span>
 </span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
 </span><span id="__span-1-10"><a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="n">y_train</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">...</span><span class="p">])</span>  <span class="c1"># e.g. 336 points = 7 days x 48 half-hours</span>
 </span><span id="__span-1-11"><a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="n">y_val</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">...</span><span class="p">])</span>  <span class="c1"># e.g. 144 points = 3 days x 48 half-hours (model choice + tuning)</span>
@@ -1229,15 +1229,16 @@ disjoint from the test set used for the final report — scoring trials on the t
 the printed before/after improvement optimistic by construction. A single fixed split is
 still only one realisation; a rolling-origin (walk-forward) evaluation is the stronger
 approach and is not yet implemented.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ts_model_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelTuner</span><span class="p">,</span> <span class="n">SARIMAModel</span>
-</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>
-</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="n">tuner</span> <span class="o">=</span> <span class="n">ModelTuner</span><span class="p">(</span><span class="n">SARIMAModel</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span><span class="p">)</span>
-</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">param_grid</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="s2">"order"</span><span class="p">:</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span>
-</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="s2">"seasonal_order"</span><span class="p">:</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">48</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">48</span><span class="p">)],</span>
-</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="p">}</span>
-</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="n">trials</span> <span class="o">=</span> <span class="n">tuner</span><span class="o">.</span><span class="n">grid_search</span><span class="p">(</span><span class="n">param_grid</span><span class="p">)</span>
-</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">best_params</span> <span class="o">=</span> <span class="n">tuner</span><span class="o">.</span><span class="n">best_params</span><span class="p">()</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ts_models</span><span class="w"> </span><span class="kn">import</span> <span class="n">SARIMAModel</span>
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ts_evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelTuner</span>
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="n">tuner</span> <span class="o">=</span> <span class="n">ModelTuner</span><span class="p">(</span><span class="n">SARIMAModel</span><span class="p">,</span> <span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span><span class="p">)</span>
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="n">param_grid</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="s2">"order"</span><span class="p">:</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span>
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    <span class="s2">"seasonal_order"</span><span class="p">:</span> <span class="p">[(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">48</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">48</span><span class="p">)],</span>
+</span><span id="__span-5-8"><a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="p">}</span>
+</span><span id="__span-5-9"><a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="n">trials</span> <span class="o">=</span> <span class="n">tuner</span><span class="o">.</span><span class="n">grid_search</span><span class="p">(</span><span class="n">param_grid</span><span class="p">)</span>
+</span><span id="__span-5-10"><a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="n">best_params</span> <span class="o">=</span> <span class="n">tuner</span><span class="o">.</span><span class="n">best_params</span><span class="p">()</span>
 </span></code></pre></div>
 <p>Typical grids for the other two models:</p>
 <div class="language-python highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="c1"># ExponentialSmoothingModel</span>
@@ -1257,7 +1258,7 @@ approach and is not yet implemented.</p>
 </span><span id="__span-6-15"><a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a><span class="p">}</span>
 </span></code></pre></div>
 <p>Refit on train+val with the tuned params and report once on the held-back test set:</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ts_model_framework</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelEvaluator</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">ts_evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelEvaluator</span>
 </span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>
 </span><span id="__span-7-3"><a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="n">y_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">y_train</span><span class="p">,</span> <span class="n">y_val</span><span class="p">])</span>
 </span><span id="__span-7-4"><a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a><span class="n">final_model</span> <span class="o">=</span> <span class="n">SARIMAModel</span><span class="p">(</span><span class="n">y_fit</span><span class="p">,</span> <span class="o">**</span><span class="n">best_params</span><span class="p">)</span>
@@ -1312,7 +1313,7 @@ number — but it is still a single split; expect run-to-run variation.</p>
 </tbody>
 </table>
 <h2 id="files">Files<a class="headerlink" href="#files" title="Permanent link">&para;</a></h2>
-<p><code>ts_model_framework.py</code> and <code>ts_plots.py</code> live in <code>src/</code> and are self-contained — no project-specific data loading inside them. Dependencies: <code>statsmodels</code>, <code>scikit-learn</code>, <code>lightgbm</code>, <code>scipy</code>, <code>numpy</code>, <code>plotly</code>. All dataframe IO is <code>polars</code>; the models exchange numpy arrays.</p>
+<p><code>ts_contracts.py</code>, <code>ts_models.py</code>, <code>ts_evaluation.py</code>, and <code>ts_plots.py</code> live in <code>src/</code> and are self-contained — no project-specific data loading inside them. Dependencies: <code>statsmodels</code>, <code>scikit-learn</code>, <code>lightgbm</code>, <code>scipy</code>, <code>numpy</code>, <code>plotly</code>. All dataframe IO is <code>polars</code>; the models exchange numpy arrays.</p>
 
 
 
@@ -1333,7 +1334,7 @@ number — but it is still a single split; expect run-to-run variation.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 13, 2026 08:04:40 UTC">September 13, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 13, 2026 17:16:01 UTC">September 13, 2026</span>
   </span>
 
     
