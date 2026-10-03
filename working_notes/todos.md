@@ -8,14 +8,8 @@
 
 ## In Progress
 
-- [ ] Will mkdocs allow for ipynb still html output to be shown? or marimo?
-- [ ] So we know the the structure of the project and where to find things and the decisions of choices made.
-
 ## Next Steps 2
 1. Use metering_data.parquet to train baseline forecasts
-- [ ] What can we infer from the daily_metrics behavioral metrics?, asset profiling/clustering, also see docs_src\data\data_generation.md ### Why consolidate into daily_metrics? for more details.
-- [ ] Use src\data\metering_data.parquet autocorrolation. 
-
 - [ ] **Baseline Forecasts:** Use metering_data.parquet to train models
 - [ ] **Asset Profiling:** Use daily_metrics.parquet to study behavioral differences
 - [ ] **Forecasting:** Evaluate models on held-out days
@@ -28,7 +22,6 @@ Implementation follows main_idea.md layering. Tackle these in any order.
 ### Layer 1: Basic Forecasting
 - [ ] Implement point forecast with uncertainty intervals
 - [ ] Set up standard forecast output contract (asset_id, timestamp, yhat, lower, upper, model_version)
-- [ ] Validate on sample time series data
 - [ ] Document findings in docs_src/findings/
 
 ### Layer 2-4: Derived Features & Asset Profiling
@@ -38,10 +31,9 @@ Implementation follows main_idea.md layering. Tackle these in any order.
 - [ ] Asset clustering by behavioral type
 - [ ] Document methodology in docs_src/methodology/
 
-### Layer 5-7: Uncertainty & Anomaly Detection
+### Layer 5-7: Uncertainty Quantification & Event Probability
 - [ ] Forecast confidence quantification
 - [ ] Event probability calculation
-- [ ] Anomaly detection via forecast residuals
 - [ ] Model health monitoring (MAE/RMSE by time/season/conditions)
 - [ ] Document findings in docs_src/findings/
 
@@ -49,30 +41,16 @@ Implementation follows main_idea.md layering. Tackle these in any order.
 - [ ] Multi-asset forecast aggregation
 - [ ] Correlation analysis between assets
 - [ ] Portfolio-level uncertainty estimation
-- [ ] Asset classification system
-
-### Layer 11-16: Advanced Features
-- [ ] Flexibility forecasting (reduction/increase capacity)
-- [ ] Tradable volume derivation
-- [ ] Opportunity scoring (forecast + price)
-- [ ] Scenario generation for stochastic optimization
-- [ ] Automated model selection
-- [ ] Trading recommendations
 
 ## Backlog: Supporting Infrastructure
 
 - [ ] Create data pipeline for loading metering data
 - [ ] Build model training framework
 
-## Backlog: Testing & Quality
-
-- [ ] Write unit tests for core forecasting functions
-
 ## Backlog: Documentation
 
 - [ ] Document each forecasting layer as it's implemented
 - [ ] Create example notebooks showing usage
-- [ ] Build data quality reports
 - [ ] Document assumptions and limitations
 
 ---

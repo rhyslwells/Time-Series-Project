@@ -3,26 +3,28 @@ Time Series Model Comparison & Interpretation
 ==============================================
 
 Purpose:
-    Fit a seasonal-naive baseline plus SARIMA, Exponential Smoothing, and
-    LightGBM on one asset's metering data, compare them on RMSE/MAE/MAPE/PI
-    coverage, and render diagnostic plots for the best model plus a
-    side-by-side comparison of all four. The seasonal-naive model is the
-    reference the others are scored against (MASE = model MAE / baseline MAE).
+    Fit a seasonal-naive baseline plus SeasonalWindowAverage, SARIMA,
+    Exponential Smoothing, and LightGBM on one asset's metering data, compare
+    them on RMSE/MAE/MAPE/PI coverage, and render diagnostic plots for the
+    best model plus a side-by-side comparison of all five. The seasonal-naive
+    model is the reference the others are scored against (MASE = model MAE /
+    baseline MAE).
 
 Data:
     src/data/metering_data.parquet, filtered to a single asset_id, split
     into train/test (last 4 days held out as test).
 
 Depends on:
-    src/ts_models.py — SeasonalNaiveModel, SARIMAModel,
-        ExponentialSmoothingModel, LightGBMModel
+    src/ts_models.py — SeasonalWindowAverageModel (window=1 is the
+        seasonal-naive baseline), SARIMAModel, ExponentialSmoothingModel,
+        LightGBMModel
     src/ts_evaluation.py — ModelComparison
     src/ts_plots.py — TSPlotter, ComparisonPlotter
 
 Flow (sections):
     1. Data Loading & Exploration   — load, plot full series, train/test split
     2. Understanding Metrics        — pointer to docs (no computation)
-    3. Model Comparison             — fit baseline + 3 models, rank by RMSE,
+    3. Model Comparison             — fit baseline + 4 models, rank by RMSE,
        report each model's MASE against the seasonal-naive baseline
     4. Detailed Plot Analysis       — 4 diagnostic plots for the best model
        (forecast vs actual, residuals, uncertainty width, PI coverage)
@@ -45,6 +47,7 @@ app = marimo.App(width="full")
 
 
 @app.cell
+# Imports & global config
 def _():
     import marimo as mo
     import polars as pl
@@ -57,13 +60,14 @@ def _():
 
 
 @app.cell
+# Notebook title & intro (markdown)
 def _(mo):
     mo.md("""
     # Time Series Model Comparison & Interpretation
 
     **Interactive explorer** for energy metering forecasts using SARIMA, Exponential Smoothing, and LightGBM.
 
-    This notebook loads metering data, fits the 3 models, and renders diagnostic plots.
+    This notebook loads metering data, fits the 4 models, and renders diagnostic plots.
     For the math behind each metric/model and how to read each plot, see
     [`docs_src/theory/`](../../docs_src/theory/index.md) (metrics, models, diagnostics, decisions).
     """)
@@ -71,6 +75,7 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
+# About: framework pattern explanation (markdown)
 def _(mo):
     mo.md(r"""
     ## About This Notebook
@@ -112,6 +117,7 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
+# Section 1 header: Data Loading & Exploration (markdown)
 def _(mo):
     mo.md("""
     ## Section 1: Data Loading & Exploration
@@ -122,8 +128,8 @@ def _(mo):
 
 
 @app.cell
+# Load one asset's metering data, print summary stats
 def _(np, pl):
-    # Load data
     df = pl.read_parquet("../../src/data/metering_data.parquet")
     asset_id = "ASSET_001"
     asset_data = df.filter(pl.col("asset_id") == asset_id).sort("timestamp")
@@ -144,8 +150,8 @@ def _(np, pl):
 
 
 @app.cell(hide_code=True)
+# Plot full time series (interactive)
 def _(go, mo, y):
-    # Interactive plot of full time series
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
@@ -170,8 +176,8 @@ def _(go, mo, y):
 
 
 @app.cell
+# Train/test split (last 4 days held out as test)
 def _(y):
-    # Train/test split
     test_split_idx = len(y) - (4 * 48)
     y_train = y[:test_split_idx]
     y_test = y[test_split_idx:]
@@ -182,6 +188,7 @@ def _(y):
 
 
 @app.cell(hide_code=True)
+# Section 2 header: Understanding Metrics (markdown, pointer to docs)
 def _(mo):
     mo.md("""
     ## Section 2: Understanding Metrics
@@ -193,17 +200,19 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
+# Section 3 header: Model Comparison (markdown)
 def _(mo):
     mo.md("""
     ## Section 3: Model Comparison
 
-    Compare 3 models using standardised framework classes (see "About This Notebook" above
+    Compare 4 models using standardised framework classes (see "About This Notebook" above
     for the framework pattern).
     """)
     return
 
 
 @app.cell
+# Fit baseline + 4 models, compute MASE vs baseline, print ranked results
 def _(pl, y_test, y_train):
     import sys
     from pathlib import Path
@@ -211,7 +220,7 @@ def _(pl, y_test, y_train):
     sys.path.insert(0, str(Path(__file__).parent.parent))
 
     from ts_models import (
-        SeasonalNaiveModel,
+        SeasonalWindowAverageModel,
         SARIMAModel,
         ExponentialSmoothingModel,
         LightGBMModel,
@@ -225,8 +234,11 @@ def _(pl, y_test, y_train):
 
     # Add models
     print("\nAdding models to comparison...")
-    comp.add_model(SeasonalNaiveModel(y_train, season_length=48))
-    print("  [+] SeasonalNaive (baseline, s=48)")
+    comp.add_model(SeasonalWindowAverageModel(y_train, season_length=48, window=1))
+    print("  [+] SeasonalNaive (baseline, s=48, window=1)")
+
+    comp.add_model(SeasonalWindowAverageModel(y_train, season_length=48, window=7))
+    print("  [+] SeasonalWindowAverage (s=48, window=7)")
 
     comp.add_model(SARIMAModel(y_train, order=(1, 1, 1), seasonal_order=(1, 1, 1, 48)))
     print("  [+] SARIMA(1,1,1)x(1,1,1,48)")
@@ -257,6 +269,7 @@ def _(pl, y_test, y_train):
 
 
 @app.cell(hide_code=True)
+# Model ranking table + interpretation guide (markdown)
 def _(mo, results_df):
     mo.md(f"""
     ### Model Ranking (by RMSE)
@@ -283,6 +296,7 @@ def _(mo, results_df):
 
 
 @app.cell(hide_code=True)
+# Section 4 header: Detailed Plot Analysis (markdown)
 def _(mo):
     mo.md("""
     ## Section 4: Detailed Plot Analysis
@@ -293,9 +307,8 @@ def _(mo):
 
 
 @app.cell
+# Select best model (lowest RMSE, excluding the seasonal-naive baseline)
 def _(comp, pl, results_df):
-    # Best model = lowest RMSE among the real models (the seasonal-naive row is
-    # the baseline, not a deployment candidate).
     ranked = results_df.filter(pl.col("Model") != "SeasonalNaive")
     best_model_name = ranked["Model"][0]
     best_forecast = comp.get_forecast(best_model_name)
@@ -308,8 +321,8 @@ def _(comp, pl, results_df):
 
 
 @app.cell
+# Plot 1: Forecast vs Actual
 def _(TSPlotter, best_forecast, best_metrics, best_model_name, mo, y_test):
-    # Plot 1: Forecast vs Actual
     fig2 = TSPlotter.forecast_vs_actual(
         y_test, best_forecast, best_model_name, best_metrics
     )
@@ -319,6 +332,7 @@ def _(TSPlotter, best_forecast, best_metrics, best_model_name, mo, y_test):
 
 
 @app.cell(hide_code=True)
+# Plot 1 explanation (markdown, pointer to docs)
 def _(mo):
     mo.md("""
     #### Plot 1: Forecast vs Actual
@@ -399,7 +413,7 @@ def _(mo):
     mo.md("""
     ## Section 5: Comparing All Models
 
-    Side-by-side comparison of all 3 models.
+    Side-by-side comparison of all 4 models.
     """)
     return
 

@@ -1,5 +1,6 @@
 """
-Time series model implementations: SeasonalNaive, SARIMA, ExponentialSmoothing, LightGBM.
+Time series model implementations: SeasonalWindowAverage (incl. SeasonalNaive as window=1),
+SARIMA, ExponentialSmoothing, LightGBM.
 """
 
 import numpy as np
@@ -170,28 +171,52 @@ class ExponentialSmoothingModel(TSModel):
         self.fitted = False
 
 
-class SeasonalNaiveModel(TSModel):
-    """Seasonal naive baseline: yhat_t = y_{t-s}.
+class SeasonalWindowAverageModel(TSModel):
+    """Seasonal window-average baseline: yhat_t = mean(y_{t-s}, y_{t-2s}, ..., y_{t-w*s}).
 
-    The reference every other model is scored against (MASE is the ratio of a
-    model's MAE to this model's MAE on the same window). On clean data with a
-    hard-coded daily profile this is a strong baseline and beating it is not
-    guaranteed.
+    E.g. with season_length=48 (half-hourly, daily cycle) and window=7, the
+    forecast for 13:00 is the average of the previous 7 days' 13:00 values.
+    Smooths out single-day noise that the window=1 case carries forward
+    unchanged.
+
+    window=1 is the seasonal-naive special case (yhat_t = y_{t-s}) — the
+    reference every other model is scored against (MASE is the ratio of a
+    model's MAE to this model's MAE on the same window). It is named
+    "SeasonalNaive" rather than "SeasonalWindowAverage(window=1)" so that
+    MASE lookups by name (e.g. `ModelComparison` results filtered on
+    `Model == "SeasonalNaive"`) keep working regardless of window.
     """
 
-    def __init__(self, y_train: np.ndarray, season_length: int = 48):
-        super().__init__("SeasonalNaive", y_train)
+    def __init__(self, y_train: np.ndarray, season_length: int = 48, window: int = 7):
+        name = "SeasonalNaive" if window == 1 else f"SeasonalWindowAverage(window={window})"
+        super().__init__(name, y_train)
         self.season_length = season_length
+        self.window = window
 
     def fit(self, **kwargs) -> None:
         s = self.season_length
-        if len(self.y_train) <= s:
+        w = self.window
+        required = s * w
+        if len(self.y_train) <= required:
             raise RuntimeError(
-                f"SeasonalNaive needs more than {s} training points, got {len(self.y_train)}"
+                f"SeasonalWindowAverage needs more than {required} training points "
+                f"(season_length * window), got {len(self.y_train)}"
             )
-        # One-cycle-ahead in-sample residuals set the interval scale.
-        self._residual_std = float(np.std(self.y_train[s:] - self.y_train[:-s]))
-        self.model = self.y_train[-s:]
+
+        # In-sample one-step errors: at each t, predict from the w seasonal
+        # lags preceding it and compare to the actual value.
+        n = len(self.y_train)
+        preds = np.array(
+            [
+                np.mean([self.y_train[i - k * s] for k in range(1, w + 1)])
+                for i in range(required, n)
+            ]
+        )
+        actuals = self.y_train[required:n]
+        self._residual_std = float(np.std(actuals - preds))
+
+        last_cycles = self.y_train[-required:].reshape(w, s)
+        self.model = last_cycles.mean(axis=0)
         self.fitted = True
 
     def forecast(self, steps: int, confidence_level: float = 0.80) -> ForecastOutput:
@@ -199,8 +224,8 @@ class SeasonalNaiveModel(TSModel):
             raise RuntimeError("Model not fitted. Call fit() first.")
 
         s = self.season_length
-        last_season = self.model
-        yhat = np.array([last_season[i % s] for i in range(steps)])
+        seasonal_avg = self.model
+        yhat = np.array([seasonal_avg[i % s] for i in range(steps)])
 
         # h-step error accumulates one residual variance per seasonal cycle.
         z_score = norm.ppf((1 + confidence_level) / 2)
@@ -215,11 +240,13 @@ class SeasonalNaiveModel(TSModel):
         )
 
     def get_params(self) -> Dict:
-        return {"season_length": self.season_length}
+        return {"season_length": self.season_length, "window": self.window}
 
     def set_params(self, **kwargs) -> None:
         if "season_length" in kwargs:
             self.season_length = kwargs["season_length"]
+        if "window" in kwargs:
+            self.window = kwargs["window"]
         self.fitted = False
 
 

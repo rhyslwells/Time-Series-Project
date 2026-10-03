@@ -135,8 +135,9 @@ Neither is implemented in `ModelEvaluator` yet — compute them from `forecast.l
 An MAE of 0.4 means nothing on its own. The reference point is **seasonal naive**
 ($\hat{y}_t = y_{t-48}$ for a 30-minute series with a daily cycle). Compute the baseline's
 MAE/RMSE on the same test window first, then report the model as a ratio (that ratio is
-MASE). `SeasonalNaiveModel` in the framework computes this baseline directly — add it to a
-`ModelComparison` and read the other models' MAE against its row.
+MASE). `SeasonalWindowAverageModel(window=1)` in the framework computes this baseline
+directly (it auto-names itself `"SeasonalNaive"`) — add it to a `ModelComparison` and read
+the other models' MAE against its row.
 
 With 14 days of data there are only two weekly cycles, so a weekly seasonal-naive baseline
 ($\hat{y}_t = y_{t-336}$) is barely estimable — daily seasonal naive is the honest reference here.

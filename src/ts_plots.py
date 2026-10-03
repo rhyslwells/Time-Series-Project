@@ -373,12 +373,13 @@ class ComparisonPlotter:
     def forecast_comparison(
         y_test: np.ndarray,
         forecasts: Dict[str, ForecastOutput],
-        sample_size: int = 96  # Show first 4 days
+        sample_size: int = 96,  # Show first 4 days
+        x=None
     ) -> go.Figure:
         """Plot: All model forecasts overlaid"""
-        
+
         sample_idx = min(sample_size, len(y_test))
-        x_range = list(range(sample_idx))
+        x_range = list(x[:sample_idx]) if x is not None else list(range(sample_idx))
         
         fig = go.Figure()
         
@@ -403,13 +404,13 @@ class ComparisonPlotter:
         
         fig.update_layout(
             title="Model Forecast Comparison (first 4 days)",
-            xaxis_title="Time Step",
+            xaxis_title="Time" if x is not None else "Time Step",
             yaxis_title="Value (kWh)",
             height=500,
             width=1200,
             hovermode='x unified'
         )
-        
+
         return fig
     
     @staticmethod

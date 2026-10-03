@@ -2,10 +2,13 @@
 
 ## Choosing between them
 
-Always include **`SeasonalNaiveModel`** ($\hat{y}_t = y_{t-48}$) in the comparison — not as a
-candidate to deploy but as the reference the other three are scored against. A model that
-does not beat it (MASE ≥ 1) has learned less than copying yesterday. Its interval widens by
-one residual-std per seasonal cycle, so it is also a sanity check on interval scale.
+Always include **`SeasonalWindowAverageModel(window=1)`** ($\hat{y}_t = y_{t-48}$, the
+seasonal-naive special case — it auto-names itself `"SeasonalNaive"`) in the comparison —
+not as a candidate to deploy but as the reference the other three are scored against. A
+model that does not beat it (MASE ≥ 1) has learned less than copying yesterday. Its interval
+widens by one residual-std per seasonal cycle, so it is also a sanity check on interval scale.
+`window > 1` (e.g. `window=7`) averages several seasonal cycles instead of copying just the
+last one — smooths single-day noise at the cost of responsiveness to a recent level shift.
 
 | | SARIMA | Exp. Smoothing | LightGBM |
 |---|---|---|---|

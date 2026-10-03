@@ -49,8 +49,8 @@ the same `TSModel` subclasses and the same `ForecastOutput`/`EvaluationMetrics`
 contracts — only the evaluation loop around them differs.
 
 ```python
-evaluator = RollingOriginEvaluator(SeasonalNaiveModel, y, min_train_size=336, horizon=48)
-results = evaluator.run()
+evaluator = RollingOriginEvaluator(SeasonalWindowAverageModel, y, min_train_size=336, horizon=48)
+results = evaluator.run(model_kwargs={"window": 1})  # window=1 = seasonal-naive
 by_horizon = evaluator.metrics_by_horizon(results)  # mae, rmse, pi_coverage per horizon step
 ```
 
@@ -83,8 +83,8 @@ on it.
 
 **Flat width is horizon-dependent, not model-dependent.** [Diagnostics](diagnostics.md#uncertainty-width-over-time)
 notes only SARIMA produces horizon-varying interval width. That holds for a rolling-origin
-run with `horizon <= season_length` (e.g. `horizon=48` here): `SeasonalNaiveModel`'s margin
-scales with `floor(h / season_length) + 1`, which stays at 1 for every step inside one
+run with `horizon <= season_length` (e.g. `horizon=48` here): `SeasonalWindowAverageModel`'s
+margin scales with `floor(h / season_length) + 1`, which stays at 1 for every step inside one
 season, so both SeasonalNaive and ExponentialSmoothing report flat width in that run. Run
 `RollingOriginEvaluator` with `horizon > season_length` (e.g. 96, two days) and
 SeasonalNaive's width will step up at h=49 - expected, not a bug, but worth knowing before

@@ -276,7 +276,7 @@ def _(X_test, X_train, feature_cols, importances):
     X_test_sel = X_test[:, top_idx]
 
     print(f"Selected features ({len(top_features)}): {top_features}")
-    return X_test_sel, X_train_sel, top_features
+    return X_test_sel, X_train_sel
 
 
 @app.cell(hide_code=True)
@@ -640,6 +640,21 @@ def _(
     )
     comparison_fig
     return (sarima_metrics,)
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(r"""
+    Point-forecast accuracy (MAE/RMSE/MAPE): LightGBM beats SARIMA by a wide margin in both variants — roughly half the error. Tuning + feature selection gives LightGBM a further, smaller edge over its own baseline (e.g. RMSE ~0.36 → ~0.31-0.33).
+    PI Coverage tells the opposite story: SARIMA has the best-calibrated intervals (~71%, closest to the 80% target), baseline LightGBM is next (~60%), and the tuned LightGBM is actually the worst (~50-56%) — despite being the most accurate on point forecasts. That's the real finding: the tuning objective (Section 7) only minimizes RMSE on the validation slice, so it happily narrows the quantile spread in exchange for a sharper point forecast, at the cost of calibration.
+
+    None of the three hit 80% coverage. All three under-cover — the intervals are consistently too narrow for a nominal 80% CI, which is a broader calibration issue, not something specific to the tuned model.
+
+    Worth remembering the notebook's own caveat here too: LightGBM's test-set evaluation uses true lag values, not recursively forecast ones (see the Summary section), so its accuracy edge over SARIMA is somewhat optimistic relative to a genuine multi-step deployment — the PI coverage numbers are real and comparable, but the point-accuracy gap would likely narrow under a fair recursive comparison.
+
+    Practically: if calibrated uncertainty matters more than point accuracy for this use case, the baseline (or an objective that also penalizes miscalibration, not just RMSE) is the better choice over the RMSE-tuned model — that's a real tension this chart surfaces, not one the notebook resolve
+    """)
+    return
 
 
 @app.cell

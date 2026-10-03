@@ -36,8 +36,12 @@ Scope (see working_notes/8_gpt1/data_inspection.md):
 
 import marimo
 
-__generated_with = "0.24.0"
-app = marimo.App(width="full")
+__generated_with = "0.23.16"
+app = marimo.App(
+    width="full",
+    app_title="Data Inspection",
+    sql_output="polars",
+)
 
 
 @app.cell
@@ -79,7 +83,7 @@ def _(mo):
 
 @app.cell
 def _(pl):
-    df = pl.read_parquet("../../src/data/metering_data.parquet")
+    df = pl.read_parquet("src/data/metering_data.parquet")
 
     value_col = "metering_kwh"
     timestamp_col = "timestamp"
@@ -200,7 +204,6 @@ def _(DataInspector, asset_df, mo, value_col):
     y = asset_df[value_col].to_numpy()
     fig_acf_pacf = DataInspector.acf_pacf_plot(y, nlags=48, title=value_col)
     mo.ui.plotly(fig_acf_pacf)
-
 
     return
 

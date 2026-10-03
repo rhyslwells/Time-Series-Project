@@ -9,7 +9,7 @@ Time-Series-Project/
 ├── src/                          # Production code
 │   ├── __init__.py
 │   ├── ts_contracts.py            # Forecast data contracts (ForecastOutput, EvaluationMetrics)
-│   ├── ts_models.py               # TSModel + SeasonalNaive/SARIMA/ExponentialSmoothing/LightGBM
+│   ├── ts_models.py               # TSModel + SeasonalWindowAverage (window=1 = SeasonalNaive)/SARIMA/ExponentialSmoothing/LightGBM
 │   ├── ts_evaluation.py           # ModelEvaluator, ResidualDiagnostics, ModelComparison, ModelTuner
 │   ├── ts_plots.py                # Generic plotly diagnostics for any ForecastOutput
 │   ├── notebooks/                 # Marimo notebooks kept alongside the framework
