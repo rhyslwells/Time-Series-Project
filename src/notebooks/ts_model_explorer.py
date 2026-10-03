@@ -47,8 +47,8 @@ app = marimo.App(width="full")
 
 
 @app.cell
-# Imports & global config
 def _():
+    # Imports & global config
     import marimo as mo
     import polars as pl
     import numpy as np
@@ -59,8 +59,7 @@ def _():
     return go, mo, np, pl
 
 
-@app.cell
-# Notebook title & intro (markdown)
+@app.cell  # Notebook title & intro (markdown)
 def _(mo):
     mo.md("""
     # Time Series Model Comparison & Interpretation
@@ -74,8 +73,7 @@ def _(mo):
     return
 
 
-@app.cell(hide_code=True)
-# About: framework pattern explanation (markdown)
+@app.cell(hide_code=True)  # About: framework pattern explanation (markdown)
 def _(mo):
     mo.md(r"""
     ## About This Notebook
@@ -112,13 +110,14 @@ def _(mo):
     comp.add_model(MyNewModel(y_train))
     # Everything else works automatically!
     ```
+
     """)
     return
 
 
 @app.cell(hide_code=True)
-# Section 1 header: Data Loading & Exploration (markdown)
 def _(mo):
+    # Section 1 header: Data Loading & Exploration (markdown)
     mo.md("""
     ## Section 1: Data Loading & Exploration
 
@@ -128,8 +127,8 @@ def _(mo):
 
 
 @app.cell
-# Load one asset's metering data, print summary stats
 def _(np, pl):
+    # Load one asset's metering data, print summary stats
     df = pl.read_parquet("../../src/data/metering_data.parquet")
     asset_id = "ASSET_001"
     asset_data = df.filter(pl.col("asset_id") == asset_id).sort("timestamp")
@@ -146,12 +145,12 @@ def _(np, pl):
     print(f" Std: {np.std(y):.3f} kWh")
     print(f" Min: {np.min(y):.3f} kWh")
     print(f" Max: {np.max(y):.3f} kWh")
-    return (y,)
+    return timestamps, y
 
 
 @app.cell(hide_code=True)
-# Plot full time series (interactive)
 def _(go, mo, y):
+    # Plot full time series (interactive)
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
@@ -176,20 +175,21 @@ def _(go, mo, y):
 
 
 @app.cell
-# Train/test split (last 4 days held out as test)
-def _(y):
+def _(timestamps, y):
+    # Train/test split (last 4 days held out as test)
     test_split_idx = len(y) - (4 * 48)
     y_train = y[:test_split_idx]
     y_test = y[test_split_idx:]
+    test_timestamps = timestamps[test_split_idx:]
 
     print(f"Train: {len(y_train)} observations ({len(y_train) / 48:.1f} days)")
     print(f"Test: {len(y_test)} observations ({len(y_test) / 48:.1f} days)")
-    return y_test, y_train
+    return test_timestamps, y_test, y_train
 
 
 @app.cell(hide_code=True)
-# Section 2 header: Understanding Metrics (markdown, pointer to docs)
 def _(mo):
+    # Section 2 header: Understanding Metrics (markdown, pointer to docs)
     mo.md("""
     ## Section 2: Understanding Metrics
 
@@ -200,8 +200,8 @@ def _(mo):
 
 
 @app.cell(hide_code=True)
-# Section 3 header: Model Comparison (markdown)
 def _(mo):
+    # Section 3 header: Model Comparison (markdown)
     mo.md("""
     ## Section 3: Model Comparison
 
@@ -212,8 +212,8 @@ def _(mo):
 
 
 @app.cell
-# Fit baseline + 4 models, compute MASE vs baseline, print ranked results
 def _(pl, y_test, y_train):
+    # Fit baseline + 4 models, compute MASE vs baseline, print ranked results
     import sys
     from pathlib import Path
 
@@ -269,8 +269,8 @@ def _(pl, y_test, y_train):
 
 
 @app.cell(hide_code=True)
-# Model ranking table + interpretation guide (markdown)
 def _(mo, results_df):
+    # Model ranking table + interpretation guide (markdown)
     mo.md(f"""
     ### Model Ranking (by RMSE)
 
@@ -296,8 +296,8 @@ def _(mo, results_df):
 
 
 @app.cell(hide_code=True)
-# Section 4 header: Detailed Plot Analysis (markdown)
 def _(mo):
+    # Section 4 header: Detailed Plot Analysis (markdown)
     mo.md("""
     ## Section 4: Detailed Plot Analysis
 
@@ -307,8 +307,8 @@ def _(mo):
 
 
 @app.cell
-# Select best model (lowest RMSE, excluding the seasonal-naive baseline)
 def _(comp, pl, results_df):
+    # Select best model (lowest RMSE, excluding the seasonal-naive baseline)
     ranked = results_df.filter(pl.col("Model") != "SeasonalNaive")
     best_model_name = ranked["Model"][0]
     best_forecast = comp.get_forecast(best_model_name)
@@ -316,15 +316,25 @@ def _(comp, pl, results_df):
 
     best_mase = ranked["MASE"][0]
     beats_baseline = "beats" if best_mase < 1 else "does NOT beat"
-    print(f"Best Model: {best_model_name} (MASE {best_mase:.3f} - {beats_baseline} baseline)")
+    print(
+        f"Best Model: {best_model_name} (MASE {best_mase:.3f} - {beats_baseline} baseline)"
+    )
     return best_forecast, best_mase, best_metrics, best_model_name
 
 
 @app.cell
-# Plot 1: Forecast vs Actual
-def _(TSPlotter, best_forecast, best_metrics, best_model_name, mo, y_test):
+def _(
+    TSPlotter,
+    best_forecast,
+    best_metrics,
+    best_model_name,
+    mo,
+    test_timestamps,
+    y_test,
+):
+    # Plot 1: Forecast vs Actual
     fig2 = TSPlotter.forecast_vs_actual(
-        y_test, best_forecast, best_model_name, best_metrics
+        y_test, best_forecast, best_model_name, best_metrics, x=test_timestamps
     )
 
     mo.ui.plotly(fig2)
@@ -332,8 +342,8 @@ def _(TSPlotter, best_forecast, best_metrics, best_model_name, mo, y_test):
 
 
 @app.cell(hide_code=True)
-# Plot 1 explanation (markdown, pointer to docs)
 def _(mo):
+    # Plot 1 explanation (markdown, pointer to docs)
     mo.md("""
     #### Plot 1: Forecast vs Actual
 
@@ -344,9 +354,11 @@ def _(mo):
 
 
 @app.cell
-def _(TSPlotter, best_forecast, best_model_name, mo, y_test):
+def _(TSPlotter, best_forecast, best_model_name, mo, test_timestamps, y_test):
     # Plot 2: Residuals Diagnostic
-    fig3 = TSPlotter.residuals_diagnostic(y_test, best_forecast, best_model_name)
+    fig3 = TSPlotter.residuals_diagnostic(
+        y_test, best_forecast, best_model_name, x=test_timestamps
+    )
 
     mo.ui.plotly(fig3)
     return
@@ -364,9 +376,11 @@ def _(mo):
 
 
 @app.cell
-def _(TSPlotter, best_forecast, best_model_name, mo):
+def _(TSPlotter, best_forecast, best_model_name, mo, test_timestamps):
     # Plot 3: Uncertainty Width
-    fig4 = TSPlotter.uncertainty_analysis(best_forecast, best_model_name)
+    fig4 = TSPlotter.uncertainty_analysis(
+        best_forecast, best_model_name, x=test_timestamps
+    )
 
     mo.ui.plotly(fig4)
     return
@@ -384,9 +398,11 @@ def _(mo):
 
 
 @app.cell
-def _(TSPlotter, best_forecast, best_model_name, mo, y_test):
+def _(TSPlotter, best_forecast, best_model_name, mo, test_timestamps, y_test):
     # Plot 4: PI Coverage
-    fig5 = TSPlotter.pi_coverage(y_test, best_forecast, best_model_name)
+    fig5 = TSPlotter.pi_coverage(
+        y_test, best_forecast, best_model_name, x=test_timestamps
+    )
 
     mo.ui.plotly(fig5)
     return
@@ -419,12 +435,14 @@ def _(mo):
 
 
 @app.cell
-def _(ComparisonPlotter, comp, mo, y_test):
+def _(ComparisonPlotter, comp, mo, test_timestamps, y_test):
     # Get all forecasts
     forecasts = {name: comp.get_forecast(name) for name in comp.results.keys()}
 
     # Plot: All model forecasts overlaid
-    fig6 = ComparisonPlotter.forecast_comparison(y_test, forecasts, sample_size=96)
+    fig6 = ComparisonPlotter.forecast_comparison(
+        y_test, forecasts, sample_size=96, x=test_timestamps
+    )
 
     mo.ui.plotly(fig6)
     return
@@ -522,7 +540,9 @@ def _(best_mase, best_metrics):
     checks = {
         f"MASE {best_mase:.3f} < 1 (beats seasonal naive)": best_mase < 1,
         f"RMSE/MAE ratio {ratio:.2f} < 1.5 (no dominant outliers)": ratio < 1.5,
-        f"PI Coverage {best_metrics.pi_coverage:.0f}% within 75-85": 75 <= best_metrics.pi_coverage <= 85,
+        f"PI Coverage {best_metrics.pi_coverage:.0f}% within 75-85": 75
+        <= best_metrics.pi_coverage
+        <= 85,
         "Residuals centered, no trend, not autocorrelated": None,  # inspect Section 4
         "Uncertainty width varies with time of day (SARIMA only)": None,  # inspect Section 4
     }
@@ -535,7 +555,9 @@ def _(best_mase, best_metrics):
 
     auto = [v for v in checks.values() if v is not None]
     passed = sum(auto)
-    print(f"\nAutomated checks passed: {passed}/{len(auto)} (plus 2 to inspect visually)")
+    print(
+        f"\nAutomated checks passed: {passed}/{len(auto)} (plus 2 to inspect visually)"
+    )
     if passed == len(auto):
         print("-> clears the automated bar; confirm the visual checks, then deploy")
     else:
@@ -563,7 +585,9 @@ def _(best_mase, best_metrics, best_model_name, mo):
     elif 75 <= best_metrics.pi_coverage <= 85:
         verdict = f"Deploy {best_model_name}."
     else:
-        verdict = f"Retrain {best_model_name} - coverage outside the 75-85% target range."
+        verdict = (
+            f"Retrain {best_model_name} - coverage outside the 75-85% target range."
+        )
 
     mo.md(f"""
     ### Recommendations

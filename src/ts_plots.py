@@ -236,11 +236,12 @@ class TSPlotter:
     @staticmethod
     def uncertainty_analysis(
         forecast: ForecastOutput,
-        model_name: str = "Model"
+        model_name: str = "Model",
+        x=None
     ) -> go.Figure:
         """Plot: Uncertainty width over forecast horizon"""
-        
-        x_range = list(range(len(forecast.prediction)))
+
+        x_range = list(x) if x is not None else list(range(len(forecast.prediction)))
         
         fig = go.Figure()
         
@@ -261,13 +262,13 @@ class TSPlotter:
         
         fig.update_layout(
             title=f"{model_name}: Forecast Uncertainty Over Time",
-            xaxis_title="Time Step",
+            xaxis_title="Time" if x is not None else "Time Step",
             yaxis_title="Prediction Interval Width (kWh)",
             height=450,
             width=1200,
             hovermode='x unified'
         )
-        
+
         return fig
     
     @staticmethod
