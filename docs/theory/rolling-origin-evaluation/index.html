@@ -1274,8 +1274,8 @@ afterwards, once, on whichever model already won that cheap pass, to confirm the
 generalises across windows and to characterise how far ahead it can be trusted. It reuses
 the same <code>TSModel</code> subclasses and the same <code>ForecastOutput</code>/<code>EvaluationMetrics</code>
 contracts — only the evaluation loop around them differs.</p>
-<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">evaluator</span> <span class="o">=</span> <span class="n">RollingOriginEvaluator</span><span class="p">(</span><span class="n">SeasonalNaiveModel</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">min_train_size</span><span class="o">=</span><span class="mi">336</span><span class="p">,</span> <span class="n">horizon</span><span class="o">=</span><span class="mi">48</span><span class="p">)</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">results</span> <span class="o">=</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<div class="language-python highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">evaluator</span> <span class="o">=</span> <span class="n">RollingOriginEvaluator</span><span class="p">(</span><span class="n">SeasonalWindowAverageModel</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">min_train_size</span><span class="o">=</span><span class="mi">336</span><span class="p">,</span> <span class="n">horizon</span><span class="o">=</span><span class="mi">48</span><span class="p">)</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="n">results</span> <span class="o">=</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">model_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">"window"</span><span class="p">:</span> <span class="mi">1</span><span class="p">})</span>  <span class="c1"># window=1 = seasonal-naive</span>
 </span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="n">by_horizon</span> <span class="o">=</span> <span class="n">evaluator</span><span class="o">.</span><span class="n">metrics_by_horizon</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>  <span class="c1"># mae, rmse, pi_coverage per horizon step</span>
 </span></code></pre></div>
 <p>See <a href="../metrics/">Metrics</a> for what MAE/RMSE/PI coverage mean, and
@@ -1302,8 +1302,8 @@ run as a smoother look at the shape of horizon decay, not as a tighter confidenc
 on it.</p>
 <p><strong>Flat width is horizon-dependent, not model-dependent.</strong> <a href="../diagnostics/#uncertainty-width-over-time">Diagnostics</a>
 notes only SARIMA produces horizon-varying interval width. That holds for a rolling-origin
-run with <code>horizon &lt;= season_length</code> (e.g. <code>horizon=48</code> here): <code>SeasonalNaiveModel</code>'s margin
-scales with <code>floor(h / season_length) + 1</code>, which stays at 1 for every step inside one
+run with <code>horizon &lt;= season_length</code> (e.g. <code>horizon=48</code> here): <code>SeasonalWindowAverageModel</code>'s
+margin scales with <code>floor(h / season_length) + 1</code>, which stays at 1 for every step inside one
 season, so both SeasonalNaive and ExponentialSmoothing report flat width in that run. Run
 <code>RollingOriginEvaluator</code> with <code>horizon &gt; season_length</code> (e.g. 96, two days) and
 SeasonalNaive's width will step up at h=49 - expected, not a bug, but worth knowing before
@@ -1328,7 +1328,7 @@ reading a flat-vs-growing plot as a model property rather than a horizon-length 
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="September 13, 2026 18:00:34 UTC">September 13, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 3, 2026 08:05:54 UTC">October 3, 2026</span>
   </span>
 
     
