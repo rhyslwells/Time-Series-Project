@@ -1137,6 +1137,8 @@
       
         
       
+        
+      
     
     
     
@@ -1311,11 +1313,13 @@
 <h1 id="forecast-products">Forecast Products<a class="headerlink" href="#forecast-products" title="Permanent link">&para;</a></h1>
 <p>The model outputs in <a href="../models/">Models</a> are inputs to a larger system. This page covers the theory for turning a per-timestep forecast into the derived signals that system needs.</p>
 <div class="admonition warning">
-<p class="admonition-title">Proposed — not implemented</p>
-<p>Everything on this page is design, not built code. The forecasting framework produces the
-per-timestep forecast and interval; none of the derived signals below (schedules, event
-probabilities, flexibility ranges, portfolio aggregation, scenarios) exist in the repo yet.
-Read this as a map of where the system is heading.</p>
+<p class="admonition-title">Mostly proposed — partly demonstrated</p>
+<p>This page is design. The forecasting framework produces the per-timestep forecast and
+interval; the derived signals below are not a built layer. Daily energy/peak/ramp,
+uncertainty width, event probability and expected schedule are demonstrated on one fixed
+model in the <a href="../../notebooks/forecast_products/">Forecast products notebook</a>, with helpers
+in <code>src/ts_products.py</code>. The rest (baseline response, anomaly detection, portfolio
+aggregation, flexibility ranges, scenarios, asset classification) are not built.</p>
 </div>
 <p>The signals group into three bands, roughly by distance from the raw forecast:</p>
 <ol>
@@ -1335,6 +1339,12 @@ Read this as a map of where the system is heading.</p>
 <p>Large <span class="arithmatex">\(U_t\)</span> means the forecast shouldn't be trusted at face value for that timestep; small <span class="arithmatex">\(U_t\)</span> means it can be. This is why a downstream system should consume <code>expected</code>, <code>conservative</code> (e.g. <span class="arithmatex">\(P_{10}\)</span>), and <code>uncertainty</code> as three separate numbers rather than collapsing to one — it lets the optimisation layer decide how much of the uncertainty it wants to absorb, rather than baking that choice into the forecast.</p>
 <h2 id="event-probability">Event probability<a class="headerlink" href="#event-probability" title="Permanent link">&para;</a></h2>
 <p>Once the forecast is a distribution, questions like "will this asset exceed 5 MW?" become <span class="arithmatex">\(P(Y_t &gt; 5)\)</span> rather than a hard yes/no on the point forecast. This generalises to any threshold — a battery reaching a target SOC, consumption falling below a floor, a violation of an operational limit — and is usually more useful downstream than the raw forecast value, since it's already framed as a decision input.</p>
+<p>Three points that are easy to get wrong:</p>
+<ul>
+<li><strong>It is per timestep.</strong> <span class="arithmatex">\(P(Y_t &gt; c)\)</span> is a statement about one slot. Averaging it over a horizon mixes quiet and busy slots into a number that answers no operational question. Meaningful summaries are the per-slot curve, the expected number of slots above <span class="arithmatex">\(c\)</span> (<span class="arithmatex">\(\sum_t P(Y_t &gt; c)\)</span>, valid without independence), or the windows where <span class="arithmatex">\(P &gt; 0.5\)</span>. "At least one slot above <span class="arithmatex">\(c\)</span>" needs the correlation between slots and cannot be read off the marginals.</li>
+<li><strong>Use the right <span class="arithmatex">\(z\)</span>.</strong> A standard deviation recovered from an interval is <span class="arithmatex">\(\sigma_t = (U_t)/(2z)\)</span> with <span class="arithmatex">\(z\)</span> set by the interval's confidence level: 1.2816 for 80%, 1.645 for 90%. <code>ts_products.implied_std</code> takes it from the confidence level.</li>
+<li><strong>It is only as good as the distribution.</strong> A model with a flat sigma is over-confident in busy slots, so forecasts of 95% occur less often than 95%. Check calibration by binning predicted probabilities against observed frequency.</li>
+</ul>
 <h2 id="expected-behaviour-and-schedule">Expected behaviour and schedule<a class="headerlink" href="#expected-behaviour-and-schedule" title="Permanent link">&para;</a></h2>
 <p>Applying threshold/event logic across a horizon turns a forecast into an expected schedule: expected start/shutdown, expected peak/minimum, expected sustained high consumption or export, expected regime change. E.g. "expected operation 06:00-08:30 and 17:00-20:00" for a pump, or "expected generation peak 12:30-13:00" for solar.</p>
 <h2 id="baseline-and-response-estimation">Baseline and response estimation<a class="headerlink" href="#baseline-and-response-estimation" title="Permanent link">&para;</a></h2>
@@ -1392,7 +1402,7 @@ that name and it was consolidated into <code>daily_metrics.parquet</code>.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="October 3, 2026 08:05:54 UTC">October 3, 2026</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date" title="November 1, 2026 09:19:27 UTC">November 1, 2026</span>
   </span>
 
     
