@@ -2,11 +2,13 @@
 
 The model outputs in [Models](models.md) are inputs to a larger system. This page covers the theory for turning a per-timestep forecast into the derived signals that system needs.
 
-!!! warning "Proposed — not implemented"
-    Everything on this page is design, not built code. The forecasting framework produces the
-    per-timestep forecast and interval; none of the derived signals below (schedules, event
-    probabilities, flexibility ranges, portfolio aggregation, scenarios) exist in the repo yet.
-    Read this as a map of where the system is heading.
+!!! warning "Mostly proposed — partly demonstrated"
+    This page is design. The forecasting framework produces the per-timestep forecast and
+    interval; the derived signals below are not a built layer. Daily energy/peak/ramp,
+    uncertainty width, event probability and expected schedule are demonstrated on one fixed
+    model in the [Forecast products notebook](../notebooks/forecast_products.md), with helpers
+    in `src/ts_products.py`. The rest (baseline response, anomaly detection, portfolio
+    aggregation, flexibility ranges, scenarios, asset classification) are not built.
 
 The signals group into three bands, roughly by distance from the raw forecast:
 
@@ -37,6 +39,12 @@ Large $U_t$ means the forecast shouldn't be trusted at face value for that times
 ## Event probability
 
 Once the forecast is a distribution, questions like "will this asset exceed 5 MW?" become $P(Y_t > 5)$ rather than a hard yes/no on the point forecast. This generalises to any threshold — a battery reaching a target SOC, consumption falling below a floor, a violation of an operational limit — and is usually more useful downstream than the raw forecast value, since it's already framed as a decision input.
+
+Three points that are easy to get wrong:
+
+- **It is per timestep.** $P(Y_t > c)$ is a statement about one slot. Averaging it over a horizon mixes quiet and busy slots into a number that answers no operational question. Meaningful summaries are the per-slot curve, the expected number of slots above $c$ ($\sum_t P(Y_t > c)$, valid without independence), or the windows where $P > 0.5$. "At least one slot above $c$" needs the correlation between slots and cannot be read off the marginals.
+- **Use the right $z$.** A standard deviation recovered from an interval is $\sigma_t = (U_t)/(2z)$ with $z$ set by the interval's confidence level: 1.2816 for 80%, 1.645 for 90%. `ts_products.implied_std` takes it from the confidence level.
+- **It is only as good as the distribution.** A model with a flat sigma is over-confident in busy slots, so forecasts of 95% occur less often than 95%. Check calibration by binning predicted probabilities against observed frequency.
 
 ## Expected behaviour and schedule
 

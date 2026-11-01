@@ -89,6 +89,7 @@ nav:
       - notebooks/notebooks.md
       - SARIMA forecasting: notebooks/sarima.md
       - Model comparison: notebooks/ts_model_explorer.md
+      - Forecast products: notebooks/forecast_products.md
   - Findings:
       - findings/index.md
       - Asset profiling: findings/asset_profiling.md
