@@ -21,6 +21,22 @@ def implied_std(forecast: ForecastOutput, confidence_level: float) -> np.ndarray
     return forecast.uncertainty_width / (2 * z)
 
 
+def forecast_quantile(
+    forecast: ForecastOutput, q: float, confidence_level: float
+) -> np.ndarray:
+    """Per-step q-quantile of Normal(prediction, implied_std); q=0.1 is a conservative (P10) value."""
+    return forecast.prediction + norm.ppf(q) * implied_std(forecast, confidence_level)
+
+
+def expected_exceedance(
+    forecast: ForecastOutput, threshold: float, confidence_level: float
+) -> np.ndarray:
+    """E[max(Y_t - threshold, 0)] per step: expected amount over the threshold, in forecast units."""
+    sigma = implied_std(forecast, confidence_level)
+    d = (forecast.prediction - threshold) / sigma
+    return sigma * (norm.pdf(d) + d * norm.cdf(d))
+
+
 def exceedance_probability(
     forecast: ForecastOutput, threshold: float, confidence_level: float
 ) -> np.ndarray:

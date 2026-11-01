@@ -5,7 +5,8 @@ The model outputs in [Models](models.md) are inputs to a larger system. This pag
 !!! warning "Mostly proposed — partly demonstrated"
     This page is design. The forecasting framework produces the per-timestep forecast and
     interval; the derived signals below are not a built layer. Daily energy/peak/ramp,
-    uncertainty width, event probability and expected schedule are demonstrated on one fixed
+    uncertainty width, event probability, expected schedule, expected exceedance, a firm
+    (percentile) planning value, a cost-based decision cutoff and a live replay are demonstrated on one fixed
     model in the [Forecast products notebook](../notebooks/forecast_products.md), with helpers
     in `src/ts_products.py`. The rest (baseline response, anomaly detection, portfolio
     aggregation, flexibility ranges, scenarios, asset classification) are not built.

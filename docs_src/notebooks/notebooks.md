@@ -9,7 +9,7 @@ that evolve as the analysis develops, and are stored in `src/notebooks/`.
 |---|---|
 | [SARIMA forecasting pipeline](sarima.md) | End-to-end SARIMA forecast for one asset, with prediction intervals and event probabilities |
 | [Model comparison and interpretation](ts_model_explorer.md) | SARIMA vs Exponential Smoothing vs LightGBM on one split, with a diagnostic-plot reading guide |
-| [Forecast products](forecast_products.md) | What daily energy/peak/ramp, interval width, event probability (with calibration) and expected schedule tell you, with a fixed seasonal-average model |
+| [Forecast products](forecast_products.md) | What daily energy/peak/ramp, interval width, event probability (with calibration), expected schedule, expected exceedance, firm planning value and cost-based cutoff tell you, with a live-replay example and a fixed seasonal-average model |
 
 ## Running a notebook
 
