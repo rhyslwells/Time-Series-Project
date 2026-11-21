@@ -12,6 +12,7 @@ Start with `05`, which walks through the API step by step. `01`-`04` are applica
 | Notebook | Question it answers |
 |---|---|
 | `05_mlforecast_basics.py` | How do `MLForecast`, lags, `preprocess`, `cross_validation` and conformal intervals fit together? |
+| `06_quantile_vs_conformal.py` | Quantile models or conformal intervals: which gives better-calibrated 80% bands, and why? |
 | `01_likelihoods.py` | How likely is demand above/below X at a given time tomorrow? Will the asset export? |
 | `02_evaluation.py` | Does ML beat simple baselines? Are the percentiles calibrated? |
 | `03_feature_importance.py` | Which inputs does the model rely on? |

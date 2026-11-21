@@ -22,9 +22,12 @@ import pandas as pd
 from mlforecast import MLForecast
 from mlforecast.lag_transforms import RollingMax, RollingMean, RollingMin
 from sklearn.base import BaseEstimator, RegressorMixin
+from sklearn.ensemble import HistGradientBoostingRegressor
+from sklearn.linear_model import QuantileRegressor
 
 QUANTILES = [0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95]
-MODELS = ["Seasonal naive", "Slot profile", "Quantile GBM"]
+MODELS = ["Seasonal naive", "Slot profile", "Quantile GBM"]  # the tiers compared in the backtest notebooks
+ML_MODELS = ["Quantile GBM", "HistGB quantile", "Linear quantile"]  # real ML models you can pick between
 PERIODS_PER_DAY = 48
 UID = "asset"
 
@@ -106,10 +109,24 @@ def _gbm(q: float) -> lgb.LGBMRegressor:
     )
 
 
+def _hist_gbm(q: float) -> HistGradientBoostingRegressor:
+    return HistGradientBoostingRegressor(
+        loss="quantile", quantile=q, max_depth=3, max_iter=120, learning_rate=0.05,
+        min_samples_leaf=10, random_state=0,
+    )
+
+
+def _linear_quantile(q: float) -> QuantileRegressor:
+    # Linear in the features: cannot bend around the evening peak. A useful contrast with the trees.
+    return QuantileRegressor(quantile=q, alpha=0.0, solver="highs")
+
+
 _TIERS = {
     "Seasonal naive": ("naive", SeasonalNaiveQuantile),
     "Slot profile": ("profile", SlotProfileQuantile),
-    "Quantile GBM": ("gbm", _gbm),
+    "Quantile GBM": ("gbm", _gbm),  # LightGBM
+    "HistGB quantile": ("histgb", _hist_gbm),  # scikit-learn's histogram gradient boosting
+    "Linear quantile": ("linq", _linear_quantile),  # scikit-learn linear quantile regression
 }
 
 
@@ -125,33 +142,36 @@ def weekend(dates):
     return (dates.dayofweek >= 5).astype(int)
 
 
-def make_forecaster(quantiles=QUANTILES) -> MLForecast:
-    """One MLForecast holding every (tier, quantile) model. Fresh object each call."""
-    models = {model_name(t, q): make(q) for t, (_, make) in _TIERS.items() for q in quantiles}
-    return MLForecast(
-        models=models,
-        freq="30min",
-        lags=[48],  # same slot yesterday
-        lag_transforms={
-            48: [RollingMean(window_size=3), RollingMean(window_size=48),
-                 RollingMax(window_size=48), RollingMin(window_size=48)],
-        },
-        date_features=[slot, weekend],
-    )
+# The feature recipe, shared by every MLForecast in this folder (also reused by 06).
+FEATURE_KWARGS = dict(
+    freq="30min",
+    lags=[48],  # same slot yesterday
+    lag_transforms={
+        48: [RollingMean(window_size=3), RollingMean(window_size=48),
+             RollingMax(window_size=48), RollingMin(window_size=48)],
+    },
+    date_features=[slot, weekend],
+)
 
 
-def _collect(frame: pd.DataFrame, quantiles) -> dict[str, np.ndarray]:
+def make_forecaster(quantiles=QUANTILES, tiers=MODELS) -> MLForecast:
+    """One MLForecast holding a model per (tier, quantile). Fresh object each call."""
+    models = {model_name(t, q): _TIERS[t][1](q) for t in tiers for q in quantiles}
+    return MLForecast(models=models, **FEATURE_KWARGS)
+
+
+def _collect(frame: pd.DataFrame, quantiles, tiers=MODELS) -> dict[str, np.ndarray]:
     """{tier: (n, n_quantiles)} from an mlforecast output frame; sorted to stop quantile crossing."""
-    return {t: np.sort(frame[[model_name(t, q) for q in quantiles]].to_numpy(), axis=1) for t in _TIERS}
+    return {t: np.sort(frame[[model_name(t, q) for q in quantiles]].to_numpy(), axis=1) for t in tiers}
 
 
 # ----------------------------------------------------------------- forecast / backtest
 def forecast_tomorrow(s: pd.Series, tier: str = "Quantile GBM", quantiles=QUANTILES) -> pd.DataFrame:
     """Fit on all of `s`, predict the next 48 slots. Index = timestamps, columns q0.05..q0.95."""
-    fcst = make_forecaster(quantiles)
+    fcst = make_forecaster(quantiles, tiers=[tier])
     fcst.fit(to_long(s))
     out = fcst.predict(h=PERIODS_PER_DAY)
-    return pd.DataFrame(_collect(out, quantiles)[tier], columns=qcols(quantiles), index=pd.DatetimeIndex(out["ds"]))
+    return pd.DataFrame(_collect(out, quantiles, [tier])[tier], columns=qcols(quantiles), index=pd.DatetimeIndex(out["ds"]))
 
 
 def feature_table(s: pd.Series) -> pd.DataFrame:

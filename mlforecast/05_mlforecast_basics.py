@@ -13,15 +13,15 @@ def _():
     import sys
 
     import marimo as mo
-    import matplotlib.pyplot as plt
     import numpy as np
     import pandas as pd
+    import plotly.graph_objects as go
 
     if str(mo.notebook_dir()) not in sys.path:
         sys.path.insert(0, str(mo.notebook_dir()))
     import common as c
 
-    return c, mo, np, pd, plt
+    return c, go, mo, np, pd
 
 
 @app.cell
@@ -147,15 +147,20 @@ def _(cv, np, pd):
 
 
 @app.cell
-def _(cv, plt):
-    one = cv[cv["unique_id"] == "asset_0"]
-    fig, ax = plt.subplots(figsize=(11, 3.5))
-    ax.plot(one["ds"], one["y"], label="actual", color="k", lw=1)
-    ax.plot(one["ds"], one["lgbm"], label="lgbm", color="tab:blue", lw=1)
-    ax.fill_between(one["ds"], one["lgbm-lo-80"], one["lgbm-hi-80"], alpha=0.2, label="80% PI")
-    ax.legend()
-    ax.set_ylabel("kW")
-    fig
+def _(cv, go, mo):
+    _one = cv[cv["unique_id"] == "asset_0"]
+    _fig = go.Figure()
+    _fig.add_scatter(x=_one["ds"], y=_one["lgbm-hi-80"], line=dict(width=0), showlegend=False, hoverinfo="skip")
+    _fig.add_scatter(x=_one["ds"], y=_one["lgbm-lo-80"], fill="tonexty", fillcolor="rgba(31,119,180,0.2)",
+                     line=dict(width=0), name="80% PI (conformal)", hoverinfo="skip")
+    _fig.add_scatter(x=_one["ds"], y=_one["y"], name="actual", line=dict(color="black", width=1.2))
+    _fig.add_scatter(x=_one["ds"], y=_one["lgbm"], name="lgbm", line=dict(color="#1f77b4", width=1.5))
+    _fig.update_layout(
+        title="Backtest on asset_0: forecast vs actual", yaxis_title="kW", hovermode="x unified", height=380,
+        margin=dict(l=50, r=20, t=50, b=40), legend=dict(orientation="h", y=-0.2),
+    )
+    _fig.update_xaxes(tickformat="%d %b<br>%H:%M")
+    mo.vstack([_fig, mo.md("The grey-blue band is the conformal interval. Hover to compare forecast and actual at any half-hour.")])
     return
 
 

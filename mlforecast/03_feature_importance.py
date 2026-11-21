@@ -13,16 +13,16 @@ def _():
     import sys
 
     import marimo as mo
-    import matplotlib.pyplot as plt
     import numpy as np
     import pandas as pd
+    import plotly.graph_objects as go
     from sklearn.inspection import partial_dependence, permutation_importance
 
     if mo.notebook_dir() is not None:
         sys.path.insert(0, str(mo.notebook_dir()))
     import common as c
 
-    return c, mo, np, partial_dependence, permutation_importance, pd, plt
+    return c, go, mo, np, partial_dependence, permutation_importance, pd
 
 
 @app.cell
@@ -74,15 +74,20 @@ def _(c, df, permutation_importance, pd, reps, split_days):
 
 
 @app.cell
-def _(c, feats, mo, pi, plt, te, tr):
+def _(c, feats, go, mo, pi, te, tr):
     _order = pi.importances_mean.argsort()
     _names = [feats[i] for i in _order]
-    _fig, _ax = plt.subplots(figsize=(8, 3.6))
-    _ax.barh(_names, pi.importances_mean[_order], xerr=pi.importances_std[_order], color="C0", alpha=0.85)
-    _ax.axvline(0, color="k", lw=0.8)
-    _ax.set_xlabel("increase in MAE (kW) when shuffled")
-    _ax.set_title("Permutation importance (held-out days)")
-    _fig.tight_layout()
+    _fig = go.Figure()
+    _fig.add_bar(
+        y=_names, x=pi.importances_mean[_order], orientation="h", marker_color="#1f77b4", opacity=0.9,
+        error_x=dict(type="data", array=pi.importances_std[_order]),
+        hovertemplate="%{y}<br>MAE rises by %{x:.2f} kW when shuffled<extra></extra>",
+    )
+    _fig.add_vline(x=0, line=dict(color="black", width=1))
+    _fig.update_layout(
+        title="Permutation importance (held-out days)", xaxis_title="increase in MAE (kW) when shuffled",
+        height=360, margin=dict(l=240, r=20, t=50, b=40),
+    )
     _top = _names[-1]
     mo.vstack([
         mo.md(f"## What matters  \nTrained on **{tr['ds'].dt.normalize().nunique()}** days, importance measured on **{te['ds'].dt.normalize().nunique()}** unseen days."),
@@ -107,14 +112,15 @@ def _(feats, mo):
 
 
 @app.cell
-def _(c, feats, feature_pick, med_model, mo, partial_dependence, plt, tr):
+def _(c, feats, feature_pick, go, med_model, mo, partial_dependence, tr):
     _pd = partial_dependence(med_model, tr[feats].astype(float), [feature_pick.value], grid_resolution=40)
-    _fig, _ax = plt.subplots(figsize=(8, 3))
-    _ax.plot(_pd["grid_values"][0], _pd["average"][0], color="C1", lw=2)
-    _ax.set_xlabel(feature_pick.value)
-    _ax.set_ylabel("average predicted kW")
-    _ax.set_title(f"Partial dependence: {feature_pick.value}")
-    _fig.tight_layout()
+    _fig = go.Figure()
+    _fig.add_scatter(x=_pd["grid_values"][0], y=_pd["average"][0], mode="lines+markers", line=dict(color="#ff7f0e", width=2.5),
+                     hovertemplate=feature_pick.value + " = %{x:.2f}<br>avg predicted %{y:.1f} kW<extra></extra>")
+    _fig.update_layout(
+        title=f"Partial dependence: {feature_pick.value}", xaxis_title=feature_pick.value,
+        yaxis_title="average predicted kW", height=330, margin=dict(l=50, r=20, t=50, b=40),
+    )
     mo.vstack([
         _fig,
         mo.md(

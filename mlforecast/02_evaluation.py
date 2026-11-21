@@ -13,15 +13,16 @@ def _():
     import sys
 
     import marimo as mo
-    import matplotlib.pyplot as plt
     import numpy as np
     import pandas as pd
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
 
     if mo.notebook_dir() is not None:
         sys.path.insert(0, str(mo.notebook_dir()))
     import common as c
 
-    return c, mo, np, pd, plt
+    return c, go, make_subplots, mo, np, pd
 
 
 @app.cell
@@ -54,11 +55,11 @@ def _(c, mo, noise):
         bt = c.backtest(s)
     tbl = c.metrics_table(bt)
     mo.md(f"**Data:** {source} · {bt['fold'].nunique()} test days × 48 slots = {bt['model'].eq('Quantile GBM').sum()} scored points per model")
-    return bt, tbl
+    return bt, s, tbl
 
 
 @app.cell
-def _(mo, plt, tbl):
+def _(make_subplots, mo, tbl):
     _show = tbl.copy()
     _show["80% cover"] = (_show["80% cover"] * 100).round(0).astype(int).astype(str) + "%"
     _show["90% cover"] = (_show["90% cover"] * 100).round(0).astype(int).astype(str) + "%"
@@ -66,15 +67,11 @@ def _(mo, plt, tbl):
     _show = _show.round({"MAE (kW)": 2, "RMSE (kW)": 2, "pinball": 3})
 
     _best = tbl["pinball"].idxmin()
-    _fig, _axs = plt.subplots(1, 2, figsize=(10, 3))
-    _cols = ["C7", "C0", "C1"]
-    _axs[0].bar(tbl.index, tbl["MAE (kW)"], color=_cols)
-    _axs[0].set_title("Median error (MAE, kW) · lower is better")
-    _axs[1].bar(tbl.index, tbl["pinball"], color=_cols)
-    _axs[1].set_title("Pinball loss (whole distribution) · lower is better")
-    for _a in _axs:
-        _a.tick_params(axis="x", labelsize=8)
-    _fig.tight_layout()
+    _cols = ["#7f7f7f", "#1f77b4", "#ff7f0e"]
+    _fig = make_subplots(rows=1, cols=2, subplot_titles=("Median error (MAE, kW)", "Pinball loss (whole distribution)"))
+    _fig.add_bar(x=list(tbl.index), y=tbl["MAE (kW)"], marker_color=_cols, row=1, col=1, showlegend=False)
+    _fig.add_bar(x=list(tbl.index), y=tbl["pinball"], marker_color=_cols, row=1, col=2, showlegend=False)
+    _fig.update_layout(height=320, margin=dict(l=50, r=20, t=50, b=40))
 
     mo.vstack([
         mo.md("## Scoreboard"),
@@ -83,7 +80,7 @@ def _(mo, plt, tbl):
         mo.callout(
             mo.md(
                 f"**Best on pinball loss: {_best}** (skill vs naive: {tbl.loc[_best, 'skill vs naive'] * 100:.0f}%). "
-                "*Skill* = how much lower its loss is than 'same as yesterday'. "
+                "*Skill* = how much lower its loss is than 'same as yesterday'. Lower bars are better. "
                 "If the ML model isn't clearly beating the simple profile, the extra complexity isn't paying for itself yet."
             ),
             kind="success",
@@ -93,18 +90,18 @@ def _(mo, plt, tbl):
 
 
 @app.cell
-def _(bt, c, mo, np, plt):
-    _fig, _ax = plt.subplots(figsize=(4.6, 4.2))
-    _ax.plot([0, 1], [0, 1], "k--", lw=1, label="perfect")
-    for _name, _col in zip(c.MODELS, ["C7", "C0", "C1"]):
+def _(bt, c, go, mo, np):
+    _cols = {"Seasonal naive": "#7f7f7f", "Slot profile": "#1f77b4", "Quantile GBM": "#ff7f0e"}
+    _fig = go.Figure()
+    _fig.add_scatter(x=[0, 1], y=[0, 1], mode="lines", line=dict(color="black", dash="dash", width=1), name="perfect")
+    for _name in c.MODELS:
         _g = bt[bt["model"] == _name]
-        _obs = [np.mean(_g["y"] <= _g[f"q{q:.2f}"]) for q in c.QUANTILES]
-        _ax.plot(c.QUANTILES, _obs, "o-", color=_col, label=_name)
-    _ax.set_xlabel("predicted quantile level")
-    _ax.set_ylabel("share of actuals below it")
-    _ax.set_title("Calibration (reliability)")
-    _ax.legend(fontsize=8)
-    _fig.tight_layout()
+        _obs = [float(np.mean(_g["y"] <= _g[f"q{q:.2f}"])) for q in c.QUANTILES]
+        _fig.add_scatter(x=c.QUANTILES, y=_obs, mode="lines+markers", name=_name, line=dict(color=_cols[_name], width=2))
+    _fig.update_layout(
+        title="Calibration (reliability)", xaxis_title="predicted quantile level", yaxis_title="share of actuals below it",
+        height=420, width=520, margin=dict(l=60, r=20, t=50, b=50), legend=dict(orientation="h", y=-0.25),
+    )
     mo.hstack([
         _fig,
         mo.md(
@@ -135,51 +132,65 @@ def _(bt, mo):
 
 
 @app.cell
-def _(bt, day_pick, mo, model_pick, plt):
+def _(bt, day_pick, go, mo, model_pick):
     _g = bt[(bt["model"] == model_pick.value) & (bt.index.normalize() == day_pick.value)]
-    _fig, _ax = plt.subplots(figsize=(10, 3.4))
-    _ax.fill_between(_g.index, _g["q0.05"], _g["q0.95"], color="C0", alpha=0.15, label="P5–P95")
-    _ax.fill_between(_g.index, _g["q0.25"], _g["q0.75"], color="C0", alpha=0.30, label="P25–P75")
-    _ax.plot(_g.index, _g["q0.50"], color="C0", lw=2, label="P50")
-    _ax.plot(_g.index, _g["y"], color="k", lw=1.2, marker=".", label="actual")
     _out = (_g["y"] < _g["q0.05"]) | (_g["y"] > _g["q0.95"])
-    _ax.scatter(_g.index[_out], _g["y"][_out], color="red", zorder=5, label="outside P5–P95")
-    _ax.legend(ncols=5, fontsize=8, loc="upper left")
-    _ax.set_ylabel("kW")
-    _fig.tight_layout()
-    mo.vstack([_fig, mo.md(f"{_out.sum()} of 48 points outside P5–P95 (expect about 5 if calibrated).")])
+    _fig = go.Figure()
+    _fig.add_scatter(x=_g.index, y=_g["q0.95"], line=dict(width=0), showlegend=False, hoverinfo="skip")
+    _fig.add_scatter(x=_g.index, y=_g["q0.05"], fill="tonexty", fillcolor="rgba(31,119,180,0.15)", line=dict(width=0),
+                     name="P5–P95", hoverinfo="skip")
+    _fig.add_scatter(x=_g.index, y=_g["q0.75"], line=dict(width=0), showlegend=False, hoverinfo="skip")
+    _fig.add_scatter(x=_g.index, y=_g["q0.25"], fill="tonexty", fillcolor="rgba(31,119,180,0.30)", line=dict(width=0),
+                     name="P25–P75", hoverinfo="skip")
+    _fig.add_scatter(x=_g.index, y=_g["q0.50"], name="P50", line=dict(color="#1f77b4", width=2.5))
+    _fig.add_scatter(x=_g.index, y=_g["y"], name="actual", mode="lines+markers", line=dict(color="black", width=1.2), marker=dict(size=4))
+    _fig.add_scatter(x=_g.index[_out], y=_g["y"][_out], mode="markers", name="outside P5–P95",
+                     marker=dict(color="red", size=11, symbol="circle-open", line=dict(width=2)))
+    _fig.update_layout(
+        yaxis_title="kW", hovermode="x unified", height=380, margin=dict(l=50, r=20, t=30, b=40),
+        legend=dict(orientation="h", y=-0.2),
+    )
+    _fig.update_xaxes(tickformat="%d %b<br>%H:%M")
+    mo.vstack([_fig, mo.md(f"{int(_out.sum())} of 48 points outside P5–P95 (expect about 5 if calibrated).")])
     return
 
 
 @app.cell
-def _(bt, c, mo, plt):
-    _fig, _ax = plt.subplots(figsize=(10, 2.8))
-    for _name, _col in zip(c.MODELS, ["C7", "C0", "C1"]):
+def _(bt, c, go, mo):
+    _cols = {"Seasonal naive": "#7f7f7f", "Slot profile": "#1f77b4", "Quantile GBM": "#ff7f0e"}
+    _fig = go.Figure()
+    for _name in c.MODELS:
         _g = bt[bt["model"] == _name]
-        _per = _g.groupby(_g.index.normalize()).apply(lambda d: c.pinball(d["y"].to_numpy(), d[c.qcols()].to_numpy()), include_groups=False)
-        _ax.plot(_per.index, _per.values, "o-", color=_col, label=_name)
-    _ax.set_ylabel("pinball loss")
-    _ax.set_title("Loss by test day: is one model consistently better, or does it depend on the day?")
-    _ax.legend(fontsize=8)
-    _fig.tight_layout()
+        _per = _g.groupby(_g.index.normalize()).apply(
+            lambda d: c.pinball(d["y"].to_numpy(), d[c.qcols()].to_numpy()), include_groups=False
+        )
+        _fig.add_scatter(x=_per.index, y=_per.values, mode="lines+markers", name=_name, line=dict(color=_cols[_name], width=2))
+    _fig.update_layout(
+        title="Loss by test day: is one model consistently better, or does it depend on the day?",
+        yaxis_title="pinball loss", hovermode="x unified", height=320, margin=dict(l=50, r=20, t=50, b=40),
+        legend=dict(orientation="h", y=-0.25),
+    )
+    _fig.update_xaxes(tickformat="%a %d %b")
     mo.vstack([mo.md("## Consistency across days"), _fig])
     return
 
 
 @app.cell
-def _(bt, mo, plt, s):
+def _(bt, go, mo, s):
     _starts = bt.groupby("fold").apply(lambda d: d.index.min(), include_groups=False)
     _t0 = s.index[0]
-    _fig, _ax = plt.subplots(figsize=(10, 0.45 * len(_starts) + 1.2))
-    for _f, _d0 in _starts.items():
-        _ax.barh(_f, (_d0 - _t0).total_seconds() / 86400, left=0, color="0.75", height=0.6, label="train (refit each fold)" if _f == 0 else None)
-        _ax.barh(_f, 1, left=(_d0 - _t0).total_seconds() / 86400, color="C1", height=0.6, label="test day (h=48)" if _f == 0 else None)
-    _ax.invert_yaxis()
-    _ax.set_xlabel("days since start of data")
-    _ax.set_ylabel("fold")
-    _ax.legend(fontsize=8, loc="lower left")
-    _ax.set_title("How cross_validation slices the data")
-    _fig.tight_layout()
+    _off = [(_d0 - _t0).total_seconds() / 86400 for _d0 in _starts.values]
+    _names = [f"fold {f}" for f in _starts.index]
+    _fig = go.Figure()
+    _fig.add_bar(y=_names, x=_off, base=0, orientation="h", marker_color="#bbbbbb", name="train (refit each fold)",
+                 hovertemplate="train: first %{x:.0f} days<extra></extra>")
+    _fig.add_bar(y=_names, x=[1] * len(_off), base=_off, orientation="h", marker_color="#ff7f0e", name="test day (h=48)",
+                 hovertemplate="test day<extra></extra>")
+    _fig.update_layout(
+        barmode="overlay", title="How cross_validation slices the data", xaxis_title="days since start of data",
+        yaxis=dict(autorange="reversed"), height=50 * len(_names) + 170, margin=dict(l=70, r=20, t=50, b=40),
+        legend=dict(orientation="h", y=-0.3),
+    )
     mo.vstack([
         mo.md(
             """

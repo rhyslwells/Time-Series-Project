@@ -13,15 +13,16 @@ def _():
     import sys
 
     import marimo as mo
-    import matplotlib.pyplot as plt
     import numpy as np
     import pandas as pd
+    import plotly.graph_objects as go
+    from plotly.subplots import make_subplots
 
     if mo.notebook_dir() is not None:
         sys.path.insert(0, str(mo.notebook_dir()))
     import common as c
 
-    return c, mo, np, pd, plt
+    return c, go, make_subplots, mo, np, pd
 
 
 @app.cell
@@ -80,56 +81,60 @@ def _(mo, source, stats):
 
 
 @app.cell
-def _(c, g, mo, np, plt):
+def _(c, g, go, make_subplots, mo, np):
+    _lay = dict(margin=dict(l=50, r=20, t=50, b=40), template="plotly")
+
     # --- tab 1: over time + by slot
-    _f1, _ax = plt.subplots(2, 1, figsize=(10, 5))
-    _ax[0].plot(g.index, g["resid"], lw=0.8, color="C0")
-    _ax[0].axhline(0, color="k", lw=0.6)
-    _ax[0].set_title("Residuals over the test period (kW)")
-    _data = [g.loc[g["hod"] == h, "resid"].to_numpy() for h in range(48)]
-    _ax[1].boxplot(_data, showfliers=False, widths=0.6)
-    _ax[1].axhline(0, color="k", lw=0.6)
-    _ax[1].set_xticks(range(1, 49, 4), [c.slot_label(h) for h in range(0, 48, 4)])
-    _ax[1].set_title("Residual spread by half-hour of day · is there a time-of-day pattern?")
-    _f1.tight_layout()
+    _f1 = make_subplots(rows=2, cols=1, subplot_titles=(
+        "Residuals over the test period (kW)", "Residual spread by half-hour of day: is there a time-of-day pattern?"))
+    _f1.add_scatter(x=g.index, y=g["resid"], mode="lines", line=dict(color="#1f77b4", width=1), name="residual", row=1, col=1)
+    _f1.add_hline(y=0, line=dict(color="black", width=1), row=1, col=1)
+    _f1.add_box(x=[c.slot_label(h) for h in g["hod"]], y=g["resid"], boxpoints=False, marker_color="#1f77b4",
+                name="residual", row=2, col=1)
+    _f1.add_hline(y=0, line=dict(color="black", width=1), row=2, col=1)
+    _f1.update_xaxes(tickformat="%d %b<br>%H:%M", row=1, col=1)
+    _f1.update_xaxes(categoryorder="array", categoryarray=[c.slot_label(h) for h in range(48)],
+                     tickvals=[c.slot_label(h) for h in range(0, 48, 4)], row=2, col=1)
+    _f1.update_yaxes(title_text="kW", row=1, col=1)
+    _f1.update_layout(height=520, showlegend=False, **_lay)
 
     # --- tab 2: distribution + residual vs forecast
-    _f2, _ax2 = plt.subplots(1, 2, figsize=(10, 3.8))
-    _ax2[0].hist(g["resid"], bins=30, color="C0", alpha=0.8, density=True)
-    _x = np.linspace(g["resid"].min(), g["resid"].max(), 200)
     _mu, _sd = g["resid"].mean(), g["resid"].std()
-    _ax2[0].plot(_x, np.exp(-0.5 * ((_x - _mu) / _sd) ** 2) / (_sd * np.sqrt(2 * np.pi)), "r--", label="normal fit")
-    _ax2[0].set_title("Residual distribution")
-    _ax2[0].legend(fontsize=8)
-    _ax2[1].scatter(g["q0.50"], g["resid"], s=8, alpha=0.5)
-    _ax2[1].axhline(0, color="k", lw=0.6)
-    _ax2[1].set_xlabel("forecast (kW)")
-    _ax2[1].set_ylabel("residual (kW)")
-    _ax2[1].set_title("Residual vs forecast · fan shape = error grows with level")
-    _f2.tight_layout()
+    _x = np.linspace(g["resid"].min(), g["resid"].max(), 200)
+    _f2 = make_subplots(rows=1, cols=2, subplot_titles=("Residual distribution", "Residual vs forecast: fan shape = error grows with level"))
+    _f2.add_histogram(x=g["resid"], nbinsx=30, histnorm="probability density", marker_color="#1f77b4", opacity=0.8,
+                      name="residuals", row=1, col=1)
+    _f2.add_scatter(x=_x, y=np.exp(-0.5 * ((_x - _mu) / _sd) ** 2) / (_sd * np.sqrt(2 * np.pi)), mode="lines",
+                    line=dict(color="red", dash="dash"), name="normal fit", row=1, col=1)
+    _f2.add_scatter(x=g["q0.50"], y=g["resid"], mode="markers", marker=dict(size=5, opacity=0.5, color="#1f77b4"),
+                    name="residual", showlegend=False, row=1, col=2)
+    _f2.add_hline(y=0, line=dict(color="black", width=1), row=1, col=2)
+    _f2.update_xaxes(title_text="residual (kW)", row=1, col=1)
+    _f2.update_xaxes(title_text="forecast (kW)", row=1, col=2)
+    _f2.update_yaxes(title_text="residual (kW)", row=1, col=2)
+    _f2.update_layout(height=380, legend=dict(orientation="h", y=-0.2), **_lay)
 
     # --- tab 3: memory (ACF)
     _r = g["resid"].to_numpy() - g["resid"].mean()
     _lags = np.arange(1, 97)
     _acf = np.array([np.sum(_r[:-k] * _r[k:]) / np.sum(_r * _r) for k in _lags])
-    _f3, _ax3 = plt.subplots(figsize=(10, 3))
-    _ax3.bar(_lags, _acf, color="C1")
     _band = 1.96 / np.sqrt(len(_r))
-    _ax3.axhline(_band, color="k", ls=":", lw=1)
-    _ax3.axhline(-_band, color="k", ls=":", lw=1)
-    _ax3.axvline(48, color="C3", ls="--", lw=0.8)
-    _ax3.set_xlabel("lag (half-hours) · red line = 1 day")
-    _ax3.set_title("Autocorrelation of residuals · bars outside dotted band = leftover pattern")
-    _f3.tight_layout()
+    _f3 = go.Figure()
+    _f3.add_bar(x=_lags, y=_acf, marker_color="#ff7f0e", name="autocorrelation",
+                hovertemplate="lag %{x} half-hours<br>%{y:.2f}<extra></extra>")
+    _f3.add_hline(y=_band, line=dict(color="black", dash="dot", width=1))
+    _f3.add_hline(y=-_band, line=dict(color="black", dash="dot", width=1))
+    _f3.add_vline(x=48, line=dict(color="red", dash="dash", width=1), annotation_text="1 day")
+    _f3.update_layout(title="Autocorrelation of residuals: bars outside the dotted band = leftover pattern",
+                      xaxis_title="lag (half-hours)", height=340, showlegend=False, **_lay)
 
     # --- tab 4: PIT
     _pit = c.pit_values(g)
-    _f4, _ax4 = plt.subplots(figsize=(6, 3.4))
-    _ax4.hist(_pit, bins=10, range=(0, 1), color="C2", alpha=0.85)
-    _ax4.axhline(len(_pit) / 10, color="k", ls="--", lw=1)
-    _ax4.set_title("PIT histogram (calibration)")
-    _ax4.set_xlabel("where the actual fell in the predicted distribution")
-    _f4.tight_layout()
+    _f4 = go.Figure()
+    _f4.add_histogram(x=_pit, xbins=dict(start=0, end=1, size=0.1), marker_color="#2ca02c", opacity=0.85, name="PIT")
+    _f4.add_hline(y=len(_pit) / 10, line=dict(color="black", dash="dash", width=1), annotation_text="flat = calibrated")
+    _f4.update_layout(title="PIT histogram (calibration)", xaxis_title="where the actual fell in the predicted distribution",
+                      yaxis_title="count", height=340, showlegend=False, **_lay)
 
     mo.ui.tabs({
         "Time & slot": mo.vstack([_f1, mo.md("Look for systematic misses at particular times (e.g. always under-forecasting the evening ramp).")]),
