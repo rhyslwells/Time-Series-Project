@@ -245,28 +245,5 @@ def _(all_models, c, go, gs, make_subplots, mo, np):
     return
 
 
-@app.cell
-def _(mo):
-    mo.md(
-        """
-        ## Where these residuals come from
-
-        Each residual is `y - q0.50` from `MLForecast.cross_validation(..., refit=True)`: the models for each day
-        were fitted only on earlier days, so these are out-of-sample errors. All five models sit in one `MLForecast` object,
-        so they saw the identical features and the identical backtest windows.
-
-        **Ideas to try, then re-read the diagnostics above:**
-
-        - Add `lags=[48, 96]` or `RollingMean(window_size=336)` in `common.make_forecaster` (needs more days
-          of synthetic data). Does the lag-1 autocorrelation of the residuals drop?
-        - Add a lag below 48 (e.g. `lags=[1]`). The backtest looks wonderful, but a real day-ahead forecast
-          cannot know last half-hour at midnight. mlforecast would have to predict recursively, feeding its own
-          forecasts back in. That is the leakage trap this folder avoids.
-        - Compare the models: which diagnostic separates the Linear quantile model from the two tree models?
-        """
-    )
-    return
-
-
 if __name__ == "__main__":
     app.run()
