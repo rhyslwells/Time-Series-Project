@@ -28,6 +28,7 @@ dependencies = [
     "nbformat>=5.11.1",
     "lightgbm>=4.7.0",
     "optuna>=5.0.0",
+    "mlforecast>=1.1.0",
 ]
 
 [dependency-groups]
