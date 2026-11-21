@@ -26,7 +26,6 @@ def _():
 
 @app.cell
 def _(c, mo):
-    noise = mo.ui.slider(1, 10, value=4, label="Demo-data noise (kW)")
     model_pick = mo.ui.dropdown(c.ML_MODELS, value="Quantile GBM", label="ML model")
     mo.vstack([
         mo.md(
@@ -49,14 +48,14 @@ def _(c, mo):
             *Units: kW (average power over the half-hour).*
             """
         ),
-        mo.hstack([noise, model_pick], justify="start", gap=2),
+        model_pick,
     ])
-    return model_pick, noise
+    return (model_pick,)
 
 
 @app.cell
-def _(c, mo, model_pick, noise):
-    s, source = c.get_series(noise.value)
+def _(c, mo, model_pick):
+    s, source = c.get_series()
     fc = c.forecast_tomorrow(s, model_pick.value)  # MLForecast.fit(...) then .predict(h=48)
     mo.md(
         f"**Data:** {source} · {len(s) // 48} days · **model:** {model_pick.value} · "

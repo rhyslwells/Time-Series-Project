@@ -27,7 +27,12 @@ from sklearn.linear_model import QuantileRegressor
 
 QUANTILES = [0.05, 0.10, 0.25, 0.50, 0.75, 0.90, 0.95]
 MODELS = ["Seasonal naive", "Slot profile", "Quantile GBM"]  # the tiers compared in the backtest notebooks
+BASELINES = ["Seasonal naive", "Slot profile"]
 ML_MODELS = ["Quantile GBM", "HistGB quantile", "Linear quantile"]  # real ML models you can pick between
+TIER_COLORS = {
+    "Seasonal naive": "#7f7f7f", "Slot profile": "#1f77b4",
+    "Quantile GBM": "#ff7f0e", "HistGB quantile": "#2ca02c", "Linear quantile": "#9467bd",
+}
 PERIODS_PER_DAY = 48
 UID = "asset"
 
@@ -179,19 +184,19 @@ def feature_table(s: pd.Series) -> pd.DataFrame:
     return make_forecaster([0.5]).preprocess(to_long(s))
 
 
-def backtest(s: pd.Series, min_train_days: int = 8, quantiles=QUANTILES) -> pd.DataFrame:
+def backtest(s: pd.Series, min_train_days: int = 8, quantiles=QUANTILES, tiers=MODELS) -> pd.DataFrame:
     """Rolling-origin, day-ahead via `MLForecast.cross_validation`: each test day is predicted by
     models refit on earlier days only. (The first ~2 days of any training set are lost to the lags.)
     Returns a long frame: one row per (model, timestamp) with y and a column per quantile."""
     n_days = len(s) // PERIODS_PER_DAY
-    cv = make_forecaster(quantiles).cross_validation(
+    cv = make_forecaster(quantiles, tiers).cross_validation(
         to_long(s), n_windows=n_days - min_train_days, h=PERIODS_PER_DAY,
         step_size=PERIODS_PER_DAY, refit=True,
     )
     fold = cv["cutoff"].rank(method="dense").astype(int).to_numpy() - 1
     idx = pd.DatetimeIndex(cv["ds"])
     rows = []
-    for name, pred in _collect(cv, quantiles).items():
+    for name, pred in _collect(cv, quantiles, tiers).items():
         out = pd.DataFrame(pred, columns=qcols(quantiles), index=idx)
         out.insert(0, "y", cv["y"].to_numpy())
         out.insert(1, "hod", idx.hour * 2 + idx.minute // 30)
@@ -226,7 +231,7 @@ def metrics_table(bt: pd.DataFrame, quantiles=QUANTILES) -> pd.DataFrame:
             "80% cover": np.mean((y >= g["q0.10"]) & (y <= g["q0.90"])),
             "90% cover": np.mean((y >= g["q0.05"]) & (y <= g["q0.95"])),
         })
-    t = pd.DataFrame(rows).set_index("model").reindex(MODELS)
+    t = pd.DataFrame(rows).set_index("model").reindex(list(bt["model"].unique()))
     t["skill vs naive"] = 1 - t["pinball"] / t.loc["Seasonal naive", "pinball"]
     return t
 

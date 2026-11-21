@@ -27,7 +27,6 @@ def _():
 
 @app.cell
 def _(mo):
-    noise = mo.ui.slider(1, 10, value=4, label="Demo-data noise (kW)")
     mo.vstack([
         mo.md(
             """
@@ -41,14 +40,13 @@ def _(mo):
             and the feature table from `fcst.preprocess(...)`.
             """
         ),
-        mo.hstack([noise], justify="start", gap=2),
     ])
-    return (noise,)
+    return
 
 
 @app.cell
-def _(c, mo, noise):
-    s, source = c.get_series(noise.value)
+def _(c, mo):
+    s, source = c.get_series()
     df = c.to_long(s)
     ndays = len(s) // c.PERIODS_PER_DAY
     split_days = mo.ui.slider(5, max(6, ndays - 2), value=max(5, ndays - 4), label="Days used for training", show_value=True)
@@ -107,7 +105,22 @@ def _(c, feats, go, mo, pi, te, tr):
 @app.cell
 def _(feats, mo):
     feature_pick = mo.ui.dropdown(feats, value="slot", label="Show partial dependence for")
-    mo.vstack([mo.md("## How does the forecast respond to one feature?"), feature_pick])
+    mo.vstack([
+        mo.md(
+            """
+            ## How does the forecast respond to one feature? (partial dependence)
+
+            Permutation importance above says **how much** the model leans on a feature. Partial dependence says **how**:
+            which direction, and what shape.
+
+            **How it is computed.** Take the training rows. Set one feature to a value (say `slot = 36`, i.e. 18:00)
+            for *every* row, leave all other features as they were, and average the model's predictions.
+            Repeat over a grid of values and plot the averages. The line answers:
+            *"if only this feature changed, what would the forecast do on average?"*
+            """
+        ),
+        feature_pick,
+    ])
     return (feature_pick,)
 
 
@@ -123,11 +136,48 @@ def _(c, feats, feature_pick, go, med_model, mo, partial_dependence, tr):
     )
     mo.vstack([
         _fig,
-        mo.md(
-            "Average predicted median as this one feature is swept, all others left as observed. "
-            "`slot` should trace the daily shape (evening peak, midday dip if there's solar). "
-            "A flat line means the model barely uses it."
-        ),
+        mo.md(f"**`{feature_pick.value}`**: {c.FEATURE_NOTES.get(feature_pick.value, '')}."),
+        mo.accordion({
+            "What to look for, feature by feature": mo.md(
+                """
+                The synthetic data has a known truth, so you can check the model against it:
+                demand peaks around 18:00 (and a smaller bump near 08:00), solar pulls net load down around midday,
+                and weekends run about 15% lower.
+
+                | Feature | What a sensible line looks like |
+                |---|---|
+                | `slot` | The daily shape: morning bump, midday dip (solar), evening peak. If you see this, the model has learned the main pattern. |
+                | `weekend` | Two points only (0 and 1). The weekend point should be lower. |
+                | `lag48` | Rising: a high same-slot-yesterday value predicts a high value today. A slope near 1 is "tomorrow looks like today". |
+                | `rolling_mean/max/min_...48` | Rising, often gently: yesterday's overall level nudges today's forecast. |
+                | any feature | **Flat** = the model ignores it. **Staircase** = normal for tree models, which predict in steps. |
+                """
+            ),
+            "What you can learn from this notebook": mo.md(
+                """
+                1. **Did the model learn the right thing?** Compare the `slot` line with the known daily shape.
+                   A model can score well for the wrong reason, and this is how you spot it.
+                2. **Which inputs earn their place?** Features with ~0 importance and a flat line can be dropped from
+                   `lags` / `lag_transforms` in `common.FEATURE_KWARGS`, which makes the pipeline simpler.
+                3. **Where is the model brittle?** Steep or jagged regions show where a small change in an input swings the
+                   forecast, a sign of overfitting on ~10 days of data.
+                4. **What is missing?** If errors in notebook 04 are big but nothing here explains them, the missing driver
+                   is something you have not given the model (here: cloud cover or weather).
+                5. **How mlforecast helps:** the fitted model is `fcst.models_[...]` and the feature table is
+                   `fcst.preprocess(...)`, so any sklearn inspection tool works on it directly.
+                """
+            ),
+            "Cautions": mo.md(
+                """
+                - **Correlated features.** The rolling mean, max, min and `lag48` all describe yesterday. Sweeping one while the
+                  others stay put creates combinations that never occur in real data (e.g. a rolling max below `lag48`),
+                  so those lines can mislead. Read them as a hint, not a measurement.
+                - **Averaging hides interactions.** If `slot` matters differently on weekends, the average blends both.
+                - **Importance is not causation.** It describes this model, not the real world.
+                - **Tiny data.** About 10 training days, so small wiggles are noise.
+                """
+            ),
+        }),
     ])
     return
 
