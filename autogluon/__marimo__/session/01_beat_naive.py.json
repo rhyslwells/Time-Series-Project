@@ -1,0 +1,191 @@
+{
+  "version": "1",
+  "metadata": {
+    "marimo_version": "0.23.16",
+    "script_metadata_hash": null
+  },
+  "cells": [
+    {
+      "id": "Hbol",
+      "code_hash": "aa6e50f1ea69486737d86694b2c6d4ce",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/plain": ""
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "MJUe",
+      "code_hash": "9d3a454ebf08c88eff804008793760ca",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h1 id=\"can-autogluon-beat-the-naive-baselines\">Can AutoGluon beat the naive baselines?</h1>\n<span class=\"paragraph\">Same question as <code>mlforecast/07_beat_naive.py</code>, answered with <code>autogluon.timeseries</code>.\nThe bar is <strong>seasonal naive</strong> (same slot yesterday, <code>m=48</code>), not plain naive.</span>\n<ul>\n<li>Data: <code>mlforecast/data/ev_long.parquet</code> (30 synthetic EV charge points, 8 weeks, 30-min).</li>\n<li>Day-ahead framing: forecast 48 slots from each midnight (<code>prediction_length=48</code>).</li>\n<li>The predictor is <strong>fit once</strong> on history before the backtest. Each backtest day is then forecast from\n  its own midnight with the <em>fitted</em> models (no refit), so the scores are rolling-origin out-of-sample.</li>\n<li>AutoGluon's own <code>SeasonalNaive</code> / <code>Naive</code> sit in the same model zoo, so baselines and challengers share\n  one code path. Scores are recomputed in numpy (MAE, RMSE, MASE) so they match the mlforecast notebook.</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "vblA",
+      "code_hash": "2dca1d70bec37e437571b9403de39879",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<div style='display: flex;flex: 1;flex-direction: column;justify-content: flex-start;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><div style='display: flex;flex: 1;flex-direction: row;justify-content: space-between;align-items: normal;flex-wrap: nowrap;gap: 0.5rem'><marimo-ui-element object-id='vblA-0' random-id='aa98b8f9-3a04-4899-1caa-301b77c1b4d3'><marimo-slider data-initial-value='7' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003ebacktest days (windows)&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-start='3' data-stop='10' data-steps='[]' data-debounce='false' data-disabled='false' data-orientation='&quot;horizontal&quot;' data-show-value='false' data-include-input='false' data-full-width='false'></marimo-slider></marimo-ui-element><marimo-ui-element object-id='vblA-1' random-id='b8d45a60-5be8-7a1b-1e81-408dcee19722'><marimo-slider data-initial-value='120' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003etime limit (s)&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-start='30' data-stop='900' data-step='30' data-steps='[]' data-debounce='false' data-disabled='false' data-orientation='&quot;horizontal&quot;' data-show-value='false' data-include-input='false' data-full-width='false'></marimo-slider></marimo-ui-element></div><marimo-ui-element object-id='vblA-2' random-id='76af0b2b-c5e1-b5dc-24f3-32cf8178233c'><marimo-checkbox data-initial-value='false' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eadd Chronos-Bolt small (zero-shot, downloads weights)&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-disabled='false'></marimo-checkbox></marimo-ui-element><marimo-ui-element object-id='vblA-3' random-id='5ad82736-ea1b-840d-33f2-de876a31a6c0'><marimo-button data-initial-value='0' data-label='&quot;&#92;u003cspan class=&#92;&quot;markdown prose dark:prose-invert contents&#92;&quot;&#92;u003e&#92;u003cspan class=&#92;&quot;paragraph&#92;&quot;&#92;u003eFit AutoGluon&#92;u003c/span&#92;u003e&#92;u003c/span&#92;u003e&quot;' data-kind='&quot;neutral&quot;' data-disabled='false' data-full-width='false'></marimo-button></marimo-ui-element></div>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "bkHC",
+      "code_hash": "43a246bb8f6b77c8f4509fb1578c52ab",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/html": "<marimo-ui-element object-id='bkHC-0' random-id='1f6f8c75-8881-f1dd-b530-9adae51cb90a'><marimo-table data-initial-value='[]' data-label='null' data-data='&quot;[{&#92;&quot;assets&#92;&quot;:30,&#92;&quot;train_end&#92;&quot;:&#92;&quot;2025-02-23 23:30:00&#92;&quot;,&#92;&quot;data_end&#92;&quot;:&#92;&quot;2025-03-02 23:30:00&#92;&quot;}]&quot;' data-total-rows='1' data-total-columns='3' data-max-columns='50' data-banner-text='&quot;&quot;' data-pagination='false' data-page-size='10' data-field-types='[[&quot;assets&quot;,[&quot;integer&quot;,&quot;int64&quot;]],[&quot;train_end&quot;,[&quot;datetime&quot;,&quot;datetime64[ns]&quot;]],[&quot;data_end&quot;,[&quot;datetime&quot;,&quot;datetime64[ns]&quot;]]]' data-show-filters='true' data-show-download='true' data-show-search='true' data-show-column-summaries='false' data-show-data-types='true' data-show-page-size-selector='false' data-show-column-explorer='true' data-show-chart-builder='true' data-row-headers='[]' data-hidden-columns='[]' data-has-stable-row-id='false' data-lazy='false' data-preload='false'></marimo-table></marimo-ui-element>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "lEQa",
+      "code_hash": "dba453dbfeb6c87436fe7f62d8fb7b8f",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><h2 id=\"1-fit\">1. Fit</h2>\n<span class=\"paragraph\">Hand-picked model zoo instead of a preset, so the run is short and the baselines are explicit:</span>\n<ul>\n<li>Baselines: <code>Naive</code>, <code>SeasonalNaive</code> (m=48).</li>\n<li>Challengers: <code>DirectTabular</code> and <code>RecursiveTabular</code> (gradient boosting on lags, pooled over all assets),\n  <code>ETS</code> and <code>Theta</code> with <code>seasonal_period=48</code>, plus the <code>WeightedEnsemble</code> AutoGluon builds on top.</li>\n<li><code>eval_metric=\"MASE\"</code> with <code>eval_metric_seasonal_period=48</code> makes model selection and ensemble weights\n  optimise against the seasonal-naive scale.</li>\n</ul></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "PKri",
+      "code_hash": "b2635bcb767944cf6e6344e664ad2790",
+      "outputs": [
+        {
+          "type": "data",
+          "data": {
+            "text/markdown": "<span class=\"markdown prose dark:prose-invert contents\"><span class=\"paragraph\">Press <strong>Fit AutoGluon</strong> to train.</span></span>"
+          }
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Xref",
+      "code_hash": "13c02d2cfe0c2f9494d2c0fd0dd246a2",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "ancestor-stopped",
+          "evalue": "This cell wasn't run because an ancestor was stopped with `mo.stop`: ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "SFPL",
+      "code_hash": "52ba16d105fc2dc604861c5f1a6874df",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "ancestor-stopped",
+          "evalue": "This cell wasn't run because an ancestor was stopped with `mo.stop`: ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "BYtC",
+      "code_hash": "16aed6f9283d88150684652eb439b3d3",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "ancestor-stopped",
+          "evalue": "This cell wasn't run because an ancestor was stopped with `mo.stop`: ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "RGSE",
+      "code_hash": "2c665ebf495ff1212dbec317d6fc1f40",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "ancestor-stopped",
+          "evalue": "This cell wasn't run because an ancestor was stopped with `mo.stop`: ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Kclp",
+      "code_hash": "937f70dce31a51e125e4110d48065fa5",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "ancestor-stopped",
+          "evalue": "This cell wasn't run because an ancestor was stopped with `mo.stop`: ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "emfo",
+      "code_hash": "1c92e8399e6e20ddb46a06662a42be96",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "ancestor-stopped",
+          "evalue": "This cell wasn't run because an ancestor was stopped with `mo.stop`: ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "Hstk",
+      "code_hash": "47cf744d1a1d20f1c786264b7a223664",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "ancestor-stopped",
+          "evalue": "This cell wasn't run because an ancestor was stopped with `mo.stop`: ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    },
+    {
+      "id": "nWHF",
+      "code_hash": "42d8587d4fc521a556da154483203662",
+      "outputs": [
+        {
+          "type": "error",
+          "ename": "ancestor-stopped",
+          "evalue": "This cell wasn't run because an ancestor was stopped with `mo.stop`: ",
+          "traceback": []
+        }
+      ],
+      "console": []
+    }
+  ]
+}

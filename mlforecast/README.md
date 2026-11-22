@@ -19,6 +19,10 @@ Start with `05`, which walks through the API step by step. `01`-`04` are applica
 | `03_feature_importance.py` | Which inputs does the model rely on? |
 | `04_residuals.py` | Where and how does it go wrong (bias, time-of-day, memory, calibration)? |
 
+`make_long_data.py` generates `data/ev_long.parquet`: 30 heterogeneous EV charge points, 8 weeks (6-week training
+window + 2-week holdout), session-like spiky load, with a peak-time shift in ~30% of assets from day 42 to test retraining.
+Independent of `src/data/`. Run `uv run python mlforecast/make_long_data.py`.
+
 `common.py` builds one `MLForecast` object (`make_forecaster`) holding three tiers of models (seasonal naive,
 slot profile, quantile LightGBM), each at 7 quantiles. Backtests use `cross_validation`, tomorrow's forecast uses
 `fit` + `predict`, and the baselines are tiny sklearn-style estimators, showing that mlforecast accepts any model

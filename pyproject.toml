@@ -7,7 +7,7 @@ authors = [
 ]
 license = {text = "MIT"}
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.14"
 
 dependencies = [
     # Forecasting core
@@ -28,8 +28,9 @@ dependencies = [
     "nbformat>=5.11.1",
     "lightgbm>=4.7.0",
     "optuna>=5.0.0",
-    "mlforecast>=1.1.0",
-    "statsforecast>=2.1.1",
+    "mlforecast>=0.14.0,<0.15",
+    "statsforecast>=2.0.2,<2.1.1",
+    "autogluon-timeseries>=1.6.3",
 ]
 
 [dependency-groups]
